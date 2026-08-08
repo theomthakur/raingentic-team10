@@ -4,6 +4,29 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 4 — dual control on policy changes
+
+Closes the sharpest criticism of replay: *"you can edit the rules, so the audit proves
+nothing."* Whoever can raise a threshold could otherwise approve anything.
+
+- **A new version is written as `pending` and decides nothing** until someone other than
+  its author activates it. Segregation of duties, the same control that stops the person
+  raising an invoice from also paying it.
+- **The author cannot approve their own change**, and case and padding are not a way
+  around it. Enforced in `activateRuleSet`, not in the UI, so a direct API call cannot
+  walk around it either.
+- `latestRuleSet()` returns the highest **active** version everywhere — store, API and UI.
+  Verified: while v2 sat pending, purchases still ran under v1; the moment a second person
+  activated it, they ran under v2.
+- One pending change at a time. Two competing drafts would make "which policy is next"
+  ambiguous, and the point of this is that the answer never is.
+- **Previewing a change stays ungated** — seeing what an edit would do to history is
+  exactly what an approver needs before deciding, so gating it behind approval would be
+  backwards.
+- Version history shows proposer, approver and pending state. 41 tests passing.
+
+Working on branch `iterations` from here; merge to `main` at the end.
+
 ## 2026-08-08 · Iteration 3 — human oversight, and controls that cite their source
 
 Answers the first objection anyone raises: *"no human is in the loop, why would I trust

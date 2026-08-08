@@ -49,12 +49,17 @@ export function createMemoryStore(): Store {
       return state().ruleSets.find((r) => r.version === version) ?? null;
     },
     async latestRuleSet() {
-      const all = state().ruleSets;
-      return all.reduce((a, b) => (b.version > a.version ? b : a));
+      // Active only. A pending version decides nothing until a second person activates it.
+      const active = state().ruleSets.filter((r) => r.status === "active");
+      return active.reduce((a, b) => (b.version > a.version ? b : a));
     },
     async appendRuleSet(ruleSet) {
       state().ruleSets.push(ruleSet);
       return ruleSet;
+    },
+    async activateRuleSet(ruleSet) {
+      const i = state().ruleSets.findIndex((r) => r.version === ruleSet.version);
+      if (i >= 0) state().ruleSets[i] = ruleSet;
     },
     async setAnchor(version, txHash) {
       const rs = state().ruleSets.find((r) => r.version === version);

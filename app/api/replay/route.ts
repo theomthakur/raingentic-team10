@@ -30,12 +30,17 @@ export async function POST(request: Request) {
 
   if (Array.isArray(body.rules)) {
     const previous = await store.latestRuleSet();
+    // A dry run against rules that were never saved. It is deliberately allowed without
+    // dual control: previewing what a change *would* do is exactly the information an
+    // approver needs before deciding, so gating it behind approval would be backwards.
     target = {
       version: previous.version + 1,
       createdAt: new Date().toISOString(),
       note: "Unsaved preview",
       rules: body.rules,
       hash: hashRules(body.rules),
+      status: "pending",
+      proposedBy: "preview",
     };
   } else if (typeof body.version === "number") {
     const found = await store.getRuleSet(body.version);

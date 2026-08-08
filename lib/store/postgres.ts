@@ -35,7 +35,11 @@ async function migrate(sql: Sql): Promise<void> {
       note           text not null,
       rules          jsonb not null,
       hash           text not null,
-      anchor_tx_hash text
+      anchor_tx_hash text,
+      status         text not null default 'active',
+      proposed_by    text not null default 'system',
+      approved_by    text,
+      approved_at    timestamptz
     )`;
   await sql`
     create table if not exists decisions (
@@ -63,8 +67,9 @@ async function migrate(sql: Sql): Promise<void> {
 async function seedAll(sql: Sql): Promise<void> {
   const rs = defaultRuleSet();
   await sql`
-    insert into rule_sets (version, created_at, note, rules, hash)
-    values (${rs.version}, ${rs.createdAt}, ${rs.note}, ${JSON.stringify(rs.rules)}, ${rs.hash})
+    insert into rule_sets (version, created_at, note, rules, hash, status, proposed_by, approved_by, approved_at)
+    values (${rs.version}, ${rs.createdAt}, ${rs.note}, ${JSON.stringify(rs.rules)}, ${rs.hash},
+            ${rs.status}, ${rs.proposedBy}, ${rs.approvedBy ?? null}, ${rs.approvedAt ?? null})
     on conflict (version) do nothing`;
 
   for (const q of SEED_QUOTES) {
@@ -93,6 +98,10 @@ function toRuleSet(r: Record<string, unknown>): RuleSet {
     rules: r.rules as RuleSet["rules"],
     hash: r.hash as string,
     anchorTxHash: (r.anchor_tx_hash as string) ?? undefined,
+    status: (r.status as RuleSet["status"]) ?? "active",
+    proposedBy: (r.proposed_by as string) ?? "system",
+    approvedBy: (r.approved_by as string) ?? undefined,
+    approvedAt: r.approved_at ? new Date(r.approved_at as string).toISOString() : undefined,
   };
 }
 
@@ -127,16 +136,27 @@ export function createPostgresStore(): Store {
     },
     async latestRuleSet() {
       const sql = await getSql();
-      const rows = await sql`select * from rule_sets order by version desc limit 1`;
+      // Active only. A pending version decides nothing until a second person activates it.
+      const rows = await sql`
+        select * from rule_sets where status = 'active' order by version desc limit 1`;
       return toRuleSet(rows[0]);
     },
     async appendRuleSet(ruleSet) {
       const sql = await getSql();
       await sql`
-        insert into rule_sets (version, created_at, note, rules, hash)
+        insert into rule_sets (version, created_at, note, rules, hash, status, proposed_by)
         values (${ruleSet.version}, ${ruleSet.createdAt}, ${ruleSet.note},
-                ${JSON.stringify(ruleSet.rules)}, ${ruleSet.hash})`;
+                ${JSON.stringify(ruleSet.rules)}, ${ruleSet.hash},
+                ${ruleSet.status}, ${ruleSet.proposedBy})`;
       return ruleSet;
+    },
+    async activateRuleSet(ruleSet) {
+      const sql = await getSql();
+      await sql`
+        update rule_sets
+        set status = 'active', approved_by = ${ruleSet.approvedBy ?? null},
+            approved_at = ${ruleSet.approvedAt ?? null}
+        where version = ${ruleSet.version}`;
     },
     async setAnchor(version, txHash) {
       const sql = await getSql();

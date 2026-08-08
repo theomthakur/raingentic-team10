@@ -18,8 +18,15 @@ export interface Store {
   // --- rule versions (append-only, never mutated) -------------------------
   listRuleSets(): Promise<RuleSet[]>;
   getRuleSet(version: number): Promise<RuleSet | null>;
+  /**
+   * The version that actually decides things: the highest **active** one. A pending
+   * version has been written down but not yet activated by a second person, and until
+   * then it must not affect a single purchase.
+   */
   latestRuleSet(): Promise<RuleSet>;
   appendRuleSet(ruleSet: RuleSet): Promise<RuleSet>;
+  /** Replace a pending version with its activated self. */
+  activateRuleSet(ruleSet: RuleSet): Promise<void>;
   setAnchor(version: number, txHash: string): Promise<void>;
 
   // --- decision log (append-only, never mutated) --------------------------
