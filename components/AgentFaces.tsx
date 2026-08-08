@@ -76,7 +76,7 @@ export function LucaFace({ hair, ...props }: FaceProps) {
   );
 }
 
-export function AdaFace({ hair, ...props }: FaceProps) {
+export function CodyFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -102,7 +102,7 @@ export const AGENT_FACES = {
   mona: MonaFace,
   prue: PrueFace,
   luca: LucaFace,
-  ada: AdaFace,
+  cody: CodyFace,
   generic: GenericFace,
 } as const;
 

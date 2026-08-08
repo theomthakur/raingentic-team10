@@ -33,7 +33,10 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
             <p className="text-[15px] font-semibold text-ink-900">
               This is {agent.name}
             </p>
-            <span className="font-mono text-[10.5px] text-ink-400">{agent.id}</span>
+            <span className="flex shrink-0 items-center gap-1.5">
+              {agent.host && <Badge tone="rain">for {agent.host}</Badge>}
+              <span className="font-mono text-[10.5px] text-ink-400">{agent.id}</span>
+            </span>
           </div>
           <p className="text-[12.5px] font-medium" style={{ color: agent.color }}>
             {agent.role} — deals with {agent.dealsWith}
@@ -74,7 +77,19 @@ export default function AgentsPage() {
       .catch(() => setDecisions([]));
   }, []);
 
-  const ids = useMemo(() => Object.keys(AGENTS), []);
+  // Host tributes first — Rain, then Monad, then Encode — so the people who ran this
+  // event see themselves at the top of the roster rather than three cards down.
+  const ids = useMemo(() => {
+    const hostOrder = { Rain: 0, Monad: 1, Encode: 2 } as const;
+    return Object.keys(AGENTS).sort((a, b) => {
+      const ha = AGENTS[a].host;
+      const hb = AGENTS[b].host;
+      if (ha && hb) return hostOrder[ha] - hostOrder[hb];
+      if (ha) return -1;
+      if (hb) return 1;
+      return 0;
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -102,10 +117,10 @@ export default function AgentsPage() {
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Every purchase order in the log was declared by one of these. The id is what
             the system actually keys on; the name is just so the feed reads like a team
-            doing work rather than a service account making requests. Two are named for
-            our hosts, three for the history of financial control — the same argument the
-            rules make, that none of this was invented here. Stats are counted live off
-            the decision log, not written by hand.
+            doing work rather than a service account making requests. Three are named for
+            the people hosting this — Rain, Monad and Encode — and two for the history of
+            financial control, which is the same argument the rules make: none of this was
+            invented here. Stats are counted live off the decision log, not written by hand.
           </p>
         </section>
 

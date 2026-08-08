@@ -13,11 +13,14 @@ export interface AgentPersona {
   role: string;
   /** Short, said-out-loud version: "deals with ___". Used anywhere space is tight. */
   dealsWith: string;
+  /** Set when the name is a tribute to one of the three hosts. Drives ordering. */
+  host?: "Rain" | "Monad" | "Encode";
   /**
-   * Why this agent is called this. Every name earns its place — two are tributes to the
-   * hosts, three come from the history of financial control, which is the same argument
-   * the rules themselves make: none of this was invented here. A judge who catches the
-   * reference gets a second thing to like; one who doesn't just sees ordinary names.
+   * Why this agent is called this. Every name earns its place — three are tributes to the
+   * hosts (Rain, Monad, Encode), two come from the history of financial control, which is
+   * the same argument the rules themselves make: none of this was invented here. A judge
+   * who catches the reference gets a second thing to like; one who doesn't just sees
+   * ordinary names, which is the property that makes this worth shipping.
    */
   why: string;
   color: string;
@@ -31,6 +34,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     name: "Rae",
     role: "Facilities agent",
     dealsWith: "facility purchases",
+    host: "Rain",
     why: "For Rain. Rae's refusal is the one that shows why a card control alone can't catch a swapped vendor — the reason has to be checked before the card exists.",
     color: "#0891b2",
     face: "rae",
@@ -41,6 +45,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     name: "Mona",
     role: "Procurement agent",
     dealsWith: "freight and logistics",
+    host: "Monad",
     why: "For Monad. Mona's refusals are only provable months later because the rule version that judged them is anchored on chain and cannot be quietly rewritten.",
     color: "#7c3aed",
     face: "mona",
@@ -68,12 +73,13 @@ export const AGENTS: Record<string, AgentPersona> = {
   },
   "cloud-compute": {
     id: "cloud-compute",
-    name: "Ada",
+    name: "Cody",
     role: "Infra buyer",
     dealsWith: "GPU compute contracts",
-    why: "For Ada Lovelace, who wrote the first program for a machine that was never built. Ada buys the machines everyone else's programs now run on.",
+    host: "Encode",
+    why: "For Encode — enCODE — the developer community hosting this. Cody buys the training compute that builders actually run on, which is the most builder-shaped line in the catalogue.",
     color: "#b30f7c",
-    face: "ada",
+    face: "cody",
     description: "Negotiates GPU capacity for training runs across three compute vendors in a tighter, faster-expiring market. Same negotiation engine as Luca's, different sellers and a shorter quote window.",
   },
 };
