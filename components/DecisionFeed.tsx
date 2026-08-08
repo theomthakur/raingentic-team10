@@ -26,7 +26,6 @@ export function DecisionFeed({
   return (
     <Panel
       title="Decision log"
-      className="flex min-h-0 flex-1 flex-col"
       right={
         <div className="flex items-center gap-2">
           <Badge tone="neutral">{decisions.length} total</Badge>
@@ -38,7 +37,7 @@ export function DecisionFeed({
       {decisions.length === 0 ? (
         <Empty>Nothing recorded yet.</Empty>
       ) : (
-        <ul className="min-h-0 flex-1 divide-y divide-edge overflow-y-auto">
+        <ul className="max-h-[440px] divide-y divide-edge overflow-y-auto">
           {decisions.map((d) => {
             const refusedRow = d.outcome === "refused";
             const selected = d.id === selectedId;

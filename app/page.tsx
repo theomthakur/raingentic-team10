@@ -19,6 +19,7 @@ import { RuleEditor } from "@/components/RuleEditor";
 import { ReplayDiff } from "@/components/ReplayDiff";
 import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
+import { Header } from "@/components/Header";
 import { Badge } from "@/components/ui";
 
 interface State {
@@ -192,108 +193,110 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto flex h-screen max-w-[1600px] flex-col gap-3 p-4">
-      <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-xl font-semibold tracking-tight text-ink-900">Mandate</h1>
-          <p className="text-[13px] text-muted">
-            An agent wants to spend money.{" "}
-            <span className="text-ink-700">Click a task below and watch what happens.</span>
+    <div className="min-h-screen bg-white">
+      <Header
+        storage={state.storage}
+        rainWired={state.rainWired}
+        ruleVersion={currentRuleSet.version}
+        errorBadge={error ? <Badge tone="fail">{error}</Badge> : undefined}
+      />
+
+      <main className="mx-auto max-w-[1600px] px-6 py-8 md:px-10">
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            1 · How it works
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {error && <Badge tone="fail">{error}</Badge>}
-          <Badge tone={state.storage === "postgres" ? "pass" : "warn"}>
-            {state.storage === "postgres" ? "postgres" : "in-memory"}
-          </Badge>
-          <Badge tone={state.rainWired ? "rain" : "neutral"}>
-            {state.rainWired ? "rain live" : "rain simulated"}
-          </Badge>
-          <Badge tone="neutral">policy v{currentRuleSet.version}</Badge>
-        </div>
-      </header>
+          <PipelineDiagram stages={stages} racing={racing} />
+        </section>
 
-      <PipelineDiagram stages={stages} racing={racing} />
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          {/* left: what the agents did, and the append-only record of it */}
+          <section className="flex flex-col gap-6">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+              2 · Run it
+            </p>
+            <RunPanel
+              negotiatedTasks={state.negotiatedTasks}
+              tasks={state.tasks}
+              blankPO={state.blankPO}
+              stages={stages}
+              busy={busy}
+              ranTasks={ranTasks}
+              onRunNegotiated={(t) => run("/api/purchase", { taskId: t.id }, t.id)}
+              onRunTask={(t) => run("/api/run", { taskId: t.id }, t.id)}
+              onRunPO={(po) => run("/api/run", { po })}
+              onReset={reset}
+            />
+            <DecisionFeed
+              decisions={state.decisions}
+              selectedId={selectedId}
+              onSelect={(d) => {
+                setSelectedId(d.id);
+                setTab("provenance");
+              }}
+            />
+          </section>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        {/* left: what the agents did, and the append-only record of it */}
-        <div className="flex min-h-0 flex-col gap-3">
-          <RunPanel
-            negotiatedTasks={state.negotiatedTasks}
-            tasks={state.tasks}
-            blankPO={state.blankPO}
-            stages={stages}
-            busy={busy}
-            ranTasks={ranTasks}
-            onRunNegotiated={(t) => run("/api/purchase", { taskId: t.id }, t.id)}
-            onRunTask={(t) => run("/api/run", { taskId: t.id }, t.id)}
-            onRunPO={(po) => run("/api/run", { po })}
-            onReset={reset}
-          />
-          <DecisionFeed
-            decisions={state.decisions}
-            selectedId={selectedId}
-            onSelect={(d) => {
-              setSelectedId(d.id);
-              setTab("provenance");
-            }}
-          />
-        </div>
+          {/* right: audit one decision, or change the policy and re-judge all of them */}
+          <section className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+                3 · Audit it
+              </p>
+              <nav className="flex gap-1.5 rounded-full border border-edge bg-ink-50 p-1">
+                {(["provenance", "policy"] as Tab[]).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTab(t)}
+                    className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-medium capitalize transition ${
+                      tab === t
+                        ? "bg-white text-rain-700 shadow-sm"
+                        : "text-muted hover:text-ink-900"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </nav>
+            </div>
 
-        {/* right: audit one decision, or change the policy and re-judge all of them */}
-        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto">
-          <nav className="flex gap-1">
-            {(["provenance", "policy"] as Tab[]).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTab(t)}
-                className={`rounded-full border px-3.5 py-1.5 text-[12px] font-medium capitalize transition ${
-                  tab === t
-                    ? "border-rain-200 bg-rain-50 text-rain-700"
-                    : "border-transparent text-muted hover:text-ink-900"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </nav>
-
-          {tab === "provenance" ? (
-            <>
-              {/* Where this PO's price came from, when it came from a negotiation. */}
-              {selected?.negotiation && (
-                <NegotiationPanel
-                  negotiation={selected.negotiation}
-                  poNumber={selected.po.poNumber}
-                  totalCents={selected.po.unitPrice * selected.po.quantity}
+            {tab === "provenance" ? (
+              <>
+                {/* Where this PO's price came from, when it came from a negotiation. */}
+                {selected?.negotiation && (
+                  <NegotiationPanel
+                    negotiation={selected.negotiation}
+                    poNumber={selected.po.poNumber}
+                    totalCents={selected.po.unitPrice * selected.po.quantity}
+                  />
+                )}
+                <ProvenancePanel decision={selected} />
+                <BudgetMeter budgets={state.budgets} />
+              </>
+            ) : (
+              <>
+                <RuleEditor
+                  rules={draftRules}
+                  ruleSets={state.ruleSets}
+                  current={currentRuleSet}
+                  dirty={dirty}
+                  busy={busy}
+                  onChange={setDraftRules}
+                  onPreview={preview}
+                  onSave={save}
+                  onRevert={(v) => {
+                    const rs = state.ruleSets.find((r) => r.version === v);
+                    if (rs) setDraftRules(rs.rules);
+                  }}
                 />
-              )}
-              <ProvenancePanel decision={selected} />
-              <BudgetMeter budgets={state.budgets} />
-            </>
-          ) : (
-            <>
-              <RuleEditor
-                rules={draftRules}
-                ruleSets={state.ruleSets}
-                current={currentRuleSet}
-                dirty={dirty}
-                busy={busy}
-                onChange={setDraftRules}
-                onPreview={preview}
-                onSave={save}
-                onRevert={(v) => {
-                  const rs = state.ruleSets.find((r) => r.version === v);
-                  if (rs) setDraftRules(rs.rules);
-                }}
-              />
-              <ReplayDiff result={replayResult} />
-            </>
-          )}
+                <ReplayDiff result={replayResult} />
+              </>
+            )}
+          </section>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 

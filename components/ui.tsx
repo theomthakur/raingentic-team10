@@ -16,8 +16,8 @@ export function Panel({
       className={`rounded-2xl border border-edge bg-panel shadow-sm shadow-ink-900/[0.03] ${className}`}
     >
       {title && (
-        <header className="flex items-center justify-between gap-3 border-b border-edge px-4 py-3">
-          <h2 className="text-[13px] font-semibold uppercase tracking-wider text-muted">{title}</h2>
+        <header className="flex items-center justify-between gap-3 border-b border-edge px-5 py-3.5">
+          <h2 className="text-[13.5px] font-semibold text-ink-900">{title}</h2>
           {right}
         </header>
       )}

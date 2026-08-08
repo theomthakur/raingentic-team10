@@ -95,8 +95,8 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
   const stillRacing = racing && revealedTo < order.length - 1;
 
   return (
-    <div className="rounded-2xl border border-edge bg-white px-5 py-4 shadow-sm shadow-ink-900/[0.03]">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="rounded-2xl border border-edge bg-white px-6 py-5 shadow-sm shadow-ink-900/[0.03]">
+      <div className="mb-4 flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
           How this works
         </p>
