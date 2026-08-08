@@ -3,6 +3,7 @@ import { Badge, Panel } from "@/components/ui";
 import { SystemDiagram } from "@/components/SystemDiagram";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { TechStack } from "@/components/TechStack";
+import { ControlCoverage } from "@/components/ControlCoverage";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
@@ -16,6 +17,7 @@ const CHECKS = [
   { id: "line-matches", label: "Vendor and SKU match the accepted quote", detail: "Right price, wrong item, is still wrong. Catches an agent that quietly substitutes what it's buying." },
   { id: "within-budget", label: "Within the cost centre's remaining budget", detail: "Checked against the real remaining balance at the moment of the request, not a cached figure." },
   { id: "no-existing-card", label: "No card already issued for this PO", detail: "Idempotency. Submit the same PO twice and the second run is refused by the record the first run itself wrote." },
+  { id: "requires-approval", label: "Above the delegated limit, a person must release it", detail: "Bounded autonomy. Above the configured threshold the purchase is held rather than refused — every check passed, it is simply large. No card exists while it waits, so approving is what creates the instrument." },
 ];
 
 const CATEGORIES = [
@@ -92,7 +94,7 @@ export default function ArchitecturePage() {
 
         <section className="mb-10">
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            The six checks that decide step 3
+            The seven checks that decide step 3
           </p>
           <Panel>
             <ul className="divide-y divide-edge">
@@ -139,6 +141,13 @@ export default function ArchitecturePage() {
               </p>
             </div>
           </Panel>
+        </section>
+
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            Where Mandate ends and Rain begins
+          </p>
+          <ControlCoverage />
         </section>
 
         <section className="mb-10">

@@ -113,7 +113,7 @@ export default function AgentsPage() {
         <section className="mb-8">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">Who's spending</p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Five agents, five roles — the same six checks
+            Five agents, five roles — the same seven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Every purchase order in the log was declared by one of these. The id is what

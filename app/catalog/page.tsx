@@ -309,7 +309,7 @@ export default function CatalogPage() {
             What the agents are buying
           </p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Real products, real quantities, the same six checks
+            Real products, real quantities, the same seven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Buying from this page posts to the same endpoints the console does — there is no
