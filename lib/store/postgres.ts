@@ -18,7 +18,17 @@ async function getSql(): Promise<Sql> {
   if (!sqlPromise) {
     sqlPromise = (async () => {
       // Imported lazily so a local run with no DATABASE_URL never loads the driver.
-      const { neon } = await import("@neondatabase/serverless");
+      const { neon, neonConfig } = await import("@neondatabase/serverless");
+
+      // 🔴 The driver talks to Neon over HTTP, and Next.js patches global fetch with its
+      // own cache. Without this, the first `select * from decisions` is memoised and
+      // replayed for every later read: the write lands in Postgres, the query returns
+      // stale rows, and the console shows a decision count that never moves. It fails
+      // exactly where it hurts — the append-only log and the replay both read through
+      // here — and it fails silently, with no error in any log.
+      neonConfig.fetchFunction = (input: unknown, init: unknown) =>
+        fetch(input as RequestInfo, { ...(init as RequestInit), cache: "no-store" });
+
       const sql = neon(process.env.DATABASE_URL as string) as unknown as Sql;
       await migrate(sql);
       return sql;

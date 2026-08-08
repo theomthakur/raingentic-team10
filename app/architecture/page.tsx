@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge, Panel } from "@/components/ui";
 import { SystemDiagram } from "@/components/SystemDiagram";
 import { FlowDiagram } from "@/components/FlowDiagram";
+import { TechStack } from "@/components/TechStack";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
@@ -80,6 +81,13 @@ export default function ArchitecturePage() {
             Step by step
           </p>
           <SystemDiagram />
+        </section>
+
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            What it is built with
+          </p>
+          <TechStack />
         </section>
 
         <section className="mb-10">
