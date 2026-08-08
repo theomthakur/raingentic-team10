@@ -88,10 +88,9 @@ was built. No engineering follows from this.
 priority as the existing optional stages:**
 
 - **A tiny real Monad fee per recorded decision**, from the Underwriting idea's premium
-  concept, minus the second collateral pool. Instead of anchoring each decision hash for
-  free, charge a fraction of a cent to write it. Sharpens the existing "the chain has to
-  matter" argument: you can only afford to record every decision because it is this cheap.
-  Same owner, same cut line as the Monad anchor already in THE-PLAN.
+  concept, minus the second collateral pool. Applies on top of the rule-version anchor
+  (THE-PLAN's primary Monad use, load-bearing), not instead of it. Charge a fraction of a
+  cent per decision write. Same owner, cut before the rule-version anchor if time is short.
 - **A live budget meter in the UI**, from Burn Rate's progress-bar visual, without any
   actual streaming. The remaining budget for a cost centre, updating as purchases are
   approved. Owned by B, pure UI, no new API dependency.
@@ -121,7 +120,7 @@ cannot be faked in a five-minute demo the way a feature can.
 | Best use of Rain | card issuance is the enforcement point |
 | Agents actually move money | a real scoped virtual card, real settlement |
 | Agent negotiation | a small stage upstream of the intent, competing seller quotes |
-| Monad bounty | each decision hash anchored as a real testnet transaction |
+| Monad bounty | each rule version hash anchored as a real testnet transaction, decisions optionally too |
 
 Same pipeline, same two owners, same 17:00 join. Not four projects.
 
@@ -132,7 +131,7 @@ could give convincingly:**
 |---|---|
 | Why not just use Rain's own controls? | The reason-check is one level above amount and merchant |
 | How do you know the rules aren't hardcoded? | Replay: edit a rule, re-run history, show the diff |
-| Why Monad and not any chain? | You cannot cheaply anchor every decision on a slow or costly chain |
+| Why Monad and not any chain? | You have to anchor the rules for the audit claim to hold; only at Monad's cost can you afford decisions too |
 | Is the negotiation real? | Built from real async multi-agent orchestration experience |
 
 ---

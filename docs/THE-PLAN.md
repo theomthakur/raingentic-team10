@@ -79,20 +79,31 @@ instead of a negotiated one.
 
 ### The Monad piece, and why it is not a bolt-on
 
-Design decision 6 already says: **the decision record is append-only**, every evaluation
-plus its rule version plus its outcome, stored so it can be audited later.
+⭐ **Updated: anchor the rule version, not the decision. This is the structural one, not the
+decorative one, and CONTEXT.md is the authority on this.**
 
-**Anchor that record on Monad testnet.** Not the card, not the money movement, the
-**decision**. When Mandate approves or refuses a purchase, write a hash of that decision
-(intent, rule version, outcome) as a real transaction on Monad.
+Replay proves the rules are versioned data. It does not prove the rules were not edited
+*after* a batch of decisions to fit history you already had. In a system whose whole claim
+is auditability, "trust our timestamps" is the weak link, and the append-only log does not
+fix it, because the log is also yours to have written.
+
+**So when a rule version is created, write a hash of that version to Monad.** Now the rule
+set has an independent timestamp, and every decision that references version 1 is provably
+judged against rules that existed before it. This is load-bearing, remove it and a specific
+claim in the pitch breaks, unlike a per-decision anchor which is nice-to-have.
+
+It is also cheaper: one transaction per rule version, not one per decision, same code path
+(hash, send, store the tx hash), built once and pointed at both if there is time for both.
 
 This satisfies the Monad bounty's own stated bar better than a token gesture would:
 
 - **"Real transactions on Monad, mocked chain calls don't count."** A hash write is a real
   transaction.
 - **"The chain has to matter, would it break at 15 second finality or 50 cents a
-  transaction?"** This is the honest answer. **You cannot anchor every decision an agent
-  makes, cheaply, on a chain that costs real money or takes real time per write.** That is
+  transaction?"** This is the honest answer, and it is sharper for rule versions than
+  decisions: **you have to anchor the rules, full stop, for the audit claim to hold, and at
+  Monad's cost you can afford to anchor decisions too. On a slower or costlier chain you'd
+  anchor the rules and give up on the decisions.** That is
   the actual argument for Monad over a slower or costlier chain, said honestly rather than
   performed.
 - It is additive to a decision you already made, not a new workstream. The append-only log
@@ -327,10 +338,14 @@ exactly what beat you at ABI, and nobody else in this room will have it.
 
 If time goes, drop in this order and do not agonise:
 
-1. **The Monad anchor is the first thing cut.** It was always additive; nothing else
-   depends on it.
-2. **The negotiation stage is the second thing cut.** One seller quote replaces the
+1. **The negotiation stage is the first thing cut**, ahead of Monad. Two seller agents you
+   wrote, haggling to a number you chose, is the most fakeable thing on screen, and it is
+   in front of the judge whose actual job is agent orchestration. If it survives, describe
+   it honestly as a quote-selection stage, not a negotiation. One seller quote replaces the
    competing quotes, everything downstream is unaffected.
+2. **The per-decision Monad anchor is the second thing cut, but the rule-version anchor
+   stays if at all possible.** The rule-version anchor is structural, see above; the
+   per-decision one is additive on top of it.
 3. Four agents becomes two
 4. Real settlement becomes issuance only, and the demo is about the card that was never
    created
