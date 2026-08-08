@@ -29,15 +29,19 @@ export async function POST(request: Request) {
   const body = (await request.json()) as Task;
 
   let po: PurchaseOrder;
+  let negotiation: Awaited<ReturnType<typeof proposePurchase>>["negotiation"];
   try {
-    po = proposePurchase(body);
+    ({ po, negotiation } = proposePurchase(body));
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 422 });
   }
 
   const check = await verifyStub(po);
   if (!check.ok) {
-    return NextResponse.json({ po, status: "refused", failures: check.failures }, { status: 200 });
+    return NextResponse.json(
+      { po, negotiation, status: "refused", failures: check.failures },
+      { status: 200 },
+    );
   }
 
   try {
@@ -46,14 +50,17 @@ export async function POST(request: Request) {
       expiresAt: po.quoteExpiry,
       reference: po.poNumber,
     });
-    return NextResponse.json({ po, status: "issued", card });
+    return NextResponse.json({ po, negotiation, status: "issued", card });
   } catch (err) {
     if (err instanceof RainApiError) {
       return NextResponse.json(
-        { po, status: "rain_error", detail: err.body },
+        { po, negotiation, status: "rain_error", detail: err.body },
         { status: err.status },
       );
     }
-    return NextResponse.json({ po, status: "error", error: (err as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { po, negotiation, status: "error", error: (err as Error).message },
+      { status: 500 },
+    );
   }
 }
