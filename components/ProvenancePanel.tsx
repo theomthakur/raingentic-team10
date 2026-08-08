@@ -3,7 +3,10 @@
 import type { CheckResult, Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
-import { Badge, Dot, Empty, Panel } from "./ui";
+import { generateReceipt } from "@/lib/receipt";
+import { Avatar } from "./Avatar";
+import { AgentTag } from "./AgentTag";
+import { Badge, Button, Dot, Empty, Panel } from "./ui";
 
 /**
  * The audit view for one decision.
@@ -64,8 +67,8 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
   }
 
   const { po, record, checks, outcome } = decision;
-  const refused = outcome === "refused";
   const total = poTotal(po);
+  const statusTone = outcome === "refused" ? "fail" : outcome === "held" ? "warn" : "pass";
 
   return (
     <Panel
@@ -73,18 +76,29 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
       right={
         <div className="flex items-center gap-2">
           <Badge tone="neutral">policy v{decision.ruleVersion}</Badge>
-          <Badge tone={refused ? "fail" : "pass"}>{refused ? "REFUSED" : "APPROVED"}</Badge>
+          <Badge tone={statusTone}>{outcome.toUpperCase()}</Badge>
+          <Button variant="ghost" onClick={() => generateReceipt(decision)}>
+            Download PDF
+          </Button>
         </div>
       }
     >
       <div className="border-b border-edge px-4 py-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="font-mono text-sm text-ink-900">{po.poNumber}</p>
-          <p className="tabular font-mono text-sm text-ink-900">{money(total)}</p>
+        <div className="flex items-center gap-2.5">
+          <Avatar name={po.vendor} size={30} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="font-mono text-sm text-ink-900">{po.poNumber}</p>
+              <p className="tabular font-mono text-sm text-ink-900">{money(total)}</p>
+            </div>
+            <p className="text-[13px] text-muted">
+              {po.quantity} × {po.sku} from {po.vendor} · {po.costCentre}
+            </p>
+          </div>
         </div>
-        <p className="mt-1 text-[13px] text-muted">
-          {po.quantity} × {po.sku} from {po.vendor} · {po.costCentre} · {decision.agent}
-        </p>
+        <div className="mt-2.5">
+          <AgentTag id={decision.agent} />
+        </div>
 
         {decision.card ? (
           <p className="mt-2 font-mono text-[11px] text-mint-700">

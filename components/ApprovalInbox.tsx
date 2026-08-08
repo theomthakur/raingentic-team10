@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
+import { Avatar } from "./Avatar";
+import { AgentTag } from "./AgentTag";
 import { Badge, Button, Panel } from "./ui";
 
 /**
@@ -62,22 +64,29 @@ export function ApprovalInbox({
 
           return (
             <li key={d.id} className="px-4 py-3">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="flex min-w-0 items-baseline gap-2">
-                  <span className="truncate font-mono text-[13px] text-ink-900">
-                    {d.po.poNumber}
-                  </span>
-                  <span className="truncate text-[12px] text-muted">{d.po.vendor}</span>
-                </span>
-                <span className="tabular shrink-0 font-mono text-[13px] font-semibold text-ink-900">
-                  {money(poTotal(d.po))}
-                </span>
+              <div className="flex items-center gap-2.5">
+                <Avatar name={d.po.vendor} size={26} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="flex min-w-0 items-baseline gap-2">
+                      <span className="truncate font-mono text-[13px] text-ink-900">
+                        {d.po.poNumber}
+                      </span>
+                      <span className="truncate text-[12px] text-muted">{d.po.vendor}</span>
+                    </span>
+                    <span className="tabular shrink-0 font-mono text-[13px] font-semibold text-ink-900">
+                      {money(poTotal(d.po))}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-[12px] text-muted">
+                    {d.po.quantity} × {d.po.sku} · {d.po.costCentre} · {shortDate(d.createdAt)}
+                  </p>
+                </div>
               </div>
 
-              <p className="mt-0.5 text-[12px] text-muted">
-                {d.po.quantity} × {d.po.sku} · {d.po.costCentre} · {d.agent} ·{" "}
-                {shortDate(d.createdAt)}
-              </p>
+              <div className="mt-2">
+                <AgentTag id={d.agent} />
+              </div>
 
               {escalation && (
                 <p className="mt-1.5 text-[12px] text-warn">{escalation.reason}</p>

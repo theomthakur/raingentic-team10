@@ -4,7 +4,8 @@ import { useState } from "react";
 import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import type { PurchaseOrder } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
-import { Badge, Button, Panel } from "./ui";
+import { AgentTag } from "./AgentTag";
+import { Button, Panel } from "./ui";
 
 const STAGE_ORDER: Stage["name"][] = [
   "NEGOTIATE",
@@ -104,14 +105,14 @@ function EditablePO({
 function TaskRow({
   label,
   note,
-  tag,
+  agentId,
   alreadyRun,
   busy,
   onRun,
 }: {
   label: string;
   note: string;
-  tag: string;
+  agentId: string;
   alreadyRun: boolean;
   busy: boolean;
   onRun: () => void;
@@ -119,11 +120,11 @@ function TaskRow({
   return (
     <li className="flex items-start gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="text-[13.5px] font-medium text-ink-900">{label}</p>
-          <Badge tone="neutral">{tag}</Badge>
-        </div>
+        <p className="text-[13.5px] font-medium text-ink-900">{label}</p>
         <p className="mt-0.5 text-[12px] text-muted">{note}</p>
+        <div className="mt-1.5">
+          <AgentTag id={agentId} />
+        </div>
       </div>
       <Button
         onClick={onRun}
@@ -186,7 +187,7 @@ export function RunPanel({
             key={t.id}
             label={t.label}
             note={t.note}
-            tag={t.task.taskKey}
+            agentId={t.task.taskKey}
             alreadyRun={ranTasks.has(t.id)}
             busy={busy}
             onRun={() => onRunNegotiated(t)}
@@ -199,7 +200,7 @@ export function RunPanel({
             key={t.id}
             label={t.label}
             note={t.note}
-            tag={t.agent}
+            agentId={t.agent}
             alreadyRun={ranTasks.has(t.id)}
             busy={busy}
             onRun={() => onRunTask(t)}

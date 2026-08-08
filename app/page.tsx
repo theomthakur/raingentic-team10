@@ -273,6 +273,7 @@ export default function Page() {
                 setTab("provenance");
               }}
             />
+            <BudgetMeter budgets={state.budgets} />
           </section>
 
           {/* right: audit one decision, or change the policy and re-judge all of them */}
@@ -311,7 +312,6 @@ export default function Page() {
                 )}
                 <ApprovalInbox held={heldDecisions} busy={busy} onApprove={approve} />
                 <ProvenancePanel decision={selected} />
-                <BudgetMeter budgets={state.budgets} />
               </>
             ) : (
               <>

@@ -3,6 +3,8 @@
 import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate, shortTime } from "@/lib/format";
+import { getAgent } from "@/lib/agents";
+import { Avatar } from "./Avatar";
 import { Badge, Empty, Panel } from "./ui";
 
 /**
@@ -37,12 +39,14 @@ export function DecisionFeed({
       {decisions.length === 0 ? (
         <Empty>Nothing recorded yet.</Empty>
       ) : (
-        <ul className="max-h-[440px] divide-y divide-edge overflow-y-auto">
+        <ul className="max-h-[520px] divide-y divide-edge overflow-y-auto">
           {decisions.map((d) => {
-            const refusedRow = d.outcome === "refused";
             const selected = d.id === selectedId;
             const firstFailure = d.checks.find((c) => !c.passed && !c.skipped);
             const isNew = !d.seeded;
+            const dotClass =
+              d.outcome === "refused" ? "bg-fail" : d.outcome === "held" ? "bg-warn" : "bg-mint-500";
+            const agent = getAgent(d.agent);
 
             return (
               <li key={d.id}>
@@ -53,16 +57,13 @@ export function DecisionFeed({
                     selected ? "bg-rain-50" : "hover:bg-ink-50"
                   } ${isNew ? "animate-row-in" : ""}`}
                 >
-                  <span
-                    className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                      refusedRow ? "bg-fail" : "bg-mint-500"
-                    }`}
-                  />
+                  <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${dotClass}`} />
+                  <Avatar name={d.po.vendor} size={24} className="mt-0.5" />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-3">
                       <span className="truncate font-mono text-[13px] text-ink-900">
                         {d.po.poNumber}
-                        <span className="ml-2 text-muted">{d.po.vendor}</span>
+                        <span className="ml-2 font-sans text-muted">{d.po.vendor}</span>
                       </span>
                       <span className="tabular shrink-0 font-mono text-[13px] text-ink-700">
                         {money(poTotal(d.po))}
@@ -70,7 +71,9 @@ export function DecisionFeed({
                     </span>
                     <span className="mt-0.5 flex items-baseline justify-between gap-3">
                       <span className="truncate text-[12px] text-muted">
-                        {refusedRow && firstFailure ? firstFailure.reason : `${d.po.quantity} × ${d.po.sku}`}
+                        {d.outcome === "refused" && firstFailure
+                          ? firstFailure.reason
+                          : `${d.po.quantity} × ${d.po.sku} · ${agent.name}`}
                       </span>
                       <span className="tabular shrink-0 font-mono text-[11px] text-ink-400">
                         {d.seeded ? shortDate(d.createdAt) : shortTime(d.createdAt)}

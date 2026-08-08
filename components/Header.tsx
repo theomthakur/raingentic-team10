@@ -50,6 +50,12 @@ export function Header({
 
           <div className="flex items-center gap-3">
             <Link
+              href="/agents"
+              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
+            >
+              Agents →
+            </Link>
+            <Link
               href="/architecture"
               className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
             >
