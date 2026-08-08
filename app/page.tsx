@@ -22,6 +22,7 @@ import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { LoadingRain } from "@/components/LoadingRain";
 import { Badge } from "@/components/ui";
 import { diffRules } from "@/lib/rules/diff";
 
@@ -259,11 +260,7 @@ export default function Page() {
   }
 
   if (!state || !currentRuleSet || !draftRules) {
-    return (
-      <main className="flex h-screen items-center justify-center text-[13px] text-muted">
-        {error ?? "Loading…"}
-      </main>
-    );
+    return <LoadingRain error={error} />;
   }
 
   return (
