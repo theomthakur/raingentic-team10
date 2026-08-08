@@ -37,8 +37,10 @@ export function Header({
               Mandate
             </h1>
             <p className="mt-1.5 max-w-xl text-[14.5px] leading-relaxed text-muted">
-              An agent wants to spend money. Rain can issue the card — Mandate checks the
-              reason first, so a card only ever exists when the reason holds up.
+              Agents can already reason and negotiate, and Rain lets them move money. The
+              missing piece is proving the transaction is the one they were authorised to
+              make — so Mandate verifies that intent, and no payment instrument exists
+              until it holds.
             </p>
           </div>
         </div>

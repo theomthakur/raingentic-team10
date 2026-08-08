@@ -56,8 +56,8 @@ exists*.
 
 ## 3. How it works
 
-Eight stages. Money only moves if stage 4 passes — and for large purchases, only
-once a person has also said so.
+Eight stages, and a normal purchase runs all of them **with no human involved at all.**
+Money only moves if stage 4 passes.
 
 ```
  1  TASK        an agent is given a job to do
@@ -66,10 +66,6 @@ once a person has also said so.
  4  VERIFY      plain code checks that declaration against the real records
         |
         ├── fails ──►  REFUSE   no card, ever. A plain-English reason. Written down.
-        |
-        ├── too big ─►  HOLD    everything checked out, but it needs a person.
-        |                       Still no card. A named human releases it, and
-        |                       every check runs again on fresh records.
         ▼
  5  ISSUE       Rain creates a card scoped to exactly this purchase order
  6  SETTLE      the purchase happens; the records are updated
@@ -79,6 +75,11 @@ once a person has also said so.
 
 **There is no path in the code where a card gets made first and judged afterwards.** The
 refusal branch simply never reaches Rain.
+
+There is one exception, off to the side of this diagram: a purchase that passes every check
+but is above the delegated authority of the agent that asked is **held** for a named person
+rather than issued. That is an escalation path for capital-sized spending, not the
+operating model — see §3b.
 
 ### The eleven checks
 
@@ -108,7 +109,7 @@ shop* at the *right price* — because a card issuer has no idea your order syst
 
 **Check 6 is the one that carries the demo.** More on that below.
 
-**Check 7 is the answer to the question everyone asks first.** More on that immediately.
+**Check 7 is a boundary, not a brake.** It is what makes the agent's autonomy *bounded* rather than unlimited — and almost nothing hits it. See §3b.
 
 **Check 11 is the one nothing else can see.** Every other check judges a purchase on its
 own merits, and a runaway agent's purchases are each perfectly correct. Only the rate is
@@ -141,55 +142,33 @@ Each rule states its basis on screen and in the code. Sources in
 
 ---
 
-## 3b. "But there's no human in the loop"
+## 3b. Answers to the four things people ask
 
-This is the first objection anyone raises, and it deserves a real answer rather than
-reassurance.
+Short answers. None of these is the product — the product is the eight steps above.
 
-### There is a human — above a limit you set
+**"Is a human approving these?"** No. A normal purchase completes with no human involved
+at all: the agent negotiates, declares, the checks run, the card is issued and retired.
+Above an agent's delegated authority — think capital equipment rather than stationery — the
+purchase is *held* for a named person instead. That is an escalation path, not the
+operating model, exactly as a company gives an employee authority up to a limit rather than
+none at all. No card exists while one waits, so a rejected escalation has nothing to claw
+back.
 
-No company gives an employee unlimited spending authority either. It gives **bounded
-autonomy with an escalation path**: approve up to $X alone, above that someone senior signs
-off. An agent gets exactly the same deal.
+**"Could the AI just decide it's allowed?"** It cannot. **There is no model anywhere in the
+decision path.** The agent proposes; ordinary, readable, testable code decides. Most AI
+safety claims ask you to trust a model's judgement about a model. This one does not.
 
-Above the configured limit ($25,000 by default) a purchase is **held** — not refused. Every
-check passed; it is simply large enough that a person should look.
+**"How do you know the rules are right?"** They are not ours. Rules 1–4 are a **three-way
+match**, the purchase-order / delivery / invoice cross-check every ERP ships. Rule 6 is an
+**idempotency key**. Rule 7 is a **delegation of authority matrix**. Each rule states its
+basis on screen. Sources in [CONTROLS.md](CONTROLS.md).
 
-**Three details that matter:**
+**"Couldn't you just change the rules afterwards?"** Every version is kept and hashed, and
+that hash is anchored on Monad, so the rules that governed a decision provably existed
+before it. Changing policy also requires a second person — the author of a change cannot be
+the one who activates it. *(Worth having ready; not worth demo time unless asked.)*
 
-1. **No card exists while it waits.** Approving is what *creates* the instrument. A
-   rejected escalation has nothing to cancel, dispute or claw back.
-2. **The approver must be named.** An unattributed approval is not an approval — the whole
-   point of the control is that someone accepted responsibility.
-3. **Releasing re-runs every check** against fresh records. The world moves while things
-   sit in queues; approval is permission to proceed, not a promise the facts still hold.
-
-If two approvers both hit release, the second is refused — by rule 6, reading the record
-the first release wrote. Idempotency protecting a *human* race, not just a machine retry.
-
-### "Fine, but the AI could just decide it's allowed"
-
-It cannot. **There is no AI anywhere in the decision path.** The agent proposes; ordinary,
-readable, testable code decides. Most "AI safety" claims ask you to trust a model's
-judgement about a model. This one does not ask that at all.
-
-### "Then couldn't you just change the rules?"
-
-The sharpest version of the criticism, and the one that would make the audit worthless.
-
-So changing policy takes **two people**. A rule change is written down as a *pending*
-version that decides nothing, and **the person who wrote it cannot be the person who
-activates it** — segregation of duties, the same control that stops whoever raises an
-invoice from also paying it. Every version is kept, hashed, and can be published to a
-public chain, so it also cannot be backdated.
-
-| Your worry | The answer |
-|---|---|
-| No human is involved | There is, above a limit you set |
-| The AI decides what's allowed | It does not decide anything — it proposes |
-| The rules could be wrong | They're the three-way match you already run |
-| You could change the rules | Two people, and every version is kept and hashed |
-| Prove it | Change a rule and re-run all history against it |
+---
 
 ### The two ideas that make it more than a script
 
@@ -217,30 +196,30 @@ nothing.
 
 ## 4. The demo
 
-1. **Run a purchasing task.** Suppliers compete, one wins, a card is created for exactly
-   that amount, expiring with the quote.
-2. **Press the exact same button again.** Nothing new. No second scenario. No "bad agent"
-   we wrote to fail.
-   → **Refused.** Because the record the *first run itself wrote* now says this order is
+**The point of the first three steps is that no human appears in any of them.**
+
+1. **Run a purchasing task.** Suppliers compete, one wins, and a card is created for
+   exactly that amount, expiring with the quote. Nobody approved anything — the agent
+   negotiated, declared what it was buying, and the checks agreed.
+2. **Press the exact same button again.** No new scenario, no "bad agent" we wrote to fail.
+   → **Refused**, because the record the *first run itself wrote* now says this order is
    filled and already has a card. Rain is never contacted.
-3. **Click the refusal.** Four fields: which rule failed, what it expected, what it got, and
-   exactly which record it read. Anyone can audit it in five seconds.
-4. **Run the capital purchase.** $43,500 of conveyor line. Everything checks out — and it
-   is **held**, not refused, because it is above what the agent may spend alone. No card
-   exists. Type a name, release it, and *that* is what creates the card.
+3. **Break it three ways.** Change the supplier → refused. Change the item, keeping the
+   supplier and total identical → refused, and no card control on earth can see that.
+   Change the price by a few percent → refused.
+4. **Click the refusal.** Which rule, what it expected, what it got, and the exact record
+   field it read. Anyone can audit it in five seconds.
 5. **Change a rule and hit replay.** *"Across 54 decisions, 8 approvals would now be
-   refused."* Each row shows what the rule expected before and after, and why it flipped.
-6. **Try to approve your own rule change.** Propose it under one name, then attempt to
-   activate it under the same name. Refused. Ask someone else to type their name instead.
-7. **Hand over the keyboard.** There's a form where anyone can write their own purchase
-   order — change the supplier, the item, a single cent — and press issue. It goes through
-   the identical code path. Nothing is special-cased for the demo.
+   refused."* Each row shows what the rule expected before and after.
+6. **Hand over the keyboard.** A form where anyone can write their own purchase order and
+   press issue. Same code path. Nothing is special-cased for the demo.
 
-Step 2 is the important one. Most demos show a failure the team wrote in advance. Ours is
-caused by the first half of our own demo. It can't be staged, because nothing was staged.
+**Then, only if there is time, one sentence:** *"And for a purchase above the agent's own
+delegated authority — a $43,500 capital order — it's held for a named person instead. No
+card exists while it waits. Autonomy has boundaries, the same way an employee's does."*
 
-Steps 4 and 6 are the ones that answer *"why would I trust this?"* — and they answer it by
-being refused on stage, not by being asserted.
+Step 2 is the one that matters. Most demos show a failure the team wrote in advance; ours
+is caused by the first half of our own demo. It cannot be staged, because nothing was.
 
 ---
 
@@ -434,6 +413,11 @@ makes it dangerous.**
 - Which is Rain's own principle, enforcement at issuance, applied one level up.
 - And because there's no AI in the checking step, we can re-run every past decision against
   a new rule and trust the difference.
+
+**The three parts, one sentence each:** **Rain** moves the money, so an agent can transact
+without a human in the loop. **Mandate** verifies the intent, so the transaction is the one
+it was authorised to make. **Monad** proves the policy, so nobody can claim the rules were
+rewritten after the decisions they governed.
 - Above a limit you set, a **named person** releases it — bounded autonomy, the same deal
   a company gives an employee. No card exists while it waits, so approving is what creates
   the instrument rather than reviewing one already out in the world.

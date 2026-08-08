@@ -6,13 +6,30 @@ Team 10, Raingentic Commerce Hackathon NYC, 2026-08-08/09.
 
 ## 1. What it is
 
+Agents can already reason and negotiate, and Rain lets them move money. The missing piece
+is proving that the transaction an agent is about to make is the transaction it was
+**authorised** to make. Mandate verifies that intent before a payment instrument exists.
+
 An agent gets a **scoped virtual Rain card** bound to the exact purchase order it
 negotiated: vendor, SKU, price, quantity, expiry. Deterministic code checks the declared
 order against the real record before the card is ever created. Any mismatch means no card,
-not a decline, an instrument that never comes into existence.
+not a decline — an instrument that never comes into existence.
 
-Rain's own products bound *how much* an agent spends and *where*. Mandate binds *why*, at
-the same moment, one step earlier.
+**A normal purchase completes with no human in the loop.** The agent negotiates, declares
+what it is buying, the checks run, Rain issues the card, the purchase settles and the card
+retires. Human approval exists only as an escalation for spending above an agent's
+delegated authority — an exception, not the operating model.
+
+### The three parts
+
+| | | |
+|---|---|---|
+| **Rain** | moves the money | An agent transacts on a real scoped card, autonomously |
+| **Mandate** | verifies the intent | Eleven deterministic checks, before any instrument exists |
+| **Monad** | proves the policy | Each rule version's hash anchored, so rules cannot be backdated |
+
+Rain asks *can this agent spend this much, here?* Mandate asks *is this the exact purchase
+it was supposed to spend on?* Only when both hold does a card come into existence.
 
 ---
 
@@ -31,10 +48,6 @@ the same moment, one step earlier.
        |          rules are versioned CONFIG, not code
        |
        |-- fails ------> REFUSE  no card, ever. A plain-English reason. Logged.
-       |
-       |-- too big ----> HOLD    every check passed, but it is above the delegated
-       |                         limit. Still no card. A named person releases it,
-       |                         and every check runs again on fresh records.
        v
   4 ISSUE       Rain issues a virtual card scoped to exactly this PO
        v
@@ -46,8 +59,14 @@ the same moment, one step earlier.
 ```
 
 **There is no code path where a card is created and then judged**, and none where a card
-outlives the obligation that justified it. The refusal and hold branches never reach Rain
-at all — that is enforced by the shape of `lib/pipeline.ts`, not by a flag.
+outlives the obligation that justified it. The refusal branch never reaches Rain at all —
+that is enforced by the shape of `lib/pipeline.ts`, not by a flag.
+
+**The one exception, off the main path.** A purchase that passes every check but exceeds
+the delegated authority of the agent that asked is **held** for a named person rather than
+issued. No card exists while it waits, and the checks run again on release. This is bounded
+autonomy — the same arrangement a company gives an employee, who needs no permission for
+stationery and does need it for capital equipment — and almost nothing hits it.
 
 **The eleven checks** that decide stage 3, in order: the PO exists and was accepted; it is
 still open and the quote has not expired; the amount matches the quote; the vendor **and

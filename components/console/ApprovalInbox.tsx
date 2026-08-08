@@ -23,10 +23,13 @@ import { Badge, Button, Panel } from "../ui";
  */
 export function ApprovalInbox({
   held,
+  totalDecisions,
   busy,
   onApprove,
 }: {
   held: Decision[];
+  /** Everything ever decided, so the queue can be shown in proportion. */
+  totalDecisions: number;
   busy: boolean;
   onApprove: (decisionId: string, by: string, note: string) => void;
 }) {
@@ -43,7 +46,7 @@ export function ApprovalInbox({
 
   return (
     <Panel
-      title="Waiting for someone to approve"
+      title="Exception — above an agent\u2019s authority"
       right={
         <div className="flex items-center gap-2">
           {actionable.length > 0 && <Badge tone="warn">{actionable.length} to action</Badge>}
@@ -51,10 +54,18 @@ export function ApprovalInbox({
         </div>
       }
     >
-      <p className="border-b border-edge px-4 py-2 text-[12px] text-muted">
-        Every check passed. These are above the delegated limit, so a named person releases
-        them. <span className="text-ink-700">No card exists while a purchase waits here</span>{" "}
-        — approving is what creates it.
+      {/* The number first, because "why are humans approving things in an autonomous
+          spending demo?" is answered by the proportion, not by an argument. */}
+      <p className="border-b border-edge px-4 py-2.5 text-[12px] leading-relaxed text-muted">
+        <span className="text-ink-900">
+          {totalDecisions - held.length} of {totalDecisions} purchases completed with no
+          human involved at all.
+        </span>{" "}
+        These {held.length} are the exception: every check passed, but the amount is above
+        the delegated authority of the agent that asked. Autonomy has boundaries, exactly as
+        it does for an employee.{" "}
+        <span className="text-ink-700">No card exists while a purchase waits here</span> —
+        approving is what creates it.
       </p>
 
       <ul className="divide-y divide-edge">

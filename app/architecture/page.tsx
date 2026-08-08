@@ -63,6 +63,58 @@ export default function ArchitecturePage() {
           </p>
         </section>
 
+        {/* Three parties, one sentence each. This is the frame the whole project should
+            be read through: Rain moves the money, Mandate verifies the intent, Monad
+            proves which rules were in force. Everything else is detail underneath it. */}
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            Three parts, one sentence each
+          </p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                name: "Rain",
+                role: "moves the money",
+                dot: "bg-rain-500",
+                text: "text-rain-700",
+                body: "An agent transacts on a real scoped card. No human sits in the loop for a normal purchase.",
+              },
+              {
+                name: "Mandate",
+                role: "verifies the intent",
+                dot: "bg-mint-500",
+                text: "text-mint-700",
+                body: "Eleven deterministic checks confirm the purchase is the one the agent was authorised to make — before any instrument exists.",
+              },
+              {
+                name: "Monad",
+                role: "proves the policy",
+                dot: "bg-monad-500",
+                text: "text-monad-700",
+                body: "Each rule version's hash is anchored, so nobody can claim the rules were rewritten after the decisions they governed.",
+              },
+            ].map((p) => (
+              <div key={p.name} className="rounded-xl border border-edge bg-white p-4">
+                <p className={`flex items-center gap-2 text-[14px] font-semibold ${p.text}`}>
+                  <span className={`h-2 w-2 rounded-full ${p.dot}`} />
+                  {p.name}
+                </p>
+                <p className="mt-0.5 text-[12px] uppercase tracking-wider text-ink-400">
+                  {p.role}
+                </p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{p.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-muted">
+            Rain asks <em>can this agent spend this much, here?</em> Mandate asks{" "}
+            <em>is this the exact purchase it was supposed to spend on?</em> Only when both
+            hold does a payment instrument come into existence. Human approval is not part
+            of this path — it exists solely as an escalation for spending above an agent&apos;s
+            delegated authority.
+          </p>
+        </section>
+
         {/* The site grew a page at a time and it was no longer obvious what any of them
             were for, or which one you were meant to start on. Driven off the same PAGES
             array the nav uses, so the two can never drift apart. */}

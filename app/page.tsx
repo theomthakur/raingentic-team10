@@ -395,8 +395,16 @@ export default function Page() {
                     totalCents={selected.po.unitPrice * selected.po.quantity}
                   />
                 )}
-                <ApprovalInbox held={heldDecisions} busy={busy} onApprove={approve} />
                 <ProvenancePanel decision={selected} />
+                {/* Below the provenance panel on purpose. Normal purchases complete with
+                    no human at all; this is the exception path for spending above an
+                    agent's delegated authority, and it should read as an exception. */}
+                <ApprovalInbox
+                  held={heldDecisions}
+                  totalDecisions={state.decisions.length}
+                  busy={busy}
+                  onApprove={approve}
+                />
               </>
             ) : (
               <>

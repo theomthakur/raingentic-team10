@@ -4,6 +4,37 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Reframed: autonomy is the product, human approval is the exception
+
+A Rain engineer read the build and gave the sharpest note we've had: architecturally this
+is fine — a normal purchase never touches a human — but the *presentation* gave the human
+path so much attention that a judge could reasonably ask "isn't this supposed to be
+autonomous agentic commerce?" Nothing was rebuilt. The hierarchy changed.
+
+- **The thesis line now leads with autonomy.** Agents can already reason and negotiate and
+  Rain lets them move money; the missing piece is proving the transaction is the one they
+  were authorised to make.
+- **Three parts, one sentence each**, on the system design page: **Rain** moves the money,
+  **Mandate** verifies the intent, **Monad** proves the policy. Rain asks *can this agent
+  spend this much, here?* Mandate asks *is this the exact purchase it was supposed to spend
+  on?*
+- **The hold is off the main path** in every diagram and document. It was drawn as a peer
+  of ISSUE; it is now an explicitly-marked exception, because that is what it is.
+- **The approval queue leads with the proportion:** *"48 of 54 purchases completed with no
+  human involved at all."* A number answers "why are humans approving things?" better than
+  an argument does, and it sits below the provenance panel now rather than above it.
+- **Dual control on rule changes is demoted to an answer**, not a demo beat. It is the
+  reply to "couldn't you just change the rules afterwards?", worth having ready and not
+  worth demo time unless asked.
+- **The demo order is rewritten**: autonomous purchase first, then the duplicate, then
+  three ways of breaking it, then replay. Escalation is one closing sentence, if there is
+  time.
+
+The distinction the whole reframe turns on: not *"humans approve large purchases"* but
+*"agents operate autonomously within delegated authority, and human approval is only the
+escalation path outside it."* Autonomy has boundaries — the same ones an employee has.
+
+
 ## 2026-08-08 · One navigation, and a map of the six pages
 
 The site had grown a page at a time and nobody had looked at the whole thing. An audit
