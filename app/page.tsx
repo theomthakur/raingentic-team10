@@ -10,8 +10,9 @@ import type {
   RuleSet,
 } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
-import type { Task } from "@/lib/fixtures/tasks";
+import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import { RunPanel } from "@/components/RunPanel";
+import { NegotiationPanel } from "@/components/NegotiationPanel";
 import { DecisionFeed } from "@/components/DecisionFeed";
 import { ProvenancePanel } from "@/components/ProvenancePanel";
 import { RuleEditor } from "@/components/RuleEditor";
@@ -25,7 +26,9 @@ interface State {
   decisions: Decision[];
   ruleSets: RuleSet[];
   budgets: BudgetRecord[];
+  negotiatedTasks: NegotiatedTask[];
   tasks: Task[];
+  blankPO: PurchaseOrder;
 }
 
 type Tab = "provenance" | "policy";
@@ -51,7 +54,13 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    load().catch(() => setError("Could not load state."));
+    load()
+      .then((data) => {
+        // Land on the most recent decision rather than an empty panel. On a fresh reset
+        // that is the newest seeded row, so the audit view is never blank on arrival.
+        setSelectedId((prev) => prev ?? data.decisions[0]?.id ?? null);
+      })
+      .catch(() => setError("Could not load state."));
   }, [load]);
 
   const currentRuleSet = useMemo(
@@ -82,12 +91,16 @@ export default function Page() {
     return data as T;
   }
 
-  async function run(body: { taskId?: string; po?: PurchaseOrder }, taskId?: string) {
+  async function run(
+    url: "/api/run" | "/api/purchase",
+    body: { taskId?: string; po?: PurchaseOrder },
+    taskId?: string
+  ) {
     setBusy(true);
     setError(null);
     try {
       const { decision, stages: next } = await post<{ decision: Decision; stages: Stage[] }>(
-        "/api/run",
+        url,
         body
       );
       setStages(next);
@@ -190,12 +203,15 @@ export default function Page() {
         {/* left: what the agents did, and the append-only record of it */}
         <div className="flex min-h-0 flex-col gap-3">
           <RunPanel
+            negotiatedTasks={state.negotiatedTasks}
             tasks={state.tasks}
+            blankPO={state.blankPO}
             stages={stages}
             busy={busy}
             ranTasks={ranTasks}
-            onRunTask={(t) => run({ taskId: t.id }, t.id)}
-            onRunPO={(po) => run({ po })}
+            onRunNegotiated={(t) => run("/api/purchase", { taskId: t.id }, t.id)}
+            onRunTask={(t) => run("/api/run", { taskId: t.id }, t.id)}
+            onRunPO={(po) => run("/api/run", { po })}
             onReset={reset}
           />
           <DecisionFeed
@@ -229,6 +245,14 @@ export default function Page() {
 
           {tab === "provenance" ? (
             <>
+              {/* Where this PO's price came from, when it came from a negotiation. */}
+              {selected?.negotiation && (
+                <NegotiationPanel
+                  negotiation={selected.negotiation}
+                  poNumber={selected.po.poNumber}
+                  totalCents={selected.po.unitPrice * selected.po.quantity}
+                />
+              )}
               <ProvenancePanel decision={selected} />
               <BudgetMeter budgets={state.budgets} />
             </>

@@ -82,11 +82,20 @@ export const SEED_QUOTES: QuoteRecord[] = [
   },
 ];
 
+/**
+ * Every cost centre a demo task charges to must have clear headroom, so that a task
+ * written to demonstrate one rule fails on exactly that rule. PO-4421 exists to show a
+ * vendor mismatch; if CC-FAC were also near its limit, the refusal would cite two rules
+ * and the point would blur.
+ *
+ * CC-MKT is deliberately left near its limit — no task touches it, so it drives the amber
+ * budget meter without interfering with anything.
+ */
 export const SEED_BUDGETS: BudgetRecord[] = [
   { costCentre: "CC-OPS", limitCents: 2_500_000, spentCents: 1_180_000 },
   { costCentre: "CC-ENG", limitCents: 4_000_000, spentCents: 2_640_000 },
-  { costCentre: "CC-FAC", limitCents: 900_000, spentCents: 812_000 },
-  { costCentre: "CC-MKT", limitCents: 1_200_000, spentCents: 340_000 },
+  { costCentre: "CC-FAC", limitCents: 1_400_000, spentCents: 812_000 },
+  { costCentre: "CC-MKT", limitCents: 1_200_000, spentCents: 1_140_000 },
 ];
 
 /** Which cost centre each PO is charged to. */

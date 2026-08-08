@@ -1,5 +1,46 @@
 import type { PurchaseOrder } from "@/lib/types";
+import type { Task as AgentTask } from "@/lib/agent";
 import { PO_COST_CENTRE, SEED_QUOTES } from "./records";
+
+/**
+ * Tasks that go through the full negotiation before anything is declared.
+ *
+ * These are the primary demo path: sellers compete, one wins, and the winner's number is
+ * what the checks then verify. Running the same one twice is the headline refusal.
+ */
+export interface NegotiatedTask {
+  id: string;
+  label: string;
+  note: string;
+  task: AgentTask;
+}
+
+export const NEGOTIATED_TASKS: NegotiatedTask[] = [
+  {
+    id: "restock-office",
+    label: "Restock office supplies",
+    note: "Four sellers bid, one counter-offer round. Run it once — then run it again.",
+    task: {
+      taskKey: "office-supplies",
+      quantity: 10,
+      targetPriceCents: 4_000,
+      costCentre: "CC-OPS",
+      validForDays: 5,
+    },
+  },
+  {
+    id: "gpu-compute",
+    label: "Provision GPU compute for training",
+    note: "Three sellers, tighter market. A second clean run so the feed is not one row.",
+    task: {
+      taskKey: "cloud-compute",
+      quantity: 4,
+      targetPriceCents: 11_000,
+      costCentre: "CC-ENG",
+      validForDays: 2,
+    },
+  },
+];
 
 /**
  * Runnable demo tasks.
@@ -32,21 +73,13 @@ function fromQuote(poNumber: string, overrides: Partial<PurchaseOrder> = {}): Pu
   };
 }
 
+/**
+ * Direct purchase orders against a pre-existing quote — no negotiation.
+ *
+ * These are the deviation scenarios. They exist to show a specific rule catching a
+ * specific thing, so each one is built to fail on exactly one rule and no others.
+ */
 export const TASKS: Task[] = [
-  {
-    id: "restock-brackets",
-    label: "Restock mounting brackets",
-    agent: "procurement-01",
-    note: "An ordinary, correct purchase. Run it once — then run it again.",
-    po: fromQuote("PO-4417"),
-  },
-  {
-    id: "sensor-batch",
-    label: "Order sensor batch for line 3",
-    agent: "procurement-02",
-    note: "Also correct. A second clean run so the feed is not one row.",
-    po: fromQuote("PO-4418"),
-  },
   {
     id: "chairs-wrong-vendor",
     label: "Buy replacement chairs",
@@ -62,3 +95,7 @@ export const TASKS: Task[] = [
     po: fromQuote("PO-4422", { sku: "PL-FRT-EU4" }),
   },
 ];
+
+/** A correct PO, used to prefill the hand-written form so it starts from something that
+ *  passes and a judge has to actively break it. */
+export const BLANK_PO: PurchaseOrder = fromQuote("PO-4418");

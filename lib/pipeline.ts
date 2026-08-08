@@ -1,4 +1,4 @@
-import type { Decision, PurchaseOrder } from "@/lib/types";
+import type { Decision, NegotiationSummary, PurchaseOrder } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
 import { issueCard } from "@/lib/rain/issuer";
@@ -12,6 +12,7 @@ import { getStore, snapshot } from "@/lib/store";
  */
 
 export type StageName =
+  | "NEGOTIATE"
   | "PROPOSE"
   | "VERIFY"
   | "REFUSE"
@@ -36,10 +37,25 @@ function decisionId(): string {
   return `dec_${Date.now().toString(36)}_${counter.toString(36)}`;
 }
 
-export async function runPipeline(po: PurchaseOrder, agent: string): Promise<RunResult> {
+export async function runPipeline(
+  po: PurchaseOrder,
+  agent: string,
+  negotiation?: NegotiationSummary
+): Promise<RunResult> {
   const store = getStore();
   const stages: Stage[] = [];
   const total = poTotal(po);
+
+  // 1b NEGOTIATE — already concluded upstream; recorded here so the decision keeps the
+  // provenance of its own price.
+  if (negotiation) {
+    const won = negotiation.offers.find((o) => o.won);
+    stages.push({
+      name: "NEGOTIATE",
+      detail: `${negotiation.offers.length} sellers bid, ${negotiation.roundCount} counter-offer round — ${won?.vendor} won at ${(( won?.final ?? 0) / 100).toFixed(2)}/unit`,
+      ok: true,
+    });
+  }
 
   // 2 PROPOSE — the agent declares the PO it negotiated.
   stages.push({
@@ -69,6 +85,7 @@ export async function runPipeline(po: PurchaseOrder, agent: string): Promise<Run
     ruleVersion: ruleSet.version,
     checks: result.checks,
     agent,
+    negotiation,
   };
 
   // The refusal branch. Note what is missing: any call to Rain at all.

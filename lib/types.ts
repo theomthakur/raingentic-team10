@@ -159,6 +159,29 @@ export interface VerifyResult {
 
 export type Outcome = "approved" | "refused";
 
+/**
+ * How the price on this PO was arrived at.
+ *
+ * Recorded, never checked. The checks read the record, not the story behind it — a
+ * seller's reasoning is not evidence. But "where did this number come from" is a fair
+ * audit question, and storing the answer alongside the decision means it can be answered
+ * six months later without re-deriving anything.
+ */
+export interface NegotiationSummary {
+  taskKey: string;
+  buyerTargetCents: Cents;
+  roundCount: number;
+  offers: {
+    vendor: string;
+    strategy: string;
+    label: string;
+    opening: Cents;
+    final: Cents;
+    note: string;
+    won: boolean;
+  }[];
+}
+
 /** One immutable row in the append-only log. Nothing here is ever updated in place. */
 export interface Decision {
   id: string;
@@ -175,6 +198,8 @@ export interface Decision {
   seeded?: boolean;
   /** Which agent produced the PO. Cosmetic, but makes the feed read like a real system. */
   agent: string;
+  /** Present when this PO came out of a negotiation rather than a fixed quote. */
+  negotiation?: NegotiationSummary;
 }
 
 // ---------------------------------------------------------------------------
