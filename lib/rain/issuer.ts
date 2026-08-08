@@ -78,12 +78,68 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
   };
 }
 
+/**
+ * What the issuer can actually do right now, as opposed to what it is configured to do.
+ *
+ * `off`       no API key — every card is a local stand-in and nothing pretends otherwise.
+ * `simulated` a key is present, but no real card has been issued yet, or the last real
+ *             attempt failed. This is the dangerous state to get wrong: a key in the
+ *             environment is not the same as a working integration, and a badge that
+ *             reads "live" while every card is simulated is exactly the kind of thing
+ *             this whole project exists to argue against.
+ * `live`      a real Rain card has actually come back from the API.
+ */
+export type RainMode = "off" | "simulated" | "live";
+
+let lastRealIssuance: { ok: boolean; reason?: string } | null = null;
+
+/**
+ * Real issuance is opt-in, and off by default. This is not timidity — it is that an
+ * attempt today has only downside:
+ *
+ * Rain accepts the create call but ignores the spend limit, returning an ACTIVE card with
+ * no scope and a 2031 expiry. We then correctly refuse to present that as a scoped card,
+ * so the demo shows a simulated one either way — but the unscoped card still exists on
+ * the account, and `PATCH` cannot deactivate it until the status enum is confirmed. So
+ * every run would leave behind a live, unscoped, undeletable card in exchange for
+ * nothing. Flip this to `true` the moment a Rain engineer confirms the `configuration`
+ * schema; the code path is already correct and tested.
+ */
+function liveIssuanceEnabled(): boolean {
+  return process.env.RAIN_LIVE_ISSUANCE === "true";
+}
+
+export function rainIssuanceStatus(): { mode: RainMode; reason?: string } {
+  if (!process.env.RAIN_API_KEY) {
+    return { mode: "off", reason: "No RAIN_API_KEY set." };
+  }
+  if (lastRealIssuance?.ok) return { mode: "live" };
+  if (!liveIssuanceEnabled()) {
+    return {
+      mode: "simulated",
+      reason:
+        "Connected to Rain, but real issuance is deliberately off: Rain ignores the spend limit today, and an unscoped card cannot be deactivated. Set RAIN_LIVE_ISSUANCE=true once the configuration schema is confirmed.",
+    };
+  }
+  return {
+    mode: "simulated",
+    reason:
+      lastRealIssuance?.reason ??
+      "API key present, but no card has been issued through Rain yet this session.",
+  };
+}
+
 export async function issueCard(req: IssueRequest): Promise<IssuedCard> {
-  if (!process.env.RAIN_API_KEY) return simulate(req);
+  if (!process.env.RAIN_API_KEY || !liveIssuanceEnabled()) return simulate(req);
   try {
-    return await issueViaRain(req);
-  } catch {
-    // Never fail the demo on a credential problem, but never claim a real card either.
+    const card = await issueViaRain(req);
+    lastRealIssuance = { ok: true };
+    return card;
+  } catch (err) {
+    // Never fail the demo on a credential problem, and never claim a real card either —
+    // but do remember *why*, so the UI can say "simulated" instead of "live" rather than
+    // silently degrading while the badge still reads green.
+    lastRealIssuance = { ok: false, reason: (err as Error).message.split("\n")[0].slice(0, 160) };
     return simulate(req);
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
 import { anchoringEnabled } from "@/lib/monad/anchor";
+import { rainIssuanceStatus } from "@/lib/rain/issuer";
 import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
 
@@ -20,7 +21,9 @@ export async function GET() {
 
   return NextResponse.json({
     storage: store.kind,
-    rainWired: Boolean(process.env.RAIN_API_KEY),
+    // Not "is a key configured" — "can this actually issue a card". A key in the
+    // environment says nothing about whether Rain accepts the call.
+    rain: rainIssuanceStatus(),
     anchoringEnabled: anchoringEnabled(),
     // Deployed with no database: the log lives in serverless memory and empties on the
     // next cold start, so replay silently breaks on the exact URL we submit. It works
