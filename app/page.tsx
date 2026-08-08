@@ -13,6 +13,7 @@ import type { Stage } from "@/lib/pipeline";
 import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import { RunPanel } from "@/components/RunPanel";
 import { NegotiationPanel } from "@/components/NegotiationPanel";
+import { ApprovalInbox } from "@/components/ApprovalInbox";
 import { DecisionFeed } from "@/components/DecisionFeed";
 import { ProvenancePanel } from "@/components/ProvenancePanel";
 import { RuleEditor } from "@/components/RuleEditor";
@@ -85,6 +86,15 @@ export default function Page() {
     [state, selectedId]
   );
 
+  // A held decision that a later row already released is no longer waiting on anyone.
+  const heldDecisions = useMemo(() => {
+    if (!state) return [];
+    const released = new Set(
+      state.decisions.map((d) => d.releases).filter(Boolean) as string[]
+    );
+    return state.decisions.filter((d) => d.outcome === "held" && !released.has(d.id));
+  }, [state]);
+
   // --- actions -------------------------------------------------------------
 
   async function post<T>(url: string, body?: unknown): Promise<T> {
@@ -125,6 +135,32 @@ export default function Page() {
       await load();
       // Jump straight to the decision that was just made — in the demo this is what
       // puts the refusal and its four provenance fields on screen with no clicking.
+      setSelectedId(decision.id);
+      setTab("provenance");
+    } catch (err) {
+      setError((err as Error).message);
+      setRacing(false);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function approve(decisionId: string, by: string, note: string) {
+    setBusy(true);
+    setRacing(true);
+    setError(null);
+    setStages([]);
+    try {
+      const { decision, stages: next } = await post<{ decision: Decision; stages: Stage[] }>(
+        "/api/approve",
+        { decisionId, by, note }
+      );
+      for (let i = 0; i < next.length; i++) {
+        setStages(next.slice(0, i + 1));
+        if (i < next.length - 1) await sleep(STEP_DELAY_MS);
+      }
+      setRacing(false);
+      await load();
       setSelectedId(decision.id);
       setTab("provenance");
     } catch (err) {
@@ -272,6 +308,7 @@ export default function Page() {
                     totalCents={selected.po.unitPrice * selected.po.quantity}
                   />
                 )}
+                <ApprovalInbox held={heldDecisions} busy={busy} onApprove={approve} />
                 <ProvenancePanel decision={selected} />
                 <BudgetMeter budgets={state.budgets} />
               </>

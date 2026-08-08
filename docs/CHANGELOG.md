@@ -4,6 +4,36 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 3 — human oversight, and controls that cite their source
+
+Answers the first objection anyone raises: *"no human is in the loop, why would I trust
+it?"* Reasoning and citations in [CONTROLS.md](CONTROLS.md).
+
+- **Every rule now names the real-world control it implements.** None were invented here —
+  rules 1–4 are a three-way match, rule 6 is an idempotency key, rule 7 is a delegation of
+  authority. That is most of the trust argument: these are the controls a finance team
+  already runs, moved to before the money is committed.
+- **Rule 7, delegated authority.** Above $25,000 a purchase is **held**, not refused —
+  every check passed, it is simply large. A third outcome, because a purchase that is
+  *wrong* and one that is merely *large* need different answers; collapsing them either
+  blocks legitimate spending or waves through the thing you most wanted a person to see.
+- **No card exists while a purchase waits.** Approving is what creates the instrument, so
+  a rejected escalation has nothing to claw back.
+- **Approval inbox**, requiring a named approver — an unattributed approval is not an
+  approval, since the point of the control is that someone accepted responsibility.
+- **The release re-runs every check** against a fresh snapshot. The world may have moved
+  while the purchase sat in the queue. Approval is permission to proceed, not a promise
+  that the facts still hold.
+- **The hold and the release are two rows**, never a mutation, so the log shows both that
+  a person was asked and that a named person answered.
+- Two approvers releasing the same purchase: the second is refused. Rule 6 would catch it
+  anyway by reading what the first release wrote — idempotency protecting a human race,
+  not just a machine retry.
+
+**Bug caught by the tests:** replay classified `held` decisions as refused, because it
+only knew two outcomes. It now classifies exactly as the pipeline does and buckets changes
+by direction, so three outcomes still sort into stricter and looser. 37 tests passing.
+
 ## 2026-08-08 · Iteration 2 — the replay diff explains itself
 
 The diff was a plain list of POs, which named what flipped but never why.

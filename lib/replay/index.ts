@@ -1,4 +1,4 @@
-import type { Decision, ReplayChange, ReplayResult, RuleSet } from "@/lib/types";
+import type { Decision, Outcome, ReplayChange, ReplayResult, RuleSet } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
 
@@ -15,6 +15,11 @@ import { verify } from "@/lib/checks";
  * It is also cheap: the checks are pure functions over rows we already have, so this is a
  * loop, not a rebuild.
  */
+/** How permissive an outcome is: approved lets money move, held pauses, refused stops. */
+function permissiveness(outcome: Outcome): number {
+  return outcome === "approved" ? 2 : outcome === "held" ? 1 : 0;
+}
+
 export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
   const approvedNowRefused: ReplayChange[] = [];
   const refusedNowApproved: ReplayChange[] = [];
@@ -22,7 +27,13 @@ export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
 
   for (const decision of decisions) {
     const after = verify(decision.po, decision.record, target);
-    const outcome = after.ok ? "approved" : "refused";
+    // Must classify exactly as the pipeline does, or a decision that was held would come
+    // back looking like a refusal and the diff would report changes that never happened.
+    const outcome: Outcome = after.ok
+      ? "approved"
+      : after.failures.length > 0
+        ? "refused"
+        : "held";
 
     if (outcome === decision.outcome) {
       unchanged++;
@@ -56,8 +67,13 @@ export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
         })),
     };
 
-    if (decision.outcome === "approved") approvedNowRefused.push(change);
-    else refusedNowApproved.push(change);
+    // Bucket by direction rather than by exact pair, so the three outcomes still sort
+    // into "the policy got stricter" and "the policy got looser".
+    if (permissiveness(outcome) < permissiveness(decision.outcome)) {
+      approvedNowRefused.push(change);
+    } else {
+      refusedNowApproved.push(change);
+    }
   }
 
   const fromVersion = decisions.length

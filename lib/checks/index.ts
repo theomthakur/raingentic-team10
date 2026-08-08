@@ -297,6 +297,40 @@ const noExistingCard: CheckFn = (po, record, rule) => {
   };
 };
 
+// ---------------------------------------------------------------------------
+// 7. Delegated authority. Not a refusal — an escalation.
+//
+// "There is no human in the loop" is only alarming when it is unconditional. No company
+// gives an employee unlimited spending authority either; it gives bounded autonomy with
+// an escalation path above a threshold. An agent gets exactly the same deal.
+// ---------------------------------------------------------------------------
+
+const requiresApproval: CheckFn = (po, _record, rule) => {
+  const threshold = num(rule.params, "thresholdCents", Number.MAX_SAFE_INTEGER);
+  const role = String(rule.params.approverRole ?? "an approver");
+  const asked = poTotal(po);
+  const base = { ruleId: rule.id, label: rule.label, readFrom: "policy.thresholdCents" };
+
+  if (asked > threshold) {
+    return {
+      ...base,
+      passed: false,
+      escalates: true,
+      reason: `${money(asked)} is above the ${money(threshold)} delegated limit, so this is held for ${role} to release. Every other check passed — no card exists until a person signs off.`,
+      expected: `at most ${money(threshold)} without sign-off`,
+      actual: money(asked),
+    };
+  }
+
+  return {
+    ...base,
+    passed: true,
+    reason: `${money(asked)} is within the agent's ${money(threshold)} delegated authority.`,
+    expected: `at most ${money(threshold)} without sign-off`,
+    actual: money(asked),
+  };
+};
+
 const CHECKS: Record<RuleId, CheckFn> = {
   "po-exists": poExists,
   "po-open": poOpen,
@@ -304,6 +338,7 @@ const CHECKS: Record<RuleId, CheckFn> = {
   "line-matches": lineMatches,
   "within-budget": withinBudget,
   "no-existing-card": noExistingCard,
+  "requires-approval": requiresApproval,
 };
 
 /**
@@ -329,6 +364,16 @@ export function verify(
     checks.push(fn(po, record, rule));
   }
 
-  const failures = checks.filter((c) => !c.passed);
-  return { ok: failures.length === 0, checks, failures };
+  // A purchase that is *wrong* and a purchase that is merely *large* need different
+  // answers. Collapsing them would either block legitimate spending or wave through the
+  // very thing you most wanted a person to see.
+  const blocked = checks.filter((c) => !c.passed && !c.escalates);
+  const escalations = checks.filter((c) => !c.passed && c.escalates);
+
+  return {
+    ok: blocked.length === 0 && escalations.length === 0,
+    checks,
+    failures: blocked,
+    escalations,
+  };
 }
