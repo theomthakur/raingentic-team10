@@ -16,6 +16,8 @@ interface State {
   quotes: QuoteRecord[];
   budgets: BudgetRecord[];
   cards: IssuedCardRecord[];
+  /** Order lines currently reserved for issuance. */
+  claims: Set<string>;
 }
 
 function freshState(): State {
@@ -25,6 +27,7 @@ function freshState(): State {
     quotes: SEED_QUOTES.map((q) => ({ ...q })),
     budgets: SEED_BUDGETS.map((b) => ({ ...b })),
     cards: [],
+    claims: new Set<string>(),
   };
 }
 
@@ -93,6 +96,17 @@ export function createMemoryStore(): Store {
       const existing = state().quotes.find((x) => x.poNumber === quote.poNumber);
       if (existing) return; // first terms win, see the interface note
       state().quotes.push({ ...quote });
+    },
+
+    async claimOrderLine(poNumber) {
+      // No await between the check and the set, so this is atomic on JS's single thread.
+      // An await here would reopen exactly the window it exists to close.
+      if (state().claims.has(poNumber)) return false;
+      state().claims.add(poNumber);
+      return true;
+    },
+    async releaseOrderLine(poNumber) {
+      state().claims.delete(poNumber);
     },
 
     async recordIssuedCard(card) {

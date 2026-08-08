@@ -59,6 +59,12 @@ async function migrate(sql: Sql): Promise<void> {
   // Keyed by the order line, so a double-issue is impossible even under a concurrent
   // retry. Rule 6 is the legible version of this; the primary key is the real one.
   await sql`create table if not exists issued_cards (po_number text primary key, data jsonb not null)`;
+  // The claim is what makes idempotency hold across processes, not just within one.
+  // The primary key does the work: two concurrent inserts, exactly one wins.
+  await sql`create table if not exists line_claims (
+              po_number  text primary key,
+              claimed_at timestamptz not null default now()
+            )`;
 
   const [{ n }] = (await sql`select count(*)::int as n from rule_sets`) as { n: number }[];
   if (n === 0) await seedAll(sql);
@@ -202,6 +208,21 @@ export function createPostgresStore(): Store {
                 on conflict (po_number) do nothing`;
     },
 
+    async claimOrderLine(poNumber) {
+      const sql = await getSql();
+      // RETURNING is empty when the conflict fired, which is precisely "someone else has
+      // it". No read-then-write, so there is no window between checking and taking.
+      const rows = await sql`
+        insert into line_claims (po_number) values (${poNumber})
+        on conflict (po_number) do nothing
+        returning po_number`;
+      return rows.length > 0;
+    },
+    async releaseOrderLine(poNumber) {
+      const sql = await getSql();
+      await sql`delete from line_claims where po_number = ${poNumber}`;
+    },
+
     async recordIssuedCard(card) {
       const sql = await getSql();
       // do nothing on conflict: the first card for a line wins, always.
@@ -231,6 +252,7 @@ export function createPostgresStore(): Store {
     async reset() {
       const sql = await getSql();
       await sql`delete from issued_cards`;
+      await sql`delete from line_claims`;
       await sql`delete from decisions where seeded = false`;
       await sql`delete from rule_sets where version > 1`;
       await seedAll(sql);

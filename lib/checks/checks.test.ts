@@ -450,11 +450,70 @@ test("an unchanged policy produces an empty diff", () => {
   assert.deepEqual(diffRules(RULES.rules, RULES.rules), []);
 });
 
+// --- concurrency: idempotency as a property, not a claim ---------------------
+
+const asyncTests: [string, () => Promise<void>][] = [];
+function asyncTest(name: string, fn: () => Promise<void>) {
+  asyncTests.push([name, fn]);
+}
+
+asyncTest("two concurrent claims on the same order line: exactly one wins", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const results = await Promise.all(
+    Array.from({ length: 8 }, () => store.claimOrderLine("PO-RACE"))
+  );
+  assert.equal(
+    results.filter(Boolean).length,
+    1,
+    "exactly one caller may hold an order line"
+  );
+});
+
+asyncTest("different order lines do not block each other", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const results = await Promise.all([
+    store.claimOrderLine("PO-A"),
+    store.claimOrderLine("PO-B"),
+    store.claimOrderLine("PO-C"),
+  ]);
+  assert.deepEqual(results, [true, true, true]);
+});
+
+asyncTest("a released line can be claimed again, so a failure is not a permanent lock", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  assert.equal(await store.claimOrderLine("PO-RETRY"), true);
+  assert.equal(await store.claimOrderLine("PO-RETRY"), false);
+  await store.releaseOrderLine("PO-RETRY");
+  assert.equal(await store.claimOrderLine("PO-RETRY"), true);
+});
+
 // --- report ----------------------------------------------------------------
 
-if (failures.length) {
-  console.error(`\n✗ ${failures.length} failing, ${passed} passing\n`);
-  for (const f of failures) console.error(`  ✗ ${f}\n`);
-  process.exit(1);
+async function run() {
+  for (const [name, fn] of asyncTests) {
+    try {
+      await fn();
+      passed++;
+    } catch (err) {
+      failures.push(`${name}\n    ${(err as Error).message.split("\n")[0]}`);
+    }
+  }
+
+  if (failures.length) {
+    console.error(`\n✗ ${failures.length} failing, ${passed} passing\n`);
+    for (const f of failures) console.error(`  ✗ ${f}\n`);
+    process.exit(1);
+  }
+  console.log(`✓ ${passed} passing`);
 }
-console.log(`✓ ${passed} passing`);
+
+run();

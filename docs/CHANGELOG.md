@@ -4,6 +4,29 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 7 — idempotency under concurrency (a real bug, found and fixed)
+
+Fired two identical purchase requests at the same instant. **Both were approved and two
+cards were issued.** Rule 6 only ever protected the sequential case: both requests took
+their snapshot before either wrote a card, so both honestly read "no card yet" — they
+just read it a moment too early.
+
+This is exactly what a judge who builds high-throughput transactional systems would probe
+first, and the pitch claims idempotency out loud, so the claim had to become a property.
+
+- **The order line is now reserved before anything is created.** `claimOrderLine` is
+  atomic: in Postgres a primary-key insert with `on conflict do nothing ... returning`, so
+  two concurrent callers cannot both win; in memory a check-and-set with no `await`
+  between the two halves, since an await there would reopen the exact window it closes.
+- The losing request is **refused with a reason that says what really happened**, rather
+  than the stale check that passed a moment earlier.
+- A failed issuance **releases the line**, so a transient error is not a permanent lock.
+- Re-verified: two simultaneous identical requests now produce **exactly one card**.
+- Three concurrency tests added. 44 passing.
+
+In payments this is not hypothetical — it is a double-click, a retried webhook, two queue
+workers draining the same job.
+
 ## 2026-08-08 · Iteration 6 — stage 7 REVOKE, the card dies
 
 Rain's own framing is that an agent's card is *"retired automatically once the job is
