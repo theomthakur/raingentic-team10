@@ -9,15 +9,22 @@ import { Badge } from "./ui";
  */
 export function Header({
   storage,
-  rainWired,
+  rain,
   ruleVersion,
   errorBadge,
 }: {
   storage: "memory" | "postgres";
-  rainWired: boolean;
+  rain: { mode: "off" | "simulated" | "live"; reason?: string };
   ruleVersion: number;
   errorBadge?: ReactNode;
 }) {
+  // Deliberately not driven by whether a key exists. A failed Rain call must never look
+  // like a successful one from across a room.
+  const rainBadge = {
+    live: { tone: "rain" as const, label: "rain live" },
+    simulated: { tone: "warn" as const, label: "cards simulated" },
+    off: { tone: "neutral" as const, label: "rain not connected" },
+  }[rain.mode];
   return (
     <header className="border-b border-edge bg-white">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-6 px-6 py-7 md:px-10">
@@ -42,13 +49,19 @@ export function Header({
             <Badge tone={storage === "postgres" ? "pass" : "warn"}>
               {storage === "postgres" ? "postgres" : "in-memory"}
             </Badge>
-            <Badge tone={rainWired ? "rain" : "neutral"}>
-              {rainWired ? "rain live" : "rain simulated"}
-            </Badge>
+            <span title={rain.reason ?? "A real Rain card was issued this session."}>
+              <Badge tone={rainBadge.tone}>{rainBadge.label}</Badge>
+            </span>
             <Badge tone="neutral">policy v{ruleVersion}</Badge>
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/presentation"
+              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
+            >
+              Presentation →
+            </Link>
             <Link
               href="/catalog"
               className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"

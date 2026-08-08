@@ -27,7 +27,7 @@ import { diffRules } from "@/lib/rules/diff";
 
 interface State {
   storage: "memory" | "postgres";
-  rainWired: boolean;
+  rain: { mode: "off" | "simulated" | "live"; reason?: string };
   anchoringEnabled: boolean;
   ephemeralInProduction: boolean;
   decisions: Decision[];
@@ -270,7 +270,7 @@ export default function Page() {
     <div className="min-h-screen bg-white">
       <Header
         storage={state.storage}
-        rainWired={state.rainWired}
+        rain={state.rain}
         ruleVersion={currentRuleSet.version}
         errorBadge={error ? <Badge tone="fail">{error}</Badge> : undefined}
       />

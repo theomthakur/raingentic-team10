@@ -1,16 +1,18 @@
 /**
  * Rain API client.
  *
- * ⚠️ UNCONFIRMED, ask a Rain engineer and update here first:
- *   1. Base URL — RAIN_BASE_URL defaults to the sandbox URL seen in public docs
- *      (api-dev.raincards.xyz/v1). Confirm this is what the hackathon actually uses.
- *   2. Auth header shape — defaulting to `Authorization: Bearer <key>`, the common
- *      pattern. If Rain uses `x-api-key` or something else, change buildHeaders() only,
- *      nothing downstream needs to know.
- *   3. Endpoint paths below are inferred from public Rain/Crossmint integration docs
- *      (createRainUserContract, issueRainCard, getRainUserCards, etc.), not from Rain's
- *      own Swagger reference (behind an access code). Confirm paths on site.
- *   4. Whether issue-card supports an exact merchant lock vs category only.
+ * Confirmed against the live sandbox (see docs/RAIN-API-CONFIRMED.md):
+ *   ✅ Base URL `https://api-dev.raincards.xyz/v1`
+ *   ✅ Auth is an `api-key` header, NOT an Authorization bearer — the API says so itself
+ *      in its 401: "headers is missing required property 'api-key'".
+ *   ✅ Cards live under `/issuing`. Creation is POST /issuing/users/{userId}/cards.
+ *
+ * 🔴 Still unconfirmed, and each one is a question for a Rain engineer:
+ *   1. The `configuration` schema for a spend limit and a short expiry. The minimum body
+ *      returns an unscoped card with a 2032 expiry, which we refuse to call "scoped".
+ *   2. The status enum that deactivates a card — "inactive" returns 400.
+ *   3. Whether the collateral contract needs attaching or funding; it 403s today.
+ *   4. Whether exact-merchant locking is supported, or only category level.
  *
  * Nothing else in the app should import `fetch` directly against Rain. Change the shape
  * of a request in exactly one place: here.
@@ -94,30 +96,61 @@ export interface IssueCardParams {
   reference: string;
 }
 
+/**
+ * Create a card.
+ *
+ * Path and response shape are the ones confirmed against the live sandbox and written up
+ * in docs/RAIN-API-CONFIRMED.md — `POST /issuing/users/{userId}/cards`, not `/cards`,
+ * which 404s. The response uses `last4` and `expirationMonth`/`expirationYear`, not
+ * `lastFour` and `expiresAt`.
+ *
+ * 🔴 The `configuration` object is the remaining unknown. The minimum accepted body is
+ * `{ type: "virtual" }`, and it returns an ACTIVE card with NO spend limit and a 2032
+ * expiry. We send our intended scope anyway so that the moment a Rain engineer confirms
+ * the schema this starts working — but the caller must treat an unscoped response as a
+ * failure to scope, because "a card bound to exactly this purchase" is the entire claim.
+ */
 export async function issueScopedCard(params: IssueCardParams): Promise<ScopedCard> {
   const userId = env("RAIN_USER_ID");
-  // UNCONFIRMED path and body shape. Adjust field names once confirmed on site.
   const body = {
-    userId,
-    limit: { amount: params.limitCents, frequency: "single_use" },
-    expiresAt: params.expiresAt,
-    ...(params.merchantLock ? { merchantAllowlist: [params.merchantLock] } : {}),
-    reference: params.reference,
+    type: "virtual",
+    configuration: {
+      currency: "usd",
+      spendLimit: params.limitCents,
+      spendLimitFrequency: "single_use",
+      expiresAt: params.expiresAt,
+      ...(params.merchantLock ? { merchantAllowlist: [params.merchantLock] } : {}),
+      reference: params.reference,
+    },
   };
+
   const card = await rainFetch<{
     id: string;
-    lastFour: string;
+    last4: string;
     status: string;
-    limit: { amount: number };
-    expiresAt: string;
-  }>("/cards", { method: "POST", body: JSON.stringify(body) });
+    expirationMonth?: number;
+    expirationYear?: number;
+    configuration?: { spendLimit?: number };
+  }>(`/issuing/users/${userId}/cards`, { method: "POST", body: JSON.stringify(body) });
+
+  // Rain echoed a card back, but did it honour the scope we asked for? If the limit did
+  // not stick, saying "scoped card issued" would be false, so refuse to claim it.
+  const grantedLimit = card.configuration?.spendLimit;
+  if (grantedLimit !== params.limitCents) {
+    throw new Error(
+      `Card ${card.id} was created but NOT scoped: asked for a ${params.limitCents}c limit, got ${grantedLimit ?? "none"}. Refusing to present this as a scoped card.`
+    );
+  }
 
   return {
     cardId: card.id,
-    lastFour: card.lastFour,
+    lastFour: card.last4,
     status: card.status === "active" ? "active" : "inactive",
-    limitCents: card.limit.amount,
-    expiresAt: card.expiresAt,
+    limitCents: grantedLimit,
+    expiresAt:
+      card.expirationYear && card.expirationMonth
+        ? new Date(Date.UTC(card.expirationYear, card.expirationMonth, 0)).toISOString()
+        : params.expiresAt,
   };
 }
 
@@ -138,10 +171,9 @@ export async function setCardStatus(cardId: string, status: string): Promise<voi
 }
 
 export async function listCards(): Promise<ScopedCard[]> {
-  const userId = env("RAIN_USER_ID");
   const res = await rainFetch<{ cards: Array<{
     id: string; lastFour: string; status: string; limit: { amount: number }; expiresAt: string;
-  }> }>(`/users/${userId}/cards`);
+  }> }>(`/issuing/cards`);
   return res.cards.map((c) => ({
     cardId: c.id,
     lastFour: c.lastFour,
