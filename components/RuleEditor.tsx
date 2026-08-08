@@ -10,6 +10,10 @@ import { Badge, Button, Panel } from "./ui";
  * next version rather than editing the one in front of you. That is the difference
  * between a policy the customer owns and a policy that needs a deploy — and it is what
  * makes the replay next to it mean anything.
+ *
+ * The "anchored" badge is the one place Monad's purple appears, deliberately: it is the
+ * one thing on screen that Monad's brand actually explains, a rule version anchored as a
+ * real transaction, not a decorative accent reused everywhere.
  */
 
 function ParamField({
@@ -28,7 +32,7 @@ function ParamField({
           type="checkbox"
           checked={value}
           onChange={(e) => onChange(e.target.checked)}
-          className="h-3.5 w-3.5 accent-emerald-500"
+          className="h-3.5 w-3.5 accent-rain-500"
         />
         <span className="font-mono text-[11px] text-muted">{name}</span>
       </label>
@@ -43,7 +47,7 @@ function ParamField({
           type="number"
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="tabular w-20 rounded border border-edge bg-ink px-1.5 py-0.5 text-right font-mono text-[11px] text-slate-200 outline-none focus:border-slate-500"
+          className="tabular w-20 rounded-lg border border-edge bg-white px-1.5 py-0.5 text-right font-mono text-[11px] text-ink-900 outline-none focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
         />
       </label>
     );
@@ -55,7 +59,7 @@ function ParamField({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-28 rounded border border-edge bg-ink px-1.5 py-0.5 font-mono text-[11px] text-slate-200 outline-none focus:border-slate-500"
+        className="w-28 rounded-lg border border-edge bg-white px-1.5 py-0.5 font-mono text-[11px] text-ink-900 outline-none focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
       />
     </label>
   );
@@ -96,7 +100,7 @@ export function RuleEditor({
         </div>
       }
     >
-      <ul className="divide-y divide-edge/60">
+      <ul className="divide-y divide-edge">
         {rules.map((rule, i) => (
           <li key={rule.id} className="px-4 py-2.5">
             <div className="flex items-start gap-2.5">
@@ -104,20 +108,20 @@ export function RuleEditor({
                 type="checkbox"
                 checked={rule.enabled}
                 onChange={(e) => update(rule.id, { enabled: e.target.checked })}
-                className="mt-1 h-3.5 w-3.5 accent-emerald-500"
+                className="mt-1 h-3.5 w-3.5 accent-rain-500"
                 title="Disable this rule"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
                   <p
                     className={`text-[13px] font-medium ${
-                      rule.enabled ? "text-slate-200" : "text-slate-600 line-through"
+                      rule.enabled ? "text-ink-900" : "text-ink-400 line-through"
                     }`}
                   >
-                    <span className="mr-1.5 font-mono text-[11px] text-slate-600">{i + 1}</span>
+                    <span className="mr-1.5 font-mono text-[11px] text-ink-400">{i + 1}</span>
                     {rule.label}
                   </p>
-                  <code className="shrink-0 font-mono text-[10px] text-slate-600">{rule.id}</code>
+                  <code className="shrink-0 font-mono text-[10px] text-ink-400">{rule.id}</code>
                 </div>
                 {Object.keys(rule.params).length > 0 && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
@@ -148,7 +152,7 @@ export function RuleEditor({
 
       {/* Version history. The old version is still here, which is the point. */}
       <div className="border-t border-edge px-4 py-2.5">
-        <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-600">
+        <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-ink-400">
           versions
         </p>
         <ul className="space-y-1">
@@ -156,20 +160,20 @@ export function RuleEditor({
             <li key={rs.version} className="flex items-center gap-2 text-[12px]">
               <span
                 className={`font-mono ${
-                  rs.version === current.version ? "text-slate-200" : "text-muted"
+                  rs.version === current.version ? "text-ink-900" : "text-muted"
                 }`}
               >
                 v{rs.version}
               </span>
               <span className="truncate text-muted">{rs.note}</span>
               <code
-                className="ml-auto shrink-0 font-mono text-[10px] text-slate-600"
+                className="ml-auto shrink-0 font-mono text-[10px] text-ink-400"
                 title={`sha256 ${rs.hash}${rs.anchorTxHash ? `\nMonad tx ${rs.anchorTxHash}` : "\nnot yet anchored"}`}
               >
                 {rs.hash.slice(0, 10)}
               </code>
               {rs.anchorTxHash ? (
-                <Badge tone="pass">anchored</Badge>
+                <Badge tone="monad">anchored on monad</Badge>
               ) : (
                 <Badge tone="neutral">local</Badge>
               )}
@@ -177,7 +181,7 @@ export function RuleEditor({
                 <button
                   type="button"
                   onClick={() => onRevert(rs.version)}
-                  className="text-[11px] text-muted underline-offset-2 hover:text-slate-200 hover:underline"
+                  className="text-[11px] text-muted underline-offset-2 hover:text-ink-900 hover:underline"
                 >
                   load
                 </button>

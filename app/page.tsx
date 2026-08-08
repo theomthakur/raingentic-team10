@@ -17,6 +17,7 @@ import { ProvenancePanel } from "@/components/ProvenancePanel";
 import { RuleEditor } from "@/components/RuleEditor";
 import { ReplayDiff } from "@/components/ReplayDiff";
 import { BudgetMeter } from "@/components/BudgetMeter";
+import { PipelineDiagram } from "@/components/PipelineDiagram";
 import { Badge } from "@/components/ui";
 
 interface State {
@@ -30,10 +31,14 @@ interface State {
 
 type Tab = "provenance" | "policy";
 
+const STEP_DELAY_MS = 380;
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function Page() {
   const [state, setState] = useState<State | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [stages, setStages] = useState<Stage[]>([]);
+  const [racing, setRacing] = useState(false);
   const [ranTasks, setRanTasks] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,13 +89,23 @@ export default function Page() {
 
   async function run(body: { taskId?: string; po?: PurchaseOrder }, taskId?: string) {
     setBusy(true);
+    setRacing(true);
     setError(null);
+    setStages([]);
     try {
+      // The full result comes back in one call — it's fast and deterministic. What
+      // follows is an honest, choreographed reveal of that same real result, one step at
+      // a time, not a second slower computation. The numbers never change; only the pace
+      // of showing them does, so watching it is closer to watching it happen.
       const { decision, stages: next } = await post<{ decision: Decision; stages: Stage[] }>(
         "/api/run",
         body
       );
-      setStages(next);
+      for (let i = 0; i < next.length; i++) {
+        setStages(next.slice(0, i + 1));
+        if (i < next.length - 1) await sleep(STEP_DELAY_MS);
+      }
+      setRacing(false);
       if (taskId) setRanTasks((prev) => new Set(prev).add(taskId));
       await load();
       // Jump straight to the decision that was just made — in the demo this is what
@@ -99,6 +114,7 @@ export default function Page() {
       setTab("provenance");
     } catch (err) {
       setError((err as Error).message);
+      setRacing(false);
     } finally {
       setBusy(false);
     }
@@ -166,12 +182,10 @@ export default function Page() {
     <main className="mx-auto flex h-screen max-w-[1600px] flex-col gap-3 p-4">
       <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-slate-100">Mandate</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-ink-900">Mandate</h1>
           <p className="text-[13px] text-muted">
-            Rain bounds <em className="not-italic text-slate-300">how much</em> and{" "}
-            <em className="not-italic text-slate-300">where</em>. Mandate checks{" "}
-            <em className="not-italic text-slate-300">why</em> — and if the reason does not
-            hold, no card is ever issued.
+            An agent wants to spend money.{" "}
+            <span className="text-ink-700">Click a task below and watch what happens.</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -179,12 +193,14 @@ export default function Page() {
           <Badge tone={state.storage === "postgres" ? "pass" : "warn"}>
             {state.storage === "postgres" ? "postgres" : "in-memory"}
           </Badge>
-          <Badge tone={state.rainWired ? "pass" : "neutral"}>
+          <Badge tone={state.rainWired ? "rain" : "neutral"}>
             {state.rainWired ? "rain live" : "rain simulated"}
           </Badge>
           <Badge tone="neutral">policy v{currentRuleSet.version}</Badge>
         </div>
       </header>
+
+      <PipelineDiagram stages={stages} racing={racing} />
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         {/* left: what the agents did, and the append-only record of it */}
@@ -216,10 +232,10 @@ export default function Page() {
                 key={t}
                 type="button"
                 onClick={() => setTab(t)}
-                className={`rounded border px-3 py-1 text-[12px] font-medium capitalize transition ${
+                className={`rounded-full border px-3.5 py-1.5 text-[12px] font-medium capitalize transition ${
                   tab === t
-                    ? "border-edge bg-edge/60 text-slate-200"
-                    : "border-transparent text-muted hover:text-slate-300"
+                    ? "border-rain-200 bg-rain-50 text-rain-700"
+                    : "border-transparent text-muted hover:text-ink-900"
                 }`}
               >
                 {t}

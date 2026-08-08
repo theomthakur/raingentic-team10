@@ -38,11 +38,12 @@ export function DecisionFeed({
       {decisions.length === 0 ? (
         <Empty>Nothing recorded yet.</Empty>
       ) : (
-        <ul className="min-h-0 flex-1 divide-y divide-edge/60 overflow-y-auto">
+        <ul className="min-h-0 flex-1 divide-y divide-edge overflow-y-auto">
           {decisions.map((d) => {
             const refusedRow = d.outcome === "refused";
             const selected = d.id === selectedId;
             const firstFailure = d.checks.find((c) => !c.passed && !c.skipped);
+            const isNew = !d.seeded;
 
             return (
               <li key={d.id}>
@@ -50,21 +51,21 @@ export function DecisionFeed({
                   type="button"
                   onClick={() => onSelect(d)}
                   className={`flex w-full items-start gap-3 px-4 py-2.5 text-left transition ${
-                    selected ? "bg-edge/60" : "hover:bg-edge/30"
-                  }`}
+                    selected ? "bg-rain-50" : "hover:bg-ink-50"
+                  } ${isNew ? "animate-row-in" : ""}`}
                 >
                   <span
                     className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                      refusedRow ? "bg-fail" : "bg-pass"
+                      refusedRow ? "bg-fail" : "bg-mint-500"
                     }`}
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="truncate font-mono text-[13px] text-slate-200">
+                      <span className="truncate font-mono text-[13px] text-ink-900">
                         {d.po.poNumber}
                         <span className="ml-2 text-muted">{d.po.vendor}</span>
                       </span>
-                      <span className="tabular shrink-0 font-mono text-[13px] text-slate-300">
+                      <span className="tabular shrink-0 font-mono text-[13px] text-ink-700">
                         {money(poTotal(d.po))}
                       </span>
                     </span>
@@ -72,7 +73,7 @@ export function DecisionFeed({
                       <span className="truncate text-[12px] text-muted">
                         {refusedRow && firstFailure ? firstFailure.reason : `${d.po.quantity} × ${d.po.sku}`}
                       </span>
-                      <span className="tabular shrink-0 font-mono text-[11px] text-slate-600">
+                      <span className="tabular shrink-0 font-mono text-[11px] text-ink-400">
                         {d.seeded ? shortDate(d.createdAt) : shortTime(d.createdAt)}
                       </span>
                     </span>

@@ -16,15 +16,15 @@ export function BudgetMeter({ budgets }: { budgets: BudgetRecord[] }) {
           return (
             <li key={b.costCentre}>
               <div className="flex items-baseline justify-between gap-2">
-                <span className="font-mono text-[12px] text-slate-300">{b.costCentre}</span>
+                <span className="font-mono text-[12px] text-ink-700">{b.costCentre}</span>
                 <span className="tabular font-mono text-[11px] text-muted">
                   {money(b.limitCents - b.spentCents)} left
                 </span>
               </div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-edge">
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-100">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    tight ? "bg-warn" : "bg-emerald-500/70"
+                    tight ? "bg-warn" : "bg-mint-500"
                   }`}
                   style={{ width: `${pct}%` }}
                 />

@@ -12,9 +12,11 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={`rounded-lg border border-edge bg-panel ${className}`}>
+    <section
+      className={`rounded-2xl border border-edge bg-panel shadow-sm shadow-ink-900/[0.03] ${className}`}
+    >
       {title && (
-        <header className="flex items-center justify-between gap-3 border-b border-edge px-4 py-2.5">
+        <header className="flex items-center justify-between gap-3 border-b border-edge px-4 py-3">
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-muted">{title}</h2>
           {right}
         </header>
@@ -28,18 +30,20 @@ export function Badge({
   tone = "neutral",
   children,
 }: {
-  tone?: "pass" | "fail" | "neutral" | "warn";
+  tone?: "pass" | "fail" | "neutral" | "warn" | "rain" | "monad";
   children: ReactNode;
 }) {
   const tones = {
-    pass: "border-pass/40 bg-pass/10 text-pass",
-    fail: "border-fail/40 bg-fail/10 text-fail",
-    warn: "border-warn/40 bg-warn/10 text-warn",
-    neutral: "border-edge bg-edge/40 text-muted",
+    pass: "border-mint-500/30 bg-mint-50 text-mint-700",
+    fail: "border-fail/25 bg-red-50 text-fail",
+    warn: "border-warn/30 bg-amber-50 text-warn",
+    neutral: "border-edge bg-ink-50 text-muted",
+    rain: "border-rain-500/25 bg-rain-50 text-rain-600",
+    monad: "border-monad-500/25 bg-monad-50 text-monad-700",
   } as const;
   return (
     <span
-      className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[11px] leading-none ${tones[tone]}`}
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[11px] leading-none ${tones[tone]}`}
     >
       {children}
     </span>
@@ -49,7 +53,7 @@ export function Badge({
 /** The dot that tells you pass / fail / didn't run at a glance. */
 export function Dot({ state }: { state: "pass" | "fail" | "skip" }) {
   const cls =
-    state === "pass" ? "bg-pass" : state === "fail" ? "bg-fail" : "bg-slate-600";
+    state === "pass" ? "bg-mint-500" : state === "fail" ? "bg-fail" : "bg-ink-300";
   return <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${cls}`} />;
 }
 
@@ -67,10 +71,9 @@ export function Button({
   title?: string;
 }) {
   const variants = {
-    primary:
-      "border-emerald-500/50 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25",
-    default: "border-edge bg-edge/40 text-slate-200 hover:bg-edge",
-    ghost: "border-transparent text-muted hover:text-slate-200 hover:bg-edge/40",
+    primary: "border-transparent bg-rain-500 text-white hover:bg-rain-600 active:scale-[0.98]",
+    default: "border-edge bg-white text-ink-800 hover:border-ink-300 hover:bg-ink-50",
+    ghost: "border-transparent text-muted hover:text-ink-900 hover:bg-ink-50",
   } as const;
   return (
     <button
@@ -78,7 +81,7 @@ export function Button({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded border px-3 py-1.5 text-[13px] font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${variants[variant]}`}
+      className={`rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${variants[variant]}`}
     >
       {children}
     </button>

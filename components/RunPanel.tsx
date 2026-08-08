@@ -10,19 +10,23 @@ const STAGE_ORDER: Stage["name"][] = ["PROPOSE", "VERIFY", "REFUSE", "ISSUE", "S
 
 function StageTrace({ stages }: { stages: Stage[] }) {
   return (
-    <ol className="space-y-1.5">
-      {stages.map((s) => {
+    <ol className="space-y-2">
+      {stages.map((s, i) => {
         const n = STAGE_ORDER.indexOf(s.name) + 1;
         return (
-          <li key={`${s.name}-${s.detail}`} className="flex items-start gap-2.5 text-[12px]">
+          <li
+            key={`${s.name}-${s.detail}`}
+            className="flex animate-row-in items-start gap-2.5 text-[12.5px]"
+            style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
+          >
             <span
-              className={`mt-px w-16 shrink-0 rounded px-1 py-0.5 text-center font-mono text-[10px] font-semibold ${
-                s.ok ? "bg-pass/15 text-pass" : "bg-fail/15 text-fail"
+              className={`mt-px w-16 shrink-0 rounded-full px-2 py-0.5 text-center font-mono text-[10px] font-semibold ${
+                s.ok ? "bg-mint-100 text-mint-700" : "bg-red-100 text-fail"
               }`}
             >
               {n} {s.name}
             </span>
-            <span className={s.ok ? "text-muted" : "text-slate-200"}>{s.detail}</span>
+            <span className={s.ok ? "text-ink-600" : "text-ink-900"}>{s.detail}</span>
           </li>
         );
       })}
@@ -48,7 +52,7 @@ function EditablePO({
     type: "text" | "number" = "text"
   ) => (
     <label className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-slate-600">{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-wider text-ink-500">{label}</span>
       <input
         type={type}
         value={String(draft[key])}
@@ -58,7 +62,7 @@ function EditablePO({
             [key]: type === "number" ? Number(e.target.value) : e.target.value,
           })
         }
-        className="w-full rounded border border-edge bg-ink px-2 py-1 font-mono text-[12px] text-slate-200 outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-edge bg-white px-2 py-1 font-mono text-[12px] text-ink-900 outline-none focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
       />
     </label>
   );
@@ -78,10 +82,10 @@ function EditablePO({
         {field("quantity", "quantity", "number")}
       </div>
       <div className="flex items-center justify-between">
-        <span className="tabular font-mono text-[12px] text-slate-400">
+        <span className="tabular font-mono text-[12px] text-ink-500">
           total ${((draft.unitPrice * draft.quantity) / 100).toFixed(2)}
         </span>
-        <Button onClick={() => onRun(draft)} disabled={busy}>
+        <Button onClick={() => onRun(draft)} disabled={busy} variant="primary">
           Verify and issue
         </Button>
       </div>
@@ -117,14 +121,14 @@ export function RunPanel({
         </Button>
       }
     >
-      <ul className="divide-y divide-edge/60">
+      <ul className="divide-y divide-edge">
         {tasks.map((t) => {
           const alreadyRun = ranTasks.has(t.id);
           return (
-            <li key={t.id} className="flex items-start gap-3 px-4 py-3">
+            <li key={t.id} className="flex items-start gap-3 px-4 py-3.5">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-[13px] font-medium text-slate-200">{t.label}</p>
+                  <p className="text-[13.5px] font-medium text-ink-900">{t.label}</p>
                   <Badge tone="neutral">{t.agent}</Badge>
                 </div>
                 <p className="mt-0.5 text-[12px] text-muted">{t.note}</p>
@@ -147,16 +151,16 @@ export function RunPanel({
       </ul>
 
       {stages.length > 0 && (
-        <div className="border-t border-edge bg-ink/40 px-4 py-3">
+        <div className="border-t border-edge bg-ink-50/60 px-4 py-3.5">
           <StageTrace stages={stages} />
         </div>
       )}
 
-      <div className="border-t border-edge px-4 py-2">
+      <div className="border-t border-edge px-4 py-2.5">
         <button
           type="button"
           onClick={() => setOpenForm((v) => !v)}
-          className="text-[12px] text-muted transition hover:text-slate-200"
+          className="text-[12px] text-muted transition hover:text-ink-900"
         >
           {openForm ? "− Hide" : "+ Write your own purchase order"}
         </button>

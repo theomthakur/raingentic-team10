@@ -18,16 +18,16 @@ function ChangeRow({ change, tone }: { change: ReplayChange; tone: "fail" | "pas
   return (
     <li className="px-4 py-2">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="truncate font-mono text-[12px] text-slate-300">
+        <span className="truncate font-mono text-[12px] text-ink-700">
           {change.poNumber}
           <span className="ml-2 text-muted">{change.vendor}</span>
         </span>
-        <span className="tabular shrink-0 font-mono text-[12px] text-slate-400">
+        <span className="tabular shrink-0 font-mono text-[12px] text-ink-500">
           {money(change.totalCents)}
         </span>
       </div>
       {drivers.length > 0 && (
-        <p className={`mt-0.5 text-[12px] ${tone === "fail" ? "text-fail/80" : "text-pass/80"}`}>
+        <p className={`mt-0.5 text-[12px] ${tone === "fail" ? "text-fail" : "text-mint-700"}`}>
           {tone === "fail" ? "now fails" : "no longer fails"}: {drivers[0].label}
         </p>
       )}
@@ -61,7 +61,7 @@ export function ReplayDiff({ result }: { result: ReplayResult | null }) {
       }
     >
       {/* The sentence to read out loud. */}
-      <p className="border-b border-edge px-4 py-3 text-[13px] leading-relaxed text-slate-200">
+      <p className="border-b border-edge px-4 py-3 text-[13px] leading-relaxed text-ink-900">
         Across{" "}
         <span className="tabular font-mono font-semibold">{result.total}</span> recorded
         decisions,{" "}
@@ -71,22 +71,20 @@ export function ReplayDiff({ result }: { result: ReplayResult | null }) {
           <>
             <span className="tabular font-mono font-semibold text-fail">{refusedNow}</span>{" "}
             {refusedNow === 1 ? "approval" : "approvals"} would now be refused and{" "}
-            <span className="tabular font-mono font-semibold text-pass">{approvedNow}</span>{" "}
+            <span className="tabular font-mono font-semibold text-mint-700">{approvedNow}</span>{" "}
             {approvedNow === 1 ? "refusal" : "refusals"} would now pass.
           </>
         )}{" "}
-        <span className="text-muted">
-          {result.unchanged} unchanged.
-        </span>
+        <span className="text-muted">{result.unchanged} unchanged.</span>
       </p>
 
       <div className="max-h-80 overflow-y-auto">
         {refusedNow > 0 && (
           <div>
-            <p className="bg-fail/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-fail">
+            <p className="bg-red-50 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-fail">
               approved → refused
             </p>
-            <ul className="divide-y divide-edge/60">
+            <ul className="divide-y divide-edge">
               {result.approvedNowRefused.map((c) => (
                 <ChangeRow key={c.decisionId} change={c} tone="fail" />
               ))}
@@ -96,10 +94,10 @@ export function ReplayDiff({ result }: { result: ReplayResult | null }) {
 
         {approvedNow > 0 && (
           <div>
-            <p className="bg-pass/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-pass">
+            <p className="bg-mint-50 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-mint-700">
               refused → approved
             </p>
-            <ul className="divide-y divide-edge/60">
+            <ul className="divide-y divide-edge">
               {result.refusedNowApproved.map((c) => (
                 <ChangeRow key={c.decisionId} change={c} tone="pass" />
               ))}
