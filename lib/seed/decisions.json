@@ -2191,6 +2191,152 @@
     "seeded": true
   },
   {
+    "id": "dec_seed_026_released",
+    "createdAt": "2026-07-22T19:38:52.597Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4179",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41873,
+      "quantity": 24,
+      "quoteExpiry": "2026-07-31T17:38:52.597Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4179",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 24,
+        "quoteExpiry": "2026-07-31T17:38:52.597Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2296000,
+        "spentCents": 1000000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-22T17:38:52.597Z",
+      "agent": "facilities-01"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4179 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4179 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $10,049.52 against a quoted $9,960.00, within the 2.00% tolerance.",
+        "expected": "$9,960.00 ± $199.20",
+        "actual": "$10,049.52"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$10,049.52 against $12,960.00 remaining in CC-OPS.",
+        "expected": "at most $12,960.00 remaining",
+        "actual": "$10,049.52"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4179 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "facilities-01 is trusted up to $5,000.00 unattended, and this is $10,049.52. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $5,000.00 for facilities-01",
+        "actual": "$10,049.52"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_e7268373aa",
+      "last4": "2927",
+      "limitCents": 1004952,
+      "expiresAt": "2026-07-31T17:38:52.597Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_026",
+    "approval": {
+      "by": "J. Blanco",
+      "at": "2026-07-22T19:38:52.597Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_026"
+    }
+  },
+  {
     "id": "dec_seed_018",
     "createdAt": "2026-07-23T19:59:03.521Z",
     "agent": "procurement-01",
@@ -3935,6 +4081,152 @@
     "seeded": true
   },
   {
+    "id": "dec_seed_006_released",
+    "createdAt": "2026-07-29T13:01:59.590Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4118",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41500,
+      "quantity": 23,
+      "quoteExpiry": "2026-08-09T10:01:59.590Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4118",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 23,
+        "quoteExpiry": "2026-08-09T10:01:59.590Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 5154500,
+        "spentCents": 2800000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-29T10:01:59.590Z",
+      "agent": "facilities-01"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4118 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4118 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $9,545.00 against a quoted $9,545.00, within the 2.00% tolerance.",
+        "expected": "$9,545.00 ± $190.90",
+        "actual": "$9,545.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$9,545.00 against $23,545.00 remaining in CC-ENG.",
+        "expected": "at most $23,545.00 remaining",
+        "actual": "$9,545.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4118 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "facilities-01 is trusted up to $5,000.00 unattended, and this is $9,545.00. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $5,000.00 for facilities-01",
+        "actual": "$9,545.00"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_c2026620cc",
+      "last4": "4572",
+      "limitCents": 954500,
+      "expiresAt": "2026-08-09T10:01:59.590Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_006",
+    "approval": {
+      "by": "F. Khwaja",
+      "at": "2026-07-29T13:01:59.590Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_006"
+    }
+  },
+  {
     "id": "dec_seed_044",
     "createdAt": "2026-07-30T06:03:05.441Z",
     "agent": "facilities-01",
@@ -4220,6 +4512,152 @@
     "outcome": "held",
     "card": null,
     "seeded": true
+  },
+  {
+    "id": "dec_seed_016_released",
+    "createdAt": "2026-07-30T22:26:58.066Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4149",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 23,
+      "quoteExpiry": "2026-08-09T17:26:58.066Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4149",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 23,
+        "quoteExpiry": "2026-08-09T17:26:58.066Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4835000,
+        "spentCents": 700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-30T17:26:58.066Z",
+      "agent": "procurement-01"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4149 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4149 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $33,350.00 against a quoted $33,350.00, within the 2.00% tolerance.",
+        "expected": "$33,350.00 ± $667.00",
+        "actual": "$33,350.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$33,350.00 against $41,350.00 remaining in CC-MKT.",
+        "expected": "at most $41,350.00 remaining",
+        "actual": "$33,350.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4149 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "procurement-01 is trusted up to $10,000.00 unattended, and this is $33,350.00. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $10,000.00 for procurement-01",
+        "actual": "$33,350.00"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_8cb5e3127f",
+      "last4": "6241",
+      "limitCents": 3335000,
+      "expiresAt": "2026-08-09T17:26:58.066Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_016",
+    "approval": {
+      "by": "R. Basri",
+      "at": "2026-07-30T22:26:58.066Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_016"
+    }
   },
   {
     "id": "dec_seed_042",
@@ -5091,6 +5529,152 @@
     "outcome": "held",
     "card": null,
     "seeded": true
+  },
+  {
+    "id": "dec_seed_013_released",
+    "createdAt": "2026-08-01T15:32:33.999Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4139",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 29,
+      "quoteExpiry": "2026-08-28T11:32:33.999Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4139",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 29,
+        "quoteExpiry": "2026-08-28T11:32:33.999Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 8005000,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-01T11:32:33.999Z",
+      "agent": "procurement-02"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4139 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4139 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $42,050.00 against a quoted $42,050.00, within the 2.00% tolerance.",
+        "expected": "$42,050.00 ± $841.00",
+        "actual": "$42,050.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$42,050.00 against $54,050.00 remaining in CC-MKT.",
+        "expected": "at most $54,050.00 remaining",
+        "actual": "$42,050.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4139 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "procurement-02 is trusted up to $20,000.00 unattended, and this is $42,050.00. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $20,000.00 for procurement-02",
+        "actual": "$42,050.00"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_bc3577b605",
+      "last4": "2654",
+      "limitCents": 4205000,
+      "expiresAt": "2026-08-28T11:32:33.999Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_013",
+    "approval": {
+      "by": "J. Blanco",
+      "at": "2026-08-01T15:32:33.999Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_013"
+    }
   },
   {
     "id": "dec_seed_011",
@@ -6255,6 +6839,152 @@
     "seeded": true
   },
   {
+    "id": "dec_seed_002_released",
+    "createdAt": "2026-08-04T23:12:17.128Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4107",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 96000,
+      "quantity": 27,
+      "quoteExpiry": "2026-09-03T21:12:17.128Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4107",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 27,
+        "quoteExpiry": "2026-09-03T21:12:17.128Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 5392000,
+        "spentCents": 1900000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-04T21:12:17.128Z",
+      "agent": "procurement-01"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4107 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4107 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $25,920.00 against a quoted $25,920.00, within the 2.00% tolerance.",
+        "expected": "$25,920.00 ± $518.40",
+        "actual": "$25,920.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$25,920.00 against $34,920.00 remaining in CC-ENG.",
+        "expected": "at most $34,920.00 remaining",
+        "actual": "$25,920.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4107 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "procurement-01 is trusted up to $10,000.00 unattended, and this is $25,920.00. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $10,000.00 for procurement-01",
+        "actual": "$25,920.00"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_13f1ebfada",
+      "last4": "9454",
+      "limitCents": 2592000,
+      "expiresAt": "2026-09-03T21:12:17.128Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_002",
+    "approval": {
+      "by": "R. Basri",
+      "at": "2026-08-04T23:12:17.128Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_002"
+    }
+  },
+  {
     "id": "dec_seed_008",
     "createdAt": "2026-08-05T03:33:58.070Z",
     "agent": "facilities-01",
@@ -6838,6 +7568,152 @@
       "expiresAt": "2026-08-30T13:35:48.269Z"
     },
     "seeded": true
+  },
+  {
+    "id": "dec_seed_017_released",
+    "createdAt": "2026-08-05T17:18:18.430Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4152",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 39,
+      "quoteExpiry": "2026-08-18T11:18:18.430Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4152",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 39,
+        "quoteExpiry": "2026-08-18T11:18:18.430Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 6955000,
+        "spentCents": 600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T11:18:18.430Z",
+      "agent": "procurement-01"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4152 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4152 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $56,550.00 against a quoted $56,550.00, within the 2.00% tolerance.",
+        "expected": "$56,550.00 ± $1,131.00",
+        "actual": "$56,550.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$56,550.00 against $63,550.00 remaining in CC-OPS.",
+        "expected": "at most $63,550.00 remaining",
+        "actual": "$56,550.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4152 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "readFrom": "record.agent",
+        "passed": false,
+        "escalates": true,
+        "reason": "procurement-01 is trusted up to $10,000.00 unattended, and this is $56,550.00. Not refused — it needs whoever holds a bigger limit to release it.",
+        "expected": "at most $10,000.00 for procurement-01",
+        "actual": "$56,550.00"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_b6a05d588d",
+      "last4": "1524",
+      "limitCents": 5655000,
+      "expiresAt": "2026-08-18T11:18:18.430Z"
+    },
+    "seeded": true,
+    "releases": "dec_seed_017",
+    "approval": {
+      "by": "F. Khwaja",
+      "at": "2026-08-05T17:18:18.430Z",
+      "note": "Signed off in the weekly capital review",
+      "decisionId": "dec_seed_017"
+    }
   },
   {
     "id": "dec_seed_009",

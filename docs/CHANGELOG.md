@@ -4,6 +4,29 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · The console now opens with nobody waiting
+
+The reframe fixed the words but not the screen. The console still loaded with **six
+purchases queued for a human approver** before a judge had clicked anything, so the first
+impression of an autonomous-spending project was a queue of things needing a signature.
+
+- **Historical escalations are seeded as resolved.** Each held row now gets its follow-up
+  release row, exactly as a live release writes one — the hold is never mutated, so the log
+  still shows that a person was asked and that a named person answered. Real history looks
+  like this anyway: a capital purchase is escalated on Tuesday and signed off on Tuesday.
+  The queue starts empty, which is the truthful state of a worked backlog.
+- 🔴 **A real bug this exposed:** replaying a released purchase **re-held it every time**.
+  The pipeline lifts the rules a person signed off; replay did not, so any policy change
+  flipped every historical release back to "waiting for approval". Replay now derives the
+  lifted rules from the held row it releases, so the two paths can never disagree about
+  what an approval covered. Hard failures are still never lifted — approval is permission
+  to proceed, not permission to be wrong.
+- Two tests guard it: the seeded log leaves nothing waiting, and a released purchase is
+  never re-held under any policy change. 84 passing.
+
+On load: **60 decisions, 41 approved, 0 waiting on a human.**
+
+
 ## 2026-08-08 · Reframed: autonomy is the product, human approval is the exception
 
 A Rain engineer read the build and gave the sharpest note we've had: architecturally this

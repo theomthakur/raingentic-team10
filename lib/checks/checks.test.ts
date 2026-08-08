@@ -381,6 +381,32 @@ test("disabling the vendor and SKU rule flips refusals to approvals", () => {
   assert.equal(r.approvedNowRefused.length, 0);
 });
 
+test("the seeded log leaves nothing waiting on a person", () => {
+  // The console must not greet anyone with a queue of purchases needing a signature —
+  // this is autonomous spending, and history should read as a backlog that was worked.
+  const released = new Set(history.map((d) => d.releases).filter(Boolean));
+  const waiting = history.filter((d) => d.outcome === "held" && !released.has(d.id));
+  assert.equal(waiting.length, 0, `${waiting.length} seeded purchases still awaiting release`);
+});
+
+test("a released purchase is never re-held on replay", () => {
+  // The delegated limit was answered by a person. Replaying must not re-litigate that,
+  // or every historical release would flip to "held" on any policy change at all.
+  const releases = history.filter((d) => d.approval);
+  assert.ok(releases.length > 0, "no released decisions in the seeded history");
+
+  for (const rules of [
+    RULES.rules.map((r) => (r.id === "amount-matches" ? { ...r, params: { toleranceBps: 0 } } : r)),
+    RULES.rules.map((r) => (r.id === "line-matches" ? { ...r, enabled: false } : r)),
+  ]) {
+    const r = replay(history, nextRuleSet(RULES, rules, "probe"));
+    const reheld = [...r.approvedNowRefused, ...r.refusedNowApproved].filter(
+      (c) => c.after === "held" && history.find((d) => d.id === c.decisionId)?.approval
+    );
+    assert.equal(reheld.length, 0, `${reheld.length} released purchases were re-held`);
+  }
+});
+
 test("every decision in the log accounts for itself in a replay", () => {
   const tightened = RULES.rules.map((rule) =>
     rule.id === "amount-matches" ? { ...rule, params: { toleranceBps: 0 } } : rule

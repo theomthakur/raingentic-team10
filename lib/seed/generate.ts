@@ -296,13 +296,59 @@ const negotiationVendors = Object.values(SELLERS_BY_TASK)
 
 const priors = negotiationVendors.map((v, i) => buildPrior(v.vendor, v.sku, v.unit, i));
 
-const decisions = [...main, ...priors].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+/**
+ * Every historical escalation was resolved.
+ *
+ * Seeded holds used to sit in the queue forever, so the console greeted a judge with six
+ * purchases waiting on a human before they had clicked anything — the exact opposite of
+ * the impression this project needs to make. Real history does not look like that either:
+ * a capital purchase gets escalated on Tuesday and signed off on Tuesday.
+ *
+ * So each held row gets its follow-up release row, exactly as a live release writes one.
+ * The hold is never mutated — both rows exist, so the log still shows that a person was
+ * asked and that a named person answered. The queue simply starts empty, which is the
+ * truthful state of a system whose backlog has been worked.
+ */
+const APPROVERS = ["R. Basri", "F. Khwaja", "J. Blanco"];
+
+const releases: Decision[] = main
+  .filter((d) => d.outcome === "held")
+  .map((held, i) => {
+    const at = new Date(Date.parse(held.createdAt) + (2 + (i % 5)) * 3_600_000).toISOString();
+    const by = APPROVERS[i % APPROVERS.length];
+    return {
+      ...held,
+      id: `${held.id}_released`,
+      createdAt: at,
+      outcome: "approved" as const,
+      releases: held.id,
+      approval: { by, at, note: "Signed off in the weekly capital review", decisionId: held.id },
+      // The delegated-limit check no longer applies: a person satisfied it.
+      checks: held.checks.filter((c) => c.ruleId !== "requires-approval"),
+      card: {
+        cardId: `card_${Math.floor(rand() * 1e12).toString(16)}`,
+        last4: String(between(1000, 9999)),
+        limitCents: poTotal(held.po),
+        expiresAt: held.po.quoteExpiry,
+      },
+      seeded: true,
+    };
+  });
+
+const decisions = [...main, ...releases, ...priors].sort((a, b) =>
+  a.createdAt < b.createdAt ? -1 : 1
+);
 
 const out = join(process.cwd(), "lib", "seed", "decisions.json");
 writeFileSync(out, `${JSON.stringify(decisions, null, 2)}\n`);
 
+const released = new Set(decisions.map((d) => d.releases).filter(Boolean));
+const stillWaiting = decisions.filter(
+  (d) => d.outcome === "held" && !released.has(d.id)
+).length;
 const count = (o: string) => decisions.filter((d) => d.outcome === o).length;
 console.log(`wrote ${decisions.length} decisions to ${out}`);
 console.log(`  approved: ${count("approved")}`);
 console.log(`  held:     ${count("held")}`);
 console.log(`  refused:  ${count("refused")}`);
+console.log(`  still waiting on a person: ${stillWaiting}   <- must be 0 on a clean load`);

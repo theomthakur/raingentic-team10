@@ -21,12 +21,33 @@ function permissiveness(outcome: Outcome): number {
 }
 
 export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
+  // Lets a release row find the hold it came from, to see what was actually signed off.
+  const byId = new Map(decisions.map((d) => [d.id, d]));
   const approvedNowRefused: ReplayChange[] = [];
   const refusedNowApproved: ReplayChange[] = [];
   let unchanged = 0;
 
   for (const decision of decisions) {
-    const after = verify(decision.po, decision.record, target);
+    // A released decision is judged with the rules a person signed off already lifted,
+    // exactly as `runPipeline` does on release — derived from the held row it releases, so
+    // replay and the live path can never disagree about what an approval covered. Without
+    // this, every historical release flips straight back to "held" on any replay.
+    //
+    // Hard failures are never lifted: approval is permission to proceed, not permission to
+    // be wrong.
+    const lifted = decision.releases
+      ? (byId
+          .get(decision.releases)
+          ?.checks.filter((c) => c.escalates && !c.passed)
+          .map((c) => c.ruleId) ?? [])
+      : [];
+
+    const effective = lifted.length
+      ? { ...target, rules: target.rules.filter((r) => !lifted.includes(r.id)) }
+      : target;
+
+    const after = verify(decision.po, decision.record, effective);
+
     // Must classify exactly as the pipeline does, or a decision that was held would come
     // back looking like a refusal and the diff would report changes that never happened.
     const outcome: Outcome = after.ok
