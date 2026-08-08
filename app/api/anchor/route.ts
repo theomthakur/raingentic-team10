@@ -25,7 +25,12 @@ export async function POST(request: Request) {
 
   if (!anchoringEnabled()) {
     return NextResponse.json(
-      { error: "Monad anchoring is not configured. Set MONAD_RPC_URL and MONAD_PRIVATE_KEY." },
+      {
+        error:
+          "Monad anchoring is not configured. Set MONAD_PRIVATE_KEY in .env.local and fund " +
+          "it from faucet.monad.xyz. MONAD_RPC_URL is optional — it defaults to Monad's " +
+          "public testnet RPC.",
+      },
       { status: 501 }
     );
   }

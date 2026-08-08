@@ -7,7 +7,13 @@
 import assert from "node:assert/strict";
 import type { PurchaseOrder, RecordSnapshot, Rule, RuleSet } from "@/lib/types";
 import { verify } from "@/lib/checks";
-import { activateRuleSet, defaultRuleSet, nextRuleSet } from "@/lib/rules/defaults";
+import {
+  DEFAULT_RULES,
+  activateRuleSet,
+  defaultRuleSet,
+  nextRuleSet,
+} from "@/lib/rules/defaults";
+import { RULE_BASIS, basisFor } from "@/lib/rules/basis";
 import { hashRules } from "@/lib/rules/hash";
 import { replay } from "@/lib/replay";
 import { diffRules } from "@/lib/rules/diff";
@@ -497,6 +503,37 @@ asyncTest("a released line can be claimed again, so a failure is not a permanent
 });
 
 // --- report ----------------------------------------------------------------
+
+/**
+ * The basis strings are load-bearing for the argument, not decoration: the provenance panel
+ * shows the control a rule descends from on the row that just refused a purchase. A rule
+ * whose id is missing from RULE_BASIS renders nothing and fails silently — the row simply
+ * is not there, and nobody notices until a judge asks where the rule came from.
+ *
+ * They also live in their own module so a client component can read them without dragging
+ * node:crypto into the browser bundle, which means the two can drift apart. These tests
+ * are what stops that.
+ */
+test("every rule resolves a basis, and it matches the rule data", () => {
+  for (const rule of DEFAULT_RULES) {
+    const basis = basisFor(rule.id);
+    assert.equal(typeof basis, "string", `${rule.id} has no basis`);
+    assert.ok(basis!.length > 20, `${rule.id} basis is too short to mean anything`);
+    assert.equal(basis, rule.basis, `${rule.id} basis drifted from RULE_BASIS`);
+  }
+});
+
+test("RULE_BASIS has no orphan keys and no missing rules", () => {
+  const ruleIds = DEFAULT_RULES.map((r) => r.id).sort();
+  const basisIds = Object.keys(RULE_BASIS).sort();
+  assert.deepEqual(basisIds, ruleIds, "RULE_BASIS and DEFAULT_RULES are out of sync");
+});
+
+test("an unknown rule id resolves to undefined rather than throwing", () => {
+  // The provenance panel calls this for whatever ruleId a stored decision carries, which
+  // may predate a rule being renamed. It must degrade to hiding the row, not crash.
+  assert.equal(basisFor("no-such-rule"), undefined);
+});
 
 async function run() {
   for (const [name, fn] of asyncTests) {
