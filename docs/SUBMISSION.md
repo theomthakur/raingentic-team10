@@ -56,7 +56,7 @@ exists*.
 
 ## 3. How it works
 
-Seven stages. Money only moves if stage 4 passes — and for large purchases, only
+Eight stages. Money only moves if stage 4 passes — and for large purchases, only
 once a person has also said so.
 
 ```
@@ -73,7 +73,8 @@ once a person has also said so.
         ▼
  5  ISSUE       Rain creates a card scoped to exactly this purchase order
  6  SETTLE      the purchase happens; the records are updated
- 7  RECORD      everything is filed permanently and can never be edited
+ 7  REVOKE      the card is retired — it existed for exactly this purchase
+ 8  RECORD      everything is filed permanently and can never be edited
 ```
 
 **There is no path in the code where a card gets made first and judged afterwards.** The
@@ -240,7 +241,7 @@ Status is marked honestly:
 | Card expiry is tied to the quote's expiry, so it can't outlive the job | ✅ |
 | One card per order line, with the order line as the key, so retries can't double-spend | ✅ |
 | Real calls to Rain's card-issuance API | 🟡 client written, endpoints need confirming on site |
-| Retire the card once the job is done | ⬜ needs confirming that the endpoint exists |
+| Retire the card once the job is done | ✅ built — `PATCH /issuing/cards/{id}` confirmed; the status value it accepts is the last unknown |
 
 **Why this is the strongest possible Rain submission:** most teams will either rebuild
 Rain's control layer or ignore it. We extend it. Rain answers *how much* and *where*. We

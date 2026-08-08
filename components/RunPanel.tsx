@@ -13,6 +13,7 @@ const STAGE_ORDER: Stage["name"][] = [
   "REFUSE",
   "ISSUE",
   "SETTLE",
+  "REVOKE",
   "RECORD",
 ];
 

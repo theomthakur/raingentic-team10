@@ -4,6 +4,25 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 6 — stage 7 REVOKE, the card dies
+
+Rain's own framing is that an agent's card is *"retired automatically once the job is
+done."* Every team this weekend will demo a card being born. Nobody will demo one dying.
+
+- After settlement the card is retired, and the trace now runs the whole lifecycle:
+  `NEGOTIATE → PROPOSE → VERIFY → ISSUE → SETTLE → REVOKE → RECORD`.
+- It pre-empts *"what stops the agent reusing the card"* without having to argue: the
+  instrument exists for exactly the duration of the obligation and not a minute longer.
+- A retired card **still blocks re-issuance** (`countRevoked`), so the run-it-twice refusal
+  is unaffected — the obligation was met once, and that does not become untrue.
+- `DELETE /cards/{id}`, which the client used to call, returns 404. Replaced with the
+  confirmed `PATCH /issuing/cards/{id}`.
+- 🔴 **The accepted status value is still unknown** — `"inactive"` returns 400. It is
+  isolated to `RAIN_CARD_INACTIVE_STATUS`: ask a Rain engineer, put the answer in
+  `.env.local`, and real revocation starts working with no code change. Until then cards
+  retire locally and the UI says *simulated* rather than claiming a revocation that did
+  not happen. A card that genuinely could not be retired reports a failed stage.
+
 ## 2026-08-08 · Iteration 5 — the Monad anchor, built and inert
 
 The last unsatisfied track. Written in full and wired to the UI; it activates the moment

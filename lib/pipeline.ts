@@ -1,14 +1,15 @@
 import type { Approval, Decision, NegotiationSummary, PurchaseOrder } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
-import { issueCard } from "@/lib/rain/issuer";
+import { issueCard, revokeCard } from "@/lib/rain/issuer";
 import { getStore, snapshot } from "@/lib/store";
 
 /**
- * The six stages, in order, as one function.
+ * The stages, in order, as one function.
  *
- * The shape of this file is the architecture diagram: PROPOSE, VERIFY, then ISSUE only
- * on the pass branch. There is no code path where a card is created and then judged.
+ * The shape of this file is the architecture diagram: PROPOSE, VERIFY, then ISSUE only on
+ * the pass branch. There is no code path where a card is created and then judged, and no
+ * path where a card outlives the obligation that justified it.
  */
 
 export type StageName =
@@ -20,6 +21,7 @@ export type StageName =
   | "REFUSE"
   | "ISSUE"
   | "SETTLE"
+  | "REVOKE"
   | "RECORD";
 
 export interface Stage {
@@ -163,7 +165,28 @@ export async function runPipeline(
     ok: true,
   });
 
-  // 6 RECORD — append-only, never updated in place.
+  // 7 REVOKE — the obligation is discharged, so the instrument stops existing as a live
+  // thing. Everyone will demo a card being born; this is the other half, and it answers
+  // "what stops the agent reusing it" without needing to argue the point.
+  const revokedAt = new Date().toISOString();
+  const { revoked, simulated } = await revokeCard(card.cardId);
+  if (revoked) {
+    await store.revokeCard(po.poNumber, revokedAt);
+    stages.push({
+      name: "REVOKE",
+      detail: `Card ••••${card.last4} retired — it existed for exactly this purchase${simulated ? " (simulated)" : ""}`,
+      ok: true,
+    });
+  } else {
+    // Say so rather than claiming a revocation that did not happen.
+    stages.push({
+      name: "REVOKE",
+      detail: `Could not retire card ••••${card.last4} — it is still live`,
+      ok: false,
+    });
+  }
+
+  // 8 RECORD — append-only, never updated in place.
   const decision: Decision = {
     ...base,
     outcome: "approved",
