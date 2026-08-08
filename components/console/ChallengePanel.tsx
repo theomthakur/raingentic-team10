@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { CheckResult, Decision, PurchaseOrder, Rule } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money } from "@/lib/format";
-import { Badge, Button, Panel } from "./ui";
+import { Badge, Button, Panel } from "../ui";
 
 /**
  * Beat the checks — hand the judge the attack.

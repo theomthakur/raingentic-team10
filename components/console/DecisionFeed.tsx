@@ -5,8 +5,8 @@ import { poTotal } from "@/lib/types";
 import { money, shortDate, shortTime } from "@/lib/format";
 import { getAgent } from "@/lib/agents";
 import { departmentName, productName } from "@/lib/plain";
-import { Avatar } from "./Avatar";
-import { Badge, Empty, Panel } from "./ui";
+import { Avatar } from "../identity/Avatar";
+import { Badge, Empty, Panel } from "../ui";
 
 /**
  * The append-only log, newest first.

@@ -1,4 +1,4 @@
-import { CustomerWorkspace } from "@/components/CustomerWorkspace";
+import { CustomerWorkspace } from "@/components/explain/CustomerWorkspace";
 
 export const metadata = { title: "Mandate — spending workspace" };
 

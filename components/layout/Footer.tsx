@@ -1,4 +1,4 @@
-import { GithubIcon, LinkedinIcon } from "./icons";
+import { GithubIcon, LinkedinIcon } from "../icons";
 
 const LINKS = [
   { href: "https://github.com/theomthakur/raingentic-team10", label: "View source", icon: GithubIcon },

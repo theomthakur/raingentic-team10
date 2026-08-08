@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Badge, Button, Panel } from "./ui";
+import { Badge, Button, Panel } from "../ui";
 import { FlowDiagram } from "./FlowDiagram";
-import { GithubIcon, LinkedinIcon } from "./icons";
+import { GithubIcon, LinkedinIcon } from "../icons";
 
 /**
  * The deck. Fourteen slides, keyboard-driven, in the same type and palette as the console.

@@ -5,9 +5,9 @@ import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
 import { departmentName, productName } from "@/lib/plain";
-import { Avatar } from "./Avatar";
-import { AgentTag } from "./AgentTag";
-import { Badge, Button, Panel } from "./ui";
+import { Avatar } from "../identity/Avatar";
+import { AgentTag } from "../identity/AgentTag";
+import { Badge, Button, Panel } from "../ui";
 
 /**
  * The queue of purchases waiting on a person.

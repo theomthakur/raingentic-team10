@@ -1,4 +1,4 @@
-import { Panel } from "./ui";
+import { Panel } from "../ui";
 
 /**
  * The stack, with the reason each piece is there.

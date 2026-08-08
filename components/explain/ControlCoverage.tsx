@@ -1,4 +1,4 @@
-import { Badge, Panel } from "./ui";
+import { Badge, Panel } from "../ui";
 
 /**
  * What Rain's Agent Control Layer covers, what Mandate adds, and where the two overlap.

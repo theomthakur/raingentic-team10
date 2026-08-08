@@ -4,8 +4,8 @@ import { useState } from "react";
 import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import type { PurchaseOrder } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
-import { AgentTag } from "./AgentTag";
-import { Button, Panel } from "./ui";
+import { AgentTag } from "../identity/AgentTag";
+import { Button, Panel } from "../ui";
 
 const STAGE_ORDER: Stage["name"][] = [
   "NEGOTIATE",

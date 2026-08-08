@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { SiteNav } from "./SiteNav";
-import { Badge } from "./ui";
+import { Badge } from "../ui";
 
 /**
  * The front door. A judge who has never seen this before should know, in five seconds and

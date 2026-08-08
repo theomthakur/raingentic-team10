@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui";
-import { Deck } from "@/components/Deck";
-import { Footer } from "@/components/Footer";
-import { SubPageHeader } from "@/components/SiteNav";
+import { Deck } from "@/components/explain/Deck";
+import { Footer } from "@/components/layout/Footer";
+import { SubPageHeader } from "@/components/layout/SiteNav";
 
 export const metadata = {
   title: "Mandate — presentation",

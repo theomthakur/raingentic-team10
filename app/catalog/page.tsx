@@ -6,11 +6,11 @@ import { getCatalog, type CatalogProduct } from "@/lib/catalog";
 import type { Decision } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
 import { money } from "@/lib/format";
-import { ProductGlyph } from "@/components/ProductGlyph";
-import { Avatar } from "@/components/Avatar";
+import { ProductGlyph } from "@/components/identity/ProductGlyph";
+import { Avatar } from "@/components/identity/Avatar";
 import { Badge, Button, Panel } from "@/components/ui";
-import { Footer } from "@/components/Footer";
-import { SubPageHeader } from "@/components/SiteNav";
+import { Footer } from "@/components/layout/Footer";
+import { SubPageHeader } from "@/components/layout/SiteNav";
 
 /**
  * The buying side, as a person would actually meet it.

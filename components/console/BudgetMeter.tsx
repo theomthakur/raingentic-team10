@@ -3,7 +3,7 @@
 import type { BudgetRecord } from "@/lib/types";
 import { money } from "@/lib/format";
 import { departmentName } from "@/lib/plain";
-import { Panel } from "./ui";
+import { Panel } from "../ui";
 
 /** What each department has left to spend, moving as approvals settle. */
 export function BudgetMeter({ budgets }: { budgets: BudgetRecord[] }) {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Rule, RuleSet } from "@/lib/types";
-import { Badge, Button, Panel } from "./ui";
+import { Badge, Button, Panel } from "../ui";
 
 /**
  * The rule editor.

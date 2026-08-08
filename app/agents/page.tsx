@@ -6,10 +6,10 @@ import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money } from "@/lib/format";
 import { AGENTS } from "@/lib/agents";
-import { AgentAvatar } from "@/components/AgentAvatar";
+import { AgentAvatar } from "@/components/identity/AgentAvatar";
 import { Badge, Panel } from "@/components/ui";
-import { Footer } from "@/components/Footer";
-import { SubPageHeader } from "@/components/SiteNav";
+import { Footer } from "@/components/layout/Footer";
+import { SubPageHeader } from "@/components/layout/SiteNav";
 
 /**
  * The roster. Every stat here is counted off the live decision log, not written by hand —

@@ -5,7 +5,7 @@
  * changes behavior. This is purely so a judge watching the feed sees "Rae, Facilities"
  * make a purchase rather than a string that reads like a service account.
  */
-import type { AgentFaceKey } from "@/components/AgentFaces";
+import type { AgentFaceKey } from "@/components/identity/AgentFaces";
 
 export interface AgentPersona {
   id: string;

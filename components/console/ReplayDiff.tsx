@@ -3,7 +3,7 @@
 import type { ReplayChange, ReplayFlip, ReplayResult } from "@/lib/types";
 import type { RuleChange } from "@/lib/rules/diff";
 import { money } from "@/lib/format";
-import { Badge, Empty, Panel } from "./ui";
+import { Badge, Empty, Panel } from "../ui";
 
 /**
  * The replay diff — the headline moment.

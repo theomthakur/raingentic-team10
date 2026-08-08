@@ -6,10 +6,10 @@ import type { BudgetRecord, Decision, RuleSet } from "@/lib/types";
 import { money, shortDate, shortTime } from "@/lib/format";
 import { departmentName, outcomeSummary, productName } from "@/lib/plain";
 import { getAgent } from "@/lib/agents";
-import { Avatar } from "@/components/Avatar";
-import { SubPageHeader } from "@/components/SiteNav";
+import { Avatar } from "@/components/identity/Avatar";
+import { SubPageHeader } from "@/components/layout/SiteNav";
 import { Badge, Button, Empty, Panel } from "@/components/ui";
-import { LoadingRain } from "@/components/LoadingRain";
+import { LoadingRain } from "@/components/layout/LoadingRain";
 
 interface WorkspaceState {
   storage: "memory" | "postgres";

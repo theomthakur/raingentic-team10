@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Badge, Panel } from "@/components/ui";
-import { SystemDiagram } from "@/components/SystemDiagram";
-import { FlowDiagram } from "@/components/FlowDiagram";
-import { TechStack } from "@/components/TechStack";
-import { ControlCoverage } from "@/components/ControlCoverage";
-import { Footer } from "@/components/Footer";
-import { PAGES, SubPageHeader } from "@/components/SiteNav";
+import { SystemDiagram } from "@/components/explain/SystemDiagram";
+import { FlowDiagram } from "@/components/explain/FlowDiagram";
+import { TechStack } from "@/components/explain/TechStack";
+import { ControlCoverage } from "@/components/explain/ControlCoverage";
+import { Footer } from "@/components/layout/Footer";
+import { PAGES, SubPageHeader } from "@/components/layout/SiteNav";
 
 export const metadata = {
   title: "Mandate — system design",

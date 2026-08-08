@@ -6,9 +6,9 @@ import { money, shortDate } from "@/lib/format";
 import { departmentName, outcomeSummary, productName, ruleQuestion } from "@/lib/plain";
 import { generateReceipt } from "@/lib/receipt";
 import { basisFor } from "@/lib/rules/basis";
-import { Avatar } from "./Avatar";
-import { AgentTag } from "./AgentTag";
-import { Badge, Button, Empty, Panel } from "./ui";
+import { Avatar } from "../identity/Avatar";
+import { AgentTag } from "../identity/AgentTag";
+import { Badge, Button, Empty, Panel } from "../ui";
 
 /**
  * The audit view for one decision, written for the person who has to sign off on it.

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import type { NegotiationSummary } from "@/lib/types";
 import { money } from "@/lib/format";
-import { Avatar } from "./Avatar";
-import { Badge, Button, Panel } from "./ui";
+import { Avatar } from "../identity/Avatar";
+import { Badge, Button, Panel } from "../ui";
 
 /**
  * The transcript below is a replay, not a live chat. Every number and every note in it was
