@@ -183,7 +183,7 @@ step. This isn't only about safety — it's what makes the next feature possible
 Because rules are versioned data, and because checking is perfectly repeatable, we can
 **re-run all of history against a rule you just changed**:
 
-> *"Across 47 past decisions, 8 that we approved would now be refused. 0 refusals would now
+> *"Across 54 past decisions, 8 that we approved would now be refused. 0 refusals would now
 > pass."*
 
 That's a real number from the running app, not a mock-up. It works because each decision
@@ -206,7 +206,7 @@ nothing.
 4. **Run the capital purchase.** $43,500 of conveyor line. Everything checks out — and it
    is **held**, not refused, because it is above what the agent may spend alone. No card
    exists. Type a name, release it, and *that* is what creates the card.
-5. **Change a rule and hit replay.** *"Across 47 decisions, 8 approvals would now be
+5. **Change a rule and hit replay.** *"Across 54 decisions, 8 approvals would now be
    refused."* Each row shows what the rule expected before and after, and why it flipped.
 6. **Try to approve your own rule change.** Propose it under one name, then attempt to
    activate it under the same name. Refused. Ask someone else to type their name instead.
@@ -386,7 +386,7 @@ disqualified under the event's own rules.
 | [lib/pipeline.ts](../lib/pipeline.ts) | The seven steps, in order |
 | [app/api/purchase/](../app/api/purchase/) | The full journey: negotiate → propose → verify → issue |
 
-**41 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
+**78 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
 the two claims the pitch rests on: that the same input always gives the same answer, and
 that every threshold lives in editable settings rather than in code.
 

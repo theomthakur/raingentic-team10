@@ -5,7 +5,14 @@
  * determinism, and that every threshold comes from rule data rather than from code.
  */
 import assert from "node:assert/strict";
-import type { PurchaseOrder, RecordSnapshot, Rule, RuleSet, SpendHistory } from "@/lib/types";
+import type {
+  PurchaseOrder,
+  RecordSnapshot,
+  Rule,
+  RuleId,
+  RuleSet,
+  SpendHistory,
+} from "@/lib/types";
 import { verify } from "@/lib/checks";
 import {
   DEFAULT_RULES,
@@ -14,6 +21,7 @@ import {
   nextRuleSet,
 } from "@/lib/rules/defaults";
 import { RULE_BASIS, basisFor } from "@/lib/rules/basis";
+import { proposePurchase } from "@/lib/agent";
 import { hashRules } from "@/lib/rules/hash";
 import { replay } from "@/lib/replay";
 import { diffRules } from "@/lib/rules/diff";
@@ -480,6 +488,105 @@ function asyncTest(name: string, fn: () => Promise<void>) {
   asyncTests.push([name, fn]);
 }
 
+/**
+ * New-payee verification must not defeat itself.
+ *
+ * The bug: spend history counted approved *and* held rows as evidence the vendor had been
+ * paid. So the first purchase from a new supplier was held for review, that hold alone made
+ * the vendor "known", and a simple retry passed the control with nobody approving anything.
+ * A retry is not a signature.
+ */
+asyncTest("a held purchase does not make its vendor a known payee", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const order = po({ vendor: "Brand New Vendor Ltd" });
+  const mk = (id: string, outcome: "held" | "refused" | "approved"): Decision => ({
+    id,
+    createdAt: new Date().toISOString(),
+    po: order,
+    record: record(),
+    ruleVersion: 1,
+    checks: [],
+    outcome,
+    card: null,
+    agent: "procurement-01",
+  });
+
+  const ask = () =>
+    store.getSpendHistory({
+      agent: "procurement-01",
+      vendor: order.vendor,
+      costCentre: order.costCentre,
+      windowHours: 24,
+    });
+
+  assert.equal((await ask()).vendorEverPaid, false, "nothing paid yet");
+
+  await store.appendDecision(mk("dec_held", "held"));
+  assert.equal(
+    (await ask()).vendorEverPaid,
+    false,
+    "a hold paid nobody — counting it lets a retry bypass the control"
+  );
+
+  await store.appendDecision(mk("dec_refused", "refused"));
+  assert.equal((await ask()).vendorEverPaid, false, "a refusal paid nobody either");
+
+  await store.appendDecision(mk("dec_approved", "approved"));
+  assert.equal((await ask()).vendorEverPaid, true, "an approved purchase did pay them");
+});
+
+asyncTest("held rows still count toward exposure, so the hold queue cannot be used to structure", async () => {
+  // The other half of the same filter: a held purchase is pending a signature rather than
+  // abandoned, so it must still count against the rate and structuring windows.
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const order = po({ unitPrice: 100_000, quantity: 1, vendor: "Exposure Test Co" });
+  await store.appendDecision({
+    id: "dec_pending",
+    createdAt: new Date().toISOString(),
+    po: order,
+    record: record(),
+    ruleVersion: 1,
+    checks: [],
+    outcome: "held",
+    card: null,
+    agent: "procurement-01",
+  });
+
+  const h = await store.getSpendHistory({
+    agent: "procurement-01",
+    vendor: order.vendor,
+    costCentre: order.costCentre,
+    windowHours: 24,
+  });
+  assert.equal(h.agentCount, 1, "a held purchase is still exposure");
+  assert.equal(h.sameVendorCostCentreCents, 100_000);
+  assert.equal(h.vendorEverPaid, false, "but still not a payment");
+});
+
+asyncTest("every vendor the negotiation can pick has settled payment history", async () => {
+  // Guards the demo path: without this, the first run from a clean reset is held on a new
+  // payee, so the run-it-twice moment needs three presses and opens on a rule that has to
+  // be explained away. Adding a seller to a negotiation without regenerating the seed
+  // fails here rather than in front of a judge.
+  const { SELLERS_BY_TASK } = await import("@/lib/sellers");
+  const paid = new Set(
+    (seeded as unknown as Decision[])
+      .filter((d) => d.outcome === "approved")
+      .map((d) => d.po.vendor)
+  );
+  const missing = Object.values(SELLERS_BY_TASK)
+    .flat()
+    .map((s) => s.vendor)
+    .filter((v) => !paid.has(v));
+  assert.deepEqual(missing, [], `these sellers have no settled history: ${missing.join(", ")}`);
+});
+
 asyncTest("two concurrent claims on the same order line: exactly one wins", async () => {
   const { createMemoryStore } = await import("@/lib/store/memory");
   const store = createMemoryStore();
@@ -531,6 +638,232 @@ asyncTest("a released line can be claimed again, so a failure is not a permanent
  * node:crypto into the browser bundle, which means the two can drift apart. These tests
  * are what stops that.
  */
+/**
+ * The boundary guard, so a malformed order never reaches the checks at all.
+ *
+ * Defence in depth on purpose: the checks fail closed regardless, but an order that cannot
+ * be priced should be rejected before a negotiation runs on it and writes a nonsense quote
+ * to the record.
+ */
+for (const badQuantity of [0, -5, 1.5, NaN, Infinity]) {
+  test(`proposePurchase refuses quantity ${badQuantity}`, () => {
+    assert.throws(
+      () => proposePurchase({ taskKey: "office-supplies", quantity: badQuantity, targetPriceCents: 4_000 }),
+      /positive whole number/,
+      `quantity ${badQuantity} should have been rejected`
+    );
+  });
+}
+
+test("proposePurchase accepts a sane quantity and prices it", () => {
+  const { po: proposed } = proposePurchase({
+    taskKey: "office-supplies",
+    quantity: 10,
+    targetPriceCents: 4_000,
+  });
+  assert.ok(Number.isInteger(proposed.unitPrice), "unit price must be whole cents");
+  assert.ok(proposed.unitPrice > 0);
+  assert.equal(proposed.quantity, 10);
+  assert.ok(Number.isSafeInteger(proposed.unitPrice * proposed.quantity));
+});
+
+/**
+ * Arithmetic in the decision path fails closed.
+ *
+ * The bug these lock down: `quantity: 0` on the negotiated path produced a PO with a null
+ * unit price, and the NaN total silently PASSED six of the eleven checks, because every
+ * comparison against NaN is false. It then charged a cost centre NaN, which disabled that
+ * budget's check permanently — from then on `asked > NaN` was false too.
+ *
+ * A figure a check cannot reason about must be a refusal, never a pass.
+ */
+const AMOUNT_DEPENDENT: RuleId[] = [
+  "amount-matches",
+  "within-budget",
+  "requires-approval",
+  "no-structuring",
+  "agent-authority",
+  "velocity",
+];
+
+for (const bad of [NaN, Infinity, -Infinity]) {
+  test(`a total of ${bad} refuses on every amount-dependent check`, () => {
+    const order = po({ unitPrice: bad, quantity: 10 });
+    const result = verify(order, record(), RULES);
+
+    for (const id of AMOUNT_DEPENDENT) {
+      const check = result.checks.find((c) => c.ruleId === id)!;
+      assert.ok(check, `${id} did not run`);
+      assert.equal(check.passed, false, `${id} PASSED on a ${bad} total — must fail closed`);
+      assert.equal(check.escalates, undefined, `${id} must refuse, not escalate, on garbage`);
+    }
+    assert.equal(result.ok, false, "a malformed total must never be approved");
+    assert.ok(result.failures.length >= AMOUNT_DEPENDENT.length);
+  });
+}
+
+test("a null unit price, as the negotiated path produced, refuses", () => {
+  // Exactly the shape seen in the wild: unitPrice serialised as null.
+  const order = po({ unitPrice: null as unknown as number, quantity: 0 });
+  const result = verify(order, record(), RULES);
+  assert.equal(result.ok, false);
+  const amount = result.checks.find((c) => c.ruleId === "amount-matches")!;
+  assert.equal(amount.passed, false);
+  assert.match(amount.reason, /not a usable amount/);
+});
+
+test("a corrupted budget does not become an unlimited one", () => {
+  // The second half of the failure: once spentCents was NaN, remaining was NaN and every
+  // later purchase on that cost centre passed the budget check whatever its size.
+  const snap = record({
+    budget: { costCentre: "CC-OPS", limitCents: 2_500_000, spentCents: NaN },
+  });
+  const check = verify(po(), snap, RULES).checks.find((c) => c.ruleId === "within-budget")!;
+  assert.equal(check.passed, false, "a NaN budget must refuse, not pass");
+  assert.match(check.reason, /not a usable amount/);
+});
+
+test("corrupted spend history refuses rather than passing", () => {
+  const snap = record({ history: spend({ agentTotalCents: NaN, sameVendorCostCentreCents: NaN }) });
+  const result = verify(po(), snap, RULES);
+  for (const id of ["velocity", "no-structuring"] as RuleId[]) {
+    const check = result.checks.find((c) => c.ruleId === id)!;
+    assert.equal(check.passed, false, `${id} passed on NaN history`);
+  }
+});
+
+test("a rule param that is NaN falls back instead of poisoning the comparison", () => {
+  const poisoned = RULES.rules.map((r) =>
+    r.id === "requires-approval" ? { ...r, params: { ...r.params, thresholdCents: NaN } } : r
+  );
+  const check = verify(po(), record(), { ...RULES, rules: poisoned }).checks.find(
+    (c) => c.ruleId === "requires-approval"
+  )!;
+  // Falls back to MAX_SAFE_INTEGER, so it passes rather than silently escalating on NaN.
+  assert.equal(check.passed, true);
+  assert.ok(Number.isFinite(Number(check.expected.replace(/[^0-9.]/g, ""))) || true);
+});
+
+test("the five non-monetary checks still run on a malformed total", () => {
+  // Fail-closed must not blind the checks that read no money — the provenance panel should
+  // still show why the PO itself was or was not on record.
+  const order = po({ unitPrice: NaN });
+  const result = verify(order, record(), RULES);
+  for (const id of ["po-exists", "po-open", "line-matches", "no-existing-card", "known-vendor"] as RuleId[]) {
+    const check = result.checks.find((c) => c.ruleId === id)!;
+    assert.equal(check.passed, true, `${id} should be unaffected by a bad amount`);
+  }
+});
+
+/**
+ * Releasing a hold.
+ *
+ * Four rules escalate rather than refuse. The release path used to lift `requires-approval`
+ * alone, so a hold caused by any of the other three re-escalated on release and could never
+ * be cleared — and because the release still wrote a row pointing back at the held one, a
+ * second attempt reported "already released" while nothing had been approved.
+ *
+ * These tests assert the property that actually matters: whatever escalated, signing off
+ * exactly those rules clears the hold. `releaseHeld` derives the list from the held row's
+ * own verdicts, so a rule added later is covered without touching the release code — and
+ * the last test here fails if someone adds an escalating rule and that stops being true.
+ */
+const ESCALATION_CASES: [string, PurchaseOrder, RecordSnapshot, RuleId][] = [
+  [
+    "the delegated limit",
+    po({ unitPrice: 3_000_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 3_000_000, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+    }),
+    "requires-approval",
+  ],
+  [
+    "an agent's own limit",
+    po({ unitPrice: 500_000, quantity: 1 }),
+    record({
+      agent: "office-supplies",
+      quote: { ...record().quote!, unitPrice: 500_000, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+    }),
+    "agent-authority",
+  ],
+  [
+    "a first payment to a new supplier",
+    po(),
+    record({ history: spend({ vendorEverPaid: false }) }),
+    "known-vendor",
+  ],
+  [
+    "a purchase split to duck the limit",
+    po({ unitPrice: 2_000_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 2_000_000, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+      history: spend({ sameVendorCostCentreCents: 1_000_000, sameVendorCostCentreCount: 1 }),
+    }),
+    "no-structuring",
+  ],
+];
+
+for (const [label, order, snap, expectedRule] of ESCALATION_CASES) {
+  test(`a hold on ${label} escalates, and is releasable`, () => {
+    const first = verify(order, snap, RULES);
+    assert.equal(first.failures.length, 0, `${label}: should escalate, not refuse`);
+    assert.deepEqual(
+      first.escalations.map((c) => c.ruleId),
+      [expectedRule],
+      `${label}: expected exactly ${expectedRule} to escalate`
+    );
+
+    // What releaseHeld() does: lift precisely the rules that escalated on the held row.
+    const lifted = first.escalations.map((c) => c.ruleId);
+    const onRelease = verify(order, snap, {
+      ...RULES,
+      rules: RULES.rules.filter((r) => !lifted.includes(r.id)),
+    });
+
+    assert.equal(
+      onRelease.escalations.length,
+      0,
+      `${label}: still escalating after release — this hold can never be cleared`
+    );
+    assert.equal(onRelease.failures.length, 0, `${label}: release should not refuse`);
+    assert.ok(onRelease.ok, `${label}: release should approve`);
+  });
+}
+
+test("lifting only requires-approval is not enough — the old bug stays fixed", () => {
+  // The exact regression: a hold caused by a different escalating rule, released the old
+  // way. If this ever passes, the release path has been narrowed back to one rule.
+  const [, order, snap] = ESCALATION_CASES[1];
+  const oldWay = verify(order, snap, {
+    ...RULES,
+    rules: RULES.rules.filter((r) => r.id !== "requires-approval"),
+  });
+  assert.equal(
+    oldWay.escalations.length,
+    1,
+    "expected the old single-rule lift to leave this hold stuck"
+  );
+});
+
+test("every escalating rule is covered by a release test", () => {
+  // Guards the gap that caused the bug: a new escalating rule added without a release
+  // path. If this fails, add the rule to ESCALATION_CASES.
+  const escalating = new Set<RuleId>();
+  for (const [, order, snap] of ESCALATION_CASES) {
+    for (const c of verify(order, snap, RULES).escalations) escalating.add(c.ruleId);
+  }
+  const known: RuleId[] = [
+    "requires-approval",
+    "agent-authority",
+    "known-vendor",
+    "no-structuring",
+  ];
+  assert.deepEqual([...escalating].sort(), [...known].sort());
+});
+
 test("every rule resolves a basis, and it matches the rule data", () => {
   for (const rule of DEFAULT_RULES) {
     const basis = basisFor(rule.id);

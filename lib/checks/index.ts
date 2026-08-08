@@ -26,7 +26,64 @@ import { money } from "@/lib/format";
 
 function num(params: Rule["params"], key: string, fallback: number): number {
   const v = params[key];
-  return typeof v === "number" ? v : fallback;
+  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
+}
+
+/**
+ * Every numeric comparison in this file has to be guarded, because in JavaScript a
+ * comparison against `NaN` is always false — so `asked > limit` on a `NaN` amount does not
+ * throw and does not fail. **It passes.**
+ *
+ * That is not hypothetical. A request with `quantity: 0` on the negotiated path produced a
+ * PO with a null unit price, and the resulting `NaN` total silently satisfied six of the
+ * eleven checks — the tolerance, the budget, the delegated limit, the agent's own limit,
+ * structuring and velocity — then charged a cost centre `NaN`, which disabled that budget's
+ * check permanently, because from then on every `asked > NaN` was false too.
+ *
+ * So arithmetic in the decision path fails closed. A number we cannot reason about is a
+ * refusal, never a pass. The boundary validates too, but a check must not depend on having
+ * been called correctly.
+ */
+function usable(n: unknown): n is number {
+  return typeof n === "number" && Number.isFinite(n);
+}
+
+/** A refusal for a figure the check cannot reason about. Never a pass. */
+function unusable(
+  rule: Rule,
+  what: string,
+  readFrom: string,
+  actual: string
+): CheckResult {
+  return {
+    ruleId: rule.id,
+    label: rule.label,
+    passed: false,
+    reason: `${what} is not a usable amount, so this check cannot be satisfied. A figure that cannot be compared is refused rather than passed — a comparison against NaN is false, which would otherwise let it through.`,
+    expected: "a finite amount in whole cents",
+    actual,
+    readFrom,
+  };
+}
+
+/**
+ * Wrap an amount-dependent check so a malformed declared total fails closed.
+ *
+ * Applied to the six checks that compare against `poTotal(po)`. Doing it here rather than
+ * in each body keeps the guard impossible to forget when a rule is added.
+ */
+function needsAmount(fn: CheckFn): CheckFn {
+  return (po, record, rule) => {
+    if (!usable(po.unitPrice) || !usable(po.quantity) || !usable(poTotal(po))) {
+      return unusable(
+        rule,
+        "The declared purchase total",
+        "po.unitPrice × po.quantity",
+        `${po.quantity} × ${po.unitPrice}`
+      );
+    }
+    return fn(po, record, rule);
+  };
 }
 
 function bool(params: Rule["params"], key: string, fallback: boolean): boolean {
@@ -144,6 +201,17 @@ const amountMatches: CheckFn = (po, record, rule) => {
   const toleranceBps = num(rule.params, "toleranceBps", 0);
   const quoted = quote.unitPrice * quote.quantity;
   const asked = poTotal(po);
+
+  // The quote itself can be malformed, and then there is nothing to compare against.
+  if (!usable(quoted)) {
+    return unusable(
+      rule,
+      `The quoted total on ${po.poNumber}`,
+      "record.quote.unitPrice × quantity",
+      `${quote.quantity} × ${quote.unitPrice}`
+    );
+  }
+
   const allowed = Math.floor((quoted * toleranceBps) / 10_000);
   const delta = Math.abs(asked - quoted);
 
@@ -237,6 +305,18 @@ const withinBudget: CheckFn = (po, record, rule) => {
 
   const remaining = budget.limitCents - budget.spentCents;
   const asked = poTotal(po);
+
+  // A cost centre whose spend has been corrupted must not become unlimited. This is the
+  // second half of the NaN failure: once `spentCents` was NaN, `remaining` was NaN and
+  // every later purchase on that cost centre passed this check regardless of size.
+  if (!usable(remaining)) {
+    return unusable(
+      rule,
+      `The remaining budget for ${po.costCentre}`,
+      "record.budget.limitCents − spentCents",
+      `limit ${budget.limitCents}, spent ${budget.spentCents}`
+    );
+  }
 
   if (asked > remaining) {
     return {
@@ -359,6 +439,15 @@ const noStructuring: CheckFn = (po, record, rule) => {
   const threshold = num(rule.params, "thresholdCents", 2_500_000);
   const asked = poTotal(po);
   const combined = asked + h.sameVendorCostCentreCents;
+
+  if (!usable(combined)) {
+    return unusable(
+      rule,
+      "The combined recent spend on this vendor and cost centre",
+      "record.history.sameVendorCostCentreCents",
+      String(h.sameVendorCostCentreCents)
+    );
+  }
 
   // Only interesting when this line on its own would have sailed through.
   if (asked < threshold && combined >= threshold && h.sameVendorCostCentreCount > 0) {
@@ -488,6 +577,15 @@ const velocity: CheckFn = (po, record, rule) => {
   const nextCount = h.agentCount + 1;
   const nextTotal = h.agentTotalCents + poTotal(po);
 
+  if (!usable(nextCount) || !usable(nextTotal)) {
+    return unusable(
+      rule,
+      "This agent's recent spend",
+      "record.history.agentCount / agentTotalCents",
+      `${h.agentCount} purchases, ${h.agentTotalCents}`
+    );
+  }
+
   if (nextCount > maxCount) {
     return {
       ...base,
@@ -517,18 +615,23 @@ const velocity: CheckFn = (po, record, rule) => {
   };
 };
 
+/**
+ * The six amount-dependent checks are wrapped so a malformed total refuses instead of
+ * passing. The five that read no money — the PO existing, it still being open, the vendor
+ * and SKU strings, an existing card, and whether the vendor is known — are unaffected.
+ */
 const CHECKS: Record<RuleId, CheckFn> = {
   "po-exists": poExists,
   "po-open": poOpen,
-  "amount-matches": amountMatches,
+  "amount-matches": needsAmount(amountMatches),
   "line-matches": lineMatches,
-  "within-budget": withinBudget,
+  "within-budget": needsAmount(withinBudget),
   "no-existing-card": noExistingCard,
-  "no-structuring": noStructuring,
-  "agent-authority": agentAuthority,
+  "no-structuring": needsAmount(noStructuring),
+  "agent-authority": needsAmount(agentAuthority),
   "known-vendor": knownVendor,
-  velocity,
-  "requires-approval": requiresApproval,
+  velocity: needsAmount(velocity),
+  "requires-approval": needsAmount(requiresApproval),
 };
 
 /**

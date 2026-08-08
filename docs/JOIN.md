@@ -7,10 +7,10 @@ is deliberately one function.
 
 ## What already works
 
-- The six checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 29 tests
+- The eleven checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 78 tests
 - Rules as versioned data, a new version on every edit, sha256 per version
 - Append-only decision log, storing a **snapshot** of the record rather than a pointer
-- Replay across 47 seeded decisions plus everything the demo adds
+- Replay across 54 seeded decisions plus everything the demo adds
 - The full pipeline, `PROPOSE → VERIFY → ISSUE → SETTLE → RECORD`, with the refusal branch
 - The console: decision feed, provenance panel, rule editor, replay diff, budget meters
 - The run-it-twice demo path, verified end to end
@@ -109,4 +109,4 @@ decorative. The UI already shows `anchored` / `local` per version.
 - [ ] `DATABASE_URL` set on the deployed build — without it the log empties on a cold start
 - [ ] Run-it-twice works on the deployed URL, not just localhost
 - [ ] `git ls-files | grep -i env` returns only `.env.local.example`
-- [ ] Reset demo button restores the seeded 47 so it can be re-run for a second judge
+- [ ] Reset demo button restores the seeded 54 so it can be re-run for a second judge

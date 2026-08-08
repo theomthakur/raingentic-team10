@@ -173,13 +173,13 @@ lib/
   sellers.ts         seller fixtures per task (A)
   agent.ts           task -> negotiation -> PurchaseOrder (A)
   llm.ts             optional seller dialogue, upstream of PROPOSE, never in verify (A)
-  checks/            the six checks + verify(), pure functions, 29 tests (B)
+  checks/            the eleven checks + verify(), pure functions, 78 tests (B)
   rules/             versioned rule data + the sha256 anchored on Monad (B)
   replay/            re-judging stored decisions against another rule version (B)
   store/             append-only log; Postgres when DATABASE_URL is set, memory otherwise (B)
   pipeline.ts        the seven stages in order (B)
   rain/issuer.ts     the issue seam: verify passes -> rain-client is called
-  seed/              47 committed historical decisions, deterministically generated (B)
+  seed/              54 committed historical decisions, deterministically generated (B)
 app/
   api/rain/ping/     the first-authenticated-call milestone
   api/purchase/      the full join: negotiate -> propose -> verify -> issue

@@ -116,7 +116,7 @@ rule-version anchor first; it's also cheaper, one transaction per version, not p
 - **Revoke the card after settlement.** Rain's own line is cards are "retired automatically
   once the job is done." Confirm the endpoint, then show it. Nobody else will.
 - **Seed 40-50 historical decisions before demoing replay.** Six live rows reads as a test
-  file. "Across 47 decisions, six approvals would now be refused" reads as a real system.
+  file. "Across 54 decisions, 8 approvals would now be refused" reads as a real system.
   Half an hour of fixture writing.
 
 ## Schedule

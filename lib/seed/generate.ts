@@ -18,6 +18,7 @@ import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
 import { defaultRuleSet } from "@/lib/rules/defaults";
 import { AGENTS, COST_CENTRES } from "@/lib/fixtures/records";
+import { SELLERS_BY_TASK } from "@/lib/sellers";
 
 /** mulberry32 — small, fast, and identical on every machine. */
 function rng(seed: number) {
@@ -200,7 +201,90 @@ function build(shape: Shape, index: number): Decision {
   };
 }
 
-const decisions = PLAN.map(build).sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+/**
+ * Prior settled payments to the suppliers the negotiation can pick.
+ *
+ * Rule 10 escalates a first-ever payment to a supplier, which is correct — and it meant
+ * that from a clean reset the very first demo run was *held* on a new payee rather than
+ * approved, so the run-it-twice moment needed three presses and opened on a rule that had
+ * to be explained away.
+ *
+ * The honest fix is history rather than an exception: a company restocking office supplies
+ * has paid its office supplier before. So every vendor the negotiation can settle on gets
+ * one prior settled purchase, small and clean, dated before the window the rest of the
+ * history covers.
+ *
+ * Built after the main plan on purpose. The PRNG is shared and consumed in order, so
+ * appending here leaves all forty-seven existing rows byte-identical.
+ */
+function buildPrior(vendor: string, sku: string, unit: number, index: number): Decision {
+  const costCentre = pick(COST_CENTRES);
+  const quantity = between(2, 8);
+  const poNumber = `PO-${3900 + index}`;
+  // Comfortably before START, so these read as established history rather than as part of
+  // the period the replay diff talks about.
+  const observedAt = new Date(START - (index + 1) * 86_400_000 - 3_600_000).toISOString();
+  const quoteExpiry = new Date(Date.parse(observedAt) + 21 * 86_400_000).toISOString();
+
+  const quote: QuoteRecord = {
+    poNumber,
+    status: "accepted",
+    fulfilled: true,
+    vendor,
+    sku,
+    unitPrice: unit,
+    quantity,
+    quoteExpiry,
+  };
+  const po: PurchaseOrder = { poNumber, vendor, sku, unitPrice: unit, quantity, quoteExpiry, costCentre };
+
+  const quoted = unit * quantity;
+  const budget = {
+    costCentre,
+    limitCents: quoted + 2_000_000,
+    spentCents: 0,
+  };
+
+  // Verified against the same rules as everything else — nothing is asserted approved.
+  const record: RecordSnapshot = { quote: { ...quote, fulfilled: false }, budget, existingCard: null, observedAt };
+  const ruleSet = defaultRuleSet();
+  const result = verify(po, record, ruleSet);
+  if (!result.ok) {
+    throw new Error(
+      `Prior payment for ${vendor} did not verify clean: ${result.failures.concat(result.escalations).map((c) => c.ruleId).join(", ")}`
+    );
+  }
+
+  return {
+    id: `dec_seed_prior_${String(index).padStart(2, "0")}`,
+    createdAt: observedAt,
+    agent: pick(AGENTS),
+    po,
+    record,
+    ruleVersion: ruleSet.version,
+    checks: result.checks,
+    outcome: "approved",
+    card: {
+      cardId: `card_${Math.floor(rand() * 1e12).toString(16)}`,
+      last4: String(between(1000, 9999)),
+      limitCents: poTotal(po),
+      expiresAt: quoteExpiry,
+    },
+    seeded: true,
+  };
+}
+
+const main = PLAN.map(build);
+
+// Derived from the seller roster rather than hardcoded, so a supplier added to a
+// negotiation cannot silently reintroduce the first-payment hold on the demo path.
+const negotiationVendors = Object.values(SELLERS_BY_TASK)
+  .flat()
+  .map((s) => ({ vendor: s.vendor, sku: s.sku, unit: s.listPrice }));
+
+const priors = negotiationVendors.map((v, i) => buildPrior(v.vendor, v.sku, v.unit, i));
+
+const decisions = [...main, ...priors].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
 
 const out = join(process.cwd(), "lib", "seed", "decisions.json");
 writeFileSync(out, `${JSON.stringify(decisions, null, 2)}\n`);

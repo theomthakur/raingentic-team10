@@ -72,7 +72,7 @@ stage, not with your checks or storage.
 ### 18:00-20:00: replay, the provenance panel, the run-it-twice UI
 
 - **Replay:** edit a rule in the UI, it saves as a new version, re-run every seeded
-  decision against it, show the diff. *"Across 47 decisions, 6 approvals would now be
+  decision against it, show the diff. *"Across 54 decisions, 8 approvals would now be
   refused, 2 refusals would now pass."* This is the headline feature.
 - Make sure the **run-it-twice** moment is visually clean: first run shows a card issued,
   second identical run shows a refusal with the provenance panel open, reading the record

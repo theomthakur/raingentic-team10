@@ -1,5 +1,1034 @@
 [
   {
+    "id": "dec_seed_prior_06",
+    "createdAt": "2026-07-13T08:00:00.000Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-3906",
+      "vendor": "CoreWeave",
+      "sku": "GPU-A100-1H",
+      "unitPrice": 13800,
+      "quantity": 2,
+      "quoteExpiry": "2026-08-03T08:00:00.000Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3906",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "CoreWeave",
+        "sku": "GPU-A100-1H",
+        "unitPrice": 13800,
+        "quantity": 2,
+        "quoteExpiry": "2026-08-03T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2027600,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-13T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3906 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3906 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $276.00 against a quoted $276.00, within the 2.00% tolerance.",
+        "expected": "$276.00 ± $5.52",
+        "actual": "$276.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor CoreWeave and SKU GPU-A100-1H both match the accepted quote.",
+        "expected": "CoreWeave / GPU-A100-1H",
+        "actual": "CoreWeave / GPU-A100-1H"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$276.00 against $20,276.00 remaining in CC-OPS.",
+        "expected": "at most $20,276.00 remaining",
+        "actual": "$276.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3906 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$276.00 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$276.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_c2026620cc",
+      "last4": "4572",
+      "limitCents": 27600,
+      "expiresAt": "2026-08-03T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_05",
+    "createdAt": "2026-07-14T08:00:00.000Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-3905",
+      "vendor": "Lambda Labs",
+      "sku": "GPU-A100-1H",
+      "unitPrice": 13500,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-04T08:00:00.000Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3905",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Lambda Labs",
+        "sku": "GPU-A100-1H",
+        "unitPrice": 13500,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-04T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2108000,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-14T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3905 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3905 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,080.00 against a quoted $1,080.00, within the 2.00% tolerance.",
+        "expected": "$1,080.00 ± $21.60",
+        "actual": "$1,080.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Lambda Labs and SKU GPU-A100-1H both match the accepted quote.",
+        "expected": "Lambda Labs / GPU-A100-1H",
+        "actual": "Lambda Labs / GPU-A100-1H"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,080.00 against $21,080.00 remaining in CC-OPS.",
+        "expected": "at most $21,080.00 remaining",
+        "actual": "$1,080.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3905 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$1,080.00 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$1,080.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_667ca615ce",
+      "last4": "1488",
+      "limitCents": 108000,
+      "expiresAt": "2026-08-04T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_04",
+    "createdAt": "2026-07-15T08:00:00.000Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-3904",
+      "vendor": "Akash Network",
+      "sku": "GPU-A100-1H",
+      "unitPrice": 14000,
+      "quantity": 2,
+      "quoteExpiry": "2026-08-05T08:00:00.000Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3904",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Akash Network",
+        "sku": "GPU-A100-1H",
+        "unitPrice": 14000,
+        "quantity": 2,
+        "quoteExpiry": "2026-08-05T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 2028000,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-15T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3904 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3904 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $280.00 against a quoted $280.00, within the 2.00% tolerance.",
+        "expected": "$280.00 ± $5.60",
+        "actual": "$280.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Akash Network and SKU GPU-A100-1H both match the accepted quote.",
+        "expected": "Akash Network / GPU-A100-1H",
+        "actual": "Akash Network / GPU-A100-1H"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$280.00 against $20,280.00 remaining in CC-FAC.",
+        "expected": "at most $20,280.00 remaining",
+        "actual": "$280.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3904 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$280.00 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$280.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_bf70a2f7c9",
+      "last4": "9073",
+      "limitCents": 28000,
+      "expiresAt": "2026-08-05T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_03",
+    "createdAt": "2026-07-16T08:00:00.000Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-3903",
+      "vendor": "ClearStock Supply",
+      "sku": "SKU-4471",
+      "unitPrice": 4650,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-06T08:00:00.000Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3903",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "ClearStock Supply",
+        "sku": "SKU-4471",
+        "unitPrice": 4650,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-06T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2037200,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-16T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3903 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3903 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $372.00 against a quoted $372.00, within the 2.00% tolerance.",
+        "expected": "$372.00 ± $7.44",
+        "actual": "$372.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor ClearStock Supply and SKU SKU-4471 both match the accepted quote.",
+        "expected": "ClearStock Supply / SKU-4471",
+        "actual": "ClearStock Supply / SKU-4471"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$372.00 against $20,372.00 remaining in CC-OPS.",
+        "expected": "at most $20,372.00 remaining",
+        "actual": "$372.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3903 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$372.00 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$372.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_7025d65a26",
+      "last4": "3232",
+      "limitCents": 37200,
+      "expiresAt": "2026-08-06T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_02",
+    "createdAt": "2026-07-17T08:00:00.000Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-3902",
+      "vendor": "Quill Corp",
+      "sku": "SKU-4471",
+      "unitPrice": 4550,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-07T08:00:00.000Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3902",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Quill Corp",
+        "sku": "SKU-4471",
+        "unitPrice": 4550,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-07T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 2036400,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-17T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3902 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3902 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $364.00 against a quoted $364.00, within the 2.00% tolerance.",
+        "expected": "$364.00 ± $7.28",
+        "actual": "$364.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Quill Corp and SKU SKU-4471 both match the accepted quote.",
+        "expected": "Quill Corp / SKU-4471",
+        "actual": "Quill Corp / SKU-4471"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$364.00 against $20,364.00 remaining in CC-MKT.",
+        "expected": "at most $20,364.00 remaining",
+        "actual": "$364.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3902 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$364.00 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$364.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_9dbd4bc062",
+      "last4": "4375",
+      "limitCents": 36400,
+      "expiresAt": "2026-08-07T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_01",
+    "createdAt": "2026-07-18T08:00:00.000Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-3901",
+      "vendor": "Staples Business",
+      "sku": "SKU-4471",
+      "unitPrice": 4299,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-08T08:00:00.000Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3901",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Staples Business",
+        "sku": "SKU-4471",
+        "unitPrice": 4299,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-08T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2034392,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-18T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3901 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3901 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $343.92 against a quoted $343.92, within the 2.00% tolerance.",
+        "expected": "$343.92 ± $6.87",
+        "actual": "$343.92"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Staples Business and SKU SKU-4471 both match the accepted quote.",
+        "expected": "Staples Business / SKU-4471",
+        "actual": "Staples Business / SKU-4471"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$343.92 against $20,343.92 remaining in CC-ENG.",
+        "expected": "at most $20,343.92 remaining",
+        "actual": "$343.92"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3901 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$343.92 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$343.92"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_6756d18131",
+      "last4": "6549",
+      "limitCents": 34392,
+      "expiresAt": "2026-08-08T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_prior_00",
+    "createdAt": "2026-07-19T08:00:00.000Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-3900",
+      "vendor": "Office Depot",
+      "sku": "SKU-4471",
+      "unitPrice": 4799,
+      "quantity": 6,
+      "quoteExpiry": "2026-08-09T08:00:00.000Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-3900",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Office Depot",
+        "sku": "SKU-4471",
+        "unitPrice": 4799,
+        "quantity": 6,
+        "quoteExpiry": "2026-08-09T08:00:00.000Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 2028794,
+        "spentCents": 0
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-19T08:00:00.000Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-3900 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-3900 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $287.94 against a quoted $287.94, within the 2.00% tolerance.",
+        "expected": "$287.94 ± $5.75",
+        "actual": "$287.94"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Office Depot and SKU SKU-4471 both match the accepted quote.",
+        "expected": "Office Depot / SKU-4471",
+        "actual": "Office Depot / SKU-4471"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$287.94 against $20,287.94 remaining in CC-MKT.",
+        "expected": "at most $20,287.94 remaining",
+        "actual": "$287.94"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-3900 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      },
+      {
+        "ruleId": "requires-approval",
+        "label": "Above the delegated limit, a person must release it",
+        "readFrom": "policy.thresholdCents",
+        "passed": true,
+        "reason": "$287.94 is within the agent's $25,000.00 delegated authority.",
+        "expected": "at most $25,000.00 without sign-off",
+        "actual": "$287.94"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_db36c3e29b",
+      "last4": "3328",
+      "limitCents": 28794,
+      "expiresAt": "2026-08-09T08:00:00.000Z"
+    },
+    "seeded": true
+  },
+  {
     "id": "dec_seed_041",
     "createdAt": "2026-07-20T10:30:21.872Z",
     "agent": "facilities-01",
@@ -96,6 +1125,46 @@
         "reason": "$27,550.00 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$27,550.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -198,6 +1267,46 @@
         "reason": "$8,101.76 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$8,101.76"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -305,6 +1414,46 @@
         "reason": "$2,340.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$2,340.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -412,6 +1561,46 @@
         "reason": "$4,855.50 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$4,855.50"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -519,6 +1708,46 @@
         "reason": "$10,150.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$10,150.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -626,6 +1855,46 @@
         "reason": "$8,715.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$8,715.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -733,6 +2002,46 @@
         "reason": "$8,803.83 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$8,803.83"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -840,6 +2149,46 @@
         "reason": "$2,241.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$2,241.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -947,6 +2296,46 @@
         "reason": "$24,960.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$24,960.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1054,6 +2443,46 @@
         "reason": "$1,106.84 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$1,106.84"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1161,6 +2590,46 @@
         "reason": "$5,744.30 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$5,744.30"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -1263,6 +2732,46 @@
         "reason": "$19,200.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$19,200.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1370,6 +2879,46 @@
         "reason": "$96.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$96.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1481,6 +3030,46 @@
         "reason": "$16,320.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$16,320.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -1583,6 +3172,46 @@
         "reason": "$2,652.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$2,652.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1690,6 +3319,46 @@
         "reason": "$1,068.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$1,068.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -1797,6 +3466,46 @@
         "reason": "$9,383.82 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$9,383.82"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -1899,6 +3608,46 @@
         "reason": "$16,320.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$16,320.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -2001,6 +3750,46 @@
         "reason": "$7,968.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$7,968.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -2109,6 +3898,46 @@
         "reason": "$25,920.00 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$25,920.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -2211,6 +4040,46 @@
         "reason": "$5,727.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$5,727.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -2313,6 +4182,46 @@
         "reason": "$996.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$996.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -2420,6 +4329,46 @@
         "reason": "$267.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$267.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -2527,6 +4476,46 @@
         "reason": "$1,024.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$1,024.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -2634,6 +4623,46 @@
         "reason": "$11,719.32 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$11,719.32"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -2741,6 +4770,46 @@
         "reason": "$178.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$178.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -2844,6 +4913,46 @@
         "reason": "$42,335.94 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$42,335.94"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "held",
@@ -2946,6 +5055,46 @@
         "reason": "$10,850.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$10,850.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3053,6 +5202,46 @@
         "reason": "$768.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$768.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3160,6 +5349,46 @@
         "reason": "$620.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$620.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -3263,6 +5492,46 @@
         "reason": "$34,560.00 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$34,560.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -3365,6 +5634,46 @@
         "reason": "$10,951.38 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$10,951.38"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -3467,6 +5776,46 @@
         "reason": "$448.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$448.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3574,6 +5923,46 @@
         "reason": "$7,024.48 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$7,024.48"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -3676,6 +6065,46 @@
         "reason": "$323.50 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$323.50"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3783,6 +6212,46 @@
         "reason": "$9,300.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$9,300.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3890,6 +6359,46 @@
         "reason": "$9,213.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$9,213.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -3997,6 +6506,46 @@
         "reason": "$416.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$416.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -4105,6 +6654,46 @@
         "reason": "$30,450.00 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$30,450.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "held",
@@ -4207,6 +6796,46 @@
         "reason": "$3,486.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$3,486.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -4314,6 +6943,46 @@
         "reason": "$787.20 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$787.20"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -4421,6 +7090,46 @@
         "reason": "$10,150.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$10,150.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "refused",
@@ -4524,6 +7233,46 @@
         "reason": "$27,840.00 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$27,840.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "held",
@@ -4626,6 +7375,46 @@
         "reason": "$11,600.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$11,600.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -4734,6 +7523,46 @@
         "reason": "$58,841.20 is above the $25,000.00 delegated limit, so this is held for finance-controller to release. Every other check passed — no card exists until a person signs off.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$58,841.20"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "held",
@@ -4836,6 +7665,46 @@
         "reason": "$960.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$960.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",
@@ -4943,6 +7812,46 @@
         "reason": "$10,375.00 is within the agent's $25,000.00 delegated authority.",
         "expected": "at most $25,000.00 without sign-off",
         "actual": "$10,375.00"
+      },
+      {
+        "ruleId": "no-structuring",
+        "label": "Not a large purchase split to duck approval",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.sameVendorCostCentreCents"
+      },
+      {
+        "ruleId": "agent-authority",
+        "label": "Inside this particular agent's own limit",
+        "passed": true,
+        "skipped": true,
+        "reason": "No agent was recorded on this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.agent"
+      },
+      {
+        "ruleId": "known-vendor",
+        "label": "A vendor we have paid before",
+        "passed": true,
+        "skipped": true,
+        "reason": "No vendor history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.vendorEverPaid"
+      },
+      {
+        "ruleId": "velocity",
+        "label": "Not spending faster than this agent should",
+        "passed": true,
+        "skipped": true,
+        "reason": "No spend history was captured with this decision.",
+        "expected": "—",
+        "actual": "—",
+        "readFrom": "record.history.agentCount"
       }
     ],
     "outcome": "approved",

@@ -44,6 +44,19 @@ export function proposePurchase(task: Task): ProposedPurchase {
   const sellers = SELLERS_BY_TASK[task.taskKey];
   if (!sellers?.length) throw new Error(`No sellers configured for "${task.taskKey}".`);
 
+  // Refuse a malformed quantity here, before the negotiation runs on it.
+  //
+  // `quantity: 0` used to divide through the bidding and produce a PO with a null unit
+  // price. The resulting NaN total then silently satisfied six of the eleven checks,
+  // because every comparison against NaN is false, and charged a cost centre NaN — which
+  // disabled that budget's check for good. The checks now fail closed on an unusable
+  // figure, but a malformed order should never reach them in the first place.
+  if (!Number.isInteger(task.quantity) || task.quantity <= 0) {
+    throw new Error(
+      `Quantity must be a positive whole number, got ${JSON.stringify(task.quantity)}.`
+    );
+  }
+
   const result = negotiate(
     sellers,
     task.quantity,

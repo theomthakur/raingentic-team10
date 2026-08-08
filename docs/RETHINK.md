@@ -168,7 +168,7 @@ Replay across the six decisions a live demo generates reads as a toy. *"One appr
 now be refused"* is not a diff, it is an anecdote.
 
 Seed **forty or fifty** plausible historical decisions across a few cost centres, agents and
-vendors, committed as data. Then the replay diff is *"across 47 decisions, six approvals
+vendors, committed as data. Then the replay diff is *"across 54 decisions, 8 approvals
 would now be refused and two refusals would now pass,"* and the screen has enough rows to
 look like a system of record rather than a test file.
 

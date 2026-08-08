@@ -212,14 +212,22 @@ export function createPostgresStore(): Store {
     },
 
     /**
-     * Read straight off the decision log. Only approved and held rows count as committed
-     * spend — a refusal never moved money, so counting it would punish an agent for the
-     * system correctly stopping it.
+     * Read straight off the decision log. Must match `memory.ts` exactly — a rule that
+     * behaves differently on the deployed store than on a laptop is worse than no rule.
+     *
+     * **Exposure** (rate, structuring): approved *and* held. A held purchase is pending a
+     * signature rather than abandoned, and ignoring the hold queue would let an agent
+     * structure a purchase through it. A refusal moved no money.
+     *
+     * **Payment history** (rule 10): approved only. A held purchase has paid nobody, and
+     * counting it made the control defeat itself — the first attempt was held for review,
+     * and that hold alone made the vendor "known", so a retry passed with no human input.
      */
     async getSpendHistory({ agent, vendor, costCentre, windowHours }) {
       const cutoff = Date.now() - windowHours * 3_600_000;
       const all = await this.listDecisions();
       const committed = all.filter((d) => d.outcome === "approved" || d.outcome === "held");
+      const settled = all.filter((d) => d.outcome === "approved");
       const inWindow = committed.filter((d) => Date.parse(d.createdAt) >= cutoff);
 
       const mine = inWindow.filter((d) => d.agent === agent);
@@ -236,7 +244,8 @@ export function createPostgresStore(): Store {
         sameVendorCostCentreCents: total(sameLine),
         sameVendorCostCentreCount: sameLine.length,
         // Across all time, not just the window: a vendor paid two years ago is not new.
-        vendorEverPaid: committed.some((d) => d.po.vendor === vendor),
+        // `settled`, not `committed` — see the note above.
+        vendorEverPaid: settled.some((d) => d.po.vendor === vendor),
       };
     },
 

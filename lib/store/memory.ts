@@ -93,14 +93,26 @@ export function createMemoryStore(): Store {
     },
 
     /**
-     * Read straight off the decision log. Only approved and held rows count as committed
-     * spend — a refusal never moved money, so counting it would punish an agent for the
-     * system correctly stopping it.
+     * Read straight off the decision log.
+     *
+     * Two different questions, and they need two different filters:
+     *
+     * **Exposure** — the rate and structuring rules ask "how much is this agent committing
+     * right now". Approved *and* held rows both count, because a held purchase is pending a
+     * signature rather than abandoned, and ignoring the hold queue would let an agent
+     * structure a purchase through it. A refusal never moved money, so counting it would
+     * punish an agent for the system correctly stopping it.
+     *
+     * **Payment history** — rule 10 asks "have we ever actually paid this supplier". Only
+     * an approved row answers yes. A held purchase has paid nobody, and counting it made
+     * the control defeat itself: the first attempt was held for review, and that hold alone
+     * made the vendor "known" so a retry sailed through with no human involved.
      */
     async getSpendHistory({ agent, vendor, costCentre, windowHours }) {
       const cutoff = Date.now() - windowHours * 3_600_000;
       const all = await this.listDecisions();
       const committed = all.filter((d) => d.outcome === "approved" || d.outcome === "held");
+      const settled = all.filter((d) => d.outcome === "approved");
       const inWindow = committed.filter((d) => Date.parse(d.createdAt) >= cutoff);
 
       const mine = inWindow.filter((d) => d.agent === agent);
@@ -117,7 +129,9 @@ export function createMemoryStore(): Store {
         sameVendorCostCentreCents: total(sameLine),
         sameVendorCostCentreCount: sameLine.length,
         // Across all time, not just the window: a vendor paid two years ago is not new.
-        vendorEverPaid: committed.some((d) => d.po.vendor === vendor),
+        // `settled`, not `committed` — a hold has paid nobody, and treating it as payment
+        // let a retry clear this control without anyone approving anything.
+        vendorEverPaid: settled.some((d) => d.po.vendor === vendor),
       };
     },
 

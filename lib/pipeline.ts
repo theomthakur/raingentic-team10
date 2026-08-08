@@ -4,6 +4,7 @@ import type {
   Decision,
   NegotiationSummary,
   PurchaseOrder,
+  RuleId,
 } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
@@ -50,6 +51,18 @@ function decisionId(): string {
 export interface ReleaseContext {
   approval: Approval;
   releases: string;
+  /**
+   * The rules a person has actually signed off, taken from the held decision's own
+   * verdicts — not a hardcoded list.
+   *
+   * Four rules escalate rather than refuse: the delegated limit, a split purchase, an
+   * agent's own limit, and a first payment to a new supplier. An approver is answering the
+   * specific concerns that were raised, so only those are lifted. Every other rule still
+   * runs against facts read now, which is why a release can still be refused or even held
+   * again for a *different* reason — approval is permission to proceed, not a promise that
+   * the facts have not moved.
+   */
+  liftedRules: RuleId[];
 }
 
 export async function runPipeline(
@@ -84,11 +97,15 @@ export async function runPipeline(
   const record = await snapshot(store, po, agent);
   const ruleSet = await store.latestRuleSet();
 
-  // On a release, the delegated-limit rule has already been satisfied — by a person.
-  // Every other rule still runs, against a snapshot taken now, because the world may
-  // have moved while the purchase sat in the queue.
+  // On a release, the rules a person signed off have already been satisfied — by that
+  // person. Every other rule still runs, against a snapshot taken now, because the world
+  // may have moved while the purchase sat in the queue.
+  //
+  // Lifting only what was actually escalated matters: it used to lift `requires-approval`
+  // alone, so a hold caused by any of the other three escalating rules re-escalated on
+  // release and could never be cleared.
   const effective = release
-    ? { ...ruleSet, rules: ruleSet.rules.filter((r) => r.id !== "requires-approval") }
+    ? { ...ruleSet, rules: ruleSet.rules.filter((r) => !release.liftedRules.includes(r.id)) }
     : ruleSet;
 
   const result = verify(po, record, effective);
@@ -280,10 +297,30 @@ export async function releaseHeld(
     );
   }
 
+  // What the approver is actually signing off: the rules that escalated on the held row.
+  // Read from the stored decision rather than hardcoded, so adding another escalating
+  // rule later cannot silently create holds nobody can clear.
+  const liftedRules = held.checks
+    .filter((c) => c.escalates && !c.passed)
+    .map((c) => c.ruleId);
+
+  if (liftedRules.length === 0) {
+    // A held row with nothing escalated should be impossible. If it happens, say so
+    // rather than re-running and producing another hold nobody can act on.
+    throw new Error(
+      `Decision ${decisionId} is held but records no escalation, so there is nothing to release.`
+    );
+  }
+
+  const lifted = held.checks
+    .filter((c) => liftedRules.includes(c.ruleId))
+    .map((c) => c.label)
+    .join("; ");
+
   const stages: Stage[] = [
     {
       name: "APPROVE",
-      detail: `${by} released ${held.po.poNumber}${note ? ` — "${note}"` : ""}`,
+      detail: `${by} released ${held.po.poNumber} — signed off: ${lifted}${note ? ` — "${note}"` : ""}`,
       ok: true,
     },
   ];
@@ -295,11 +332,12 @@ export async function releaseHeld(
     decisionId: held.id,
   };
 
-  // Re-run the pipeline with the escalation rule lifted for this one purchase. Every
-  // other rule still applies, against facts read now.
+  // Re-run with exactly those rules lifted for this one purchase. Every other rule still
+  // applies, against facts read now.
   const result = await runPipeline(held.po, held.agent, held.negotiation, {
     approval,
     releases: held.id,
+    liftedRules,
   });
 
   return { decision: result.decision, stages: [...stages, ...result.stages] };

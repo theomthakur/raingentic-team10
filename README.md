@@ -105,7 +105,7 @@ decision replayed tomorrow is judged against the facts that were true when it wa
 Edit a rule in the console. It saves as a new version. Re-run the entire decision log
 against it and see the diff:
 
-> *"Across 47 recorded decisions, 8 approvals would now be refused and 0 refusals would now
+> *"Across 54 recorded decisions, 8 approvals would now be refused and 0 refusals would now
 > pass. 39 unchanged."*
 
 You can also preview a change before saving it, so a finance team can see what a policy
@@ -133,7 +133,7 @@ edit would do to history before committing to it.
 ```bash
 npm install
 npm run seed     # regenerate the committed history (deterministic, rarely needed)
-npm test         # 29 tests over the checks, hashing and replay
+npm test         # 78 tests over the checks, hashing, replay and concurrency
 npm run dev
 ```
 
@@ -151,13 +151,13 @@ survive a cold start, and the decision log is what replay reads.
 | Path | |
 |---|---|
 | `lib/types.ts` | The domain. Money is always integer cents |
-| `lib/checks/` | The six checks and `verify()`. Pure, no I/O, no model, no clock |
+| `lib/checks/` | The eleven checks and `verify()`. Pure, no I/O, no model, no clock |
 | `lib/rules/` | Versioned rule data and the sha256 that gets anchored |
 | `lib/replay/` | Re-judging stored decisions against another rule version |
 | `lib/store/` | Append-only log. Postgres when `DATABASE_URL` is set, memory otherwise |
 | `lib/pipeline.ts` | The six stages in order |
 | `lib/rain/issuer.ts` | 🔴 The join seam with the Rain integration |
-| `lib/seed/` | 47 committed historical decisions, deterministically generated |
+| `lib/seed/` | 54 committed historical decisions, deterministically generated |
 | `app/api/` | `state`, `run`, `rules`, `replay`, `reset` |
 
 Full planning notes and the reasoning behind every decision above are in [`docs/`](docs/).

@@ -9,7 +9,7 @@ Merging it into `main` is the last task, not the first.
 git checkout iterations && npm install && npm test && npm run dev
 ```
 
-44 tests should pass. The app runs at `localhost:3000` with no configuration.
+78 tests should pass. The app runs at `localhost:3000` with no configuration.
 
 ---
 
@@ -34,7 +34,7 @@ decision path, you can edit a rule and re-run all history against it.
 | 7 deterministic checks | pure functions, no I/O, no model, no wall clock |
 | Rules as versioned data | sha256 per version, each citing its real-world control |
 | Append-only decision log | stores a record *snapshot*, not a pointer |
-| Replay + rule diff | "across 47 decisions, 8 approvals would now be refused" |
+| Replay + rule diff | "across 54 decisions, 8 approvals would now be refused" |
 | Negotiation | 4 sellers, distinct strategies, one counter-offer round |
 | Human oversight | above $25k a purchase is **held**; a named person releases it |
 | Dual control | a policy change needs a second person; the author cannot self-approve |
