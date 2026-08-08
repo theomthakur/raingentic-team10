@@ -76,7 +76,9 @@ export function RuleEditor({
   onPreview,
   onPropose,
   onActivate,
+  onAnchor,
   onRevert,
+  anchoringEnabled = false,
 }: {
   rules: Rule[];
   ruleSets: RuleSet[];
@@ -87,7 +89,9 @@ export function RuleEditor({
   onPreview: () => void;
   onPropose: (proposedBy: string) => void;
   onActivate: (version: number, approvedBy: string) => void;
+  onAnchor: (version: number) => void;
   onRevert: (version: number) => void;
+  anchoringEnabled?: boolean;
 }) {
   const [proposer, setProposer] = useState("");
   const [approver, setApprover] = useState("");
@@ -235,7 +239,24 @@ export function RuleEditor({
               {rs.status === "pending" ? (
                 <Badge tone="warn">pending</Badge>
               ) : rs.anchorTxHash ? (
-                <Badge tone="monad">anchored on monad</Badge>
+                <a
+                  href={`https://testnet.monadexplorer.com/tx/${rs.anchorTxHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={rs.anchorTxHash}
+                >
+                  <Badge tone="monad">anchored on monad</Badge>
+                </a>
+              ) : anchoringEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => onAnchor(rs.version)}
+                  disabled={busy}
+                  className="rounded-full border border-monad-300 bg-monad-50 px-2 py-0.5 font-mono text-[10px] text-monad-700 transition hover:bg-monad-100 disabled:opacity-40"
+                  title="Publish this version's hash to Monad testnet"
+                >
+                  anchor
+                </button>
               ) : (
                 <Badge tone="neutral">local</Badge>
               )}

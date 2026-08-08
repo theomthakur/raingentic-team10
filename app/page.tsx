@@ -27,6 +27,7 @@ import { diffRules } from "@/lib/rules/diff";
 interface State {
   storage: "memory" | "postgres";
   rainWired: boolean;
+  anchoringEnabled: boolean;
   decisions: Decision[];
   ruleSets: RuleSet[];
   budgets: BudgetRecord[];
@@ -207,6 +208,20 @@ export default function Page() {
     }
   }
 
+  /** Publish a version's hash to Monad, so it has a timestamp we do not control. */
+  async function anchor(version: number) {
+    setBusy(true);
+    setError(null);
+    try {
+      await post("/api/anchor", { version });
+      await load();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   /** The second pair of eyes. Rejected server-side if it is the same person. */
   async function activate(version: number, approvedBy: string) {
     setBusy(true);
@@ -344,6 +359,8 @@ export default function Page() {
                   onPreview={preview}
                   onPropose={propose}
                   onActivate={activate}
+                  onAnchor={anchor}
+                  anchoringEnabled={state.anchoringEnabled}
                   onRevert={(v) => {
                     const rs = state.ruleSets.find((r) => r.version === v);
                     if (rs) setDraftRules(rs.rules);

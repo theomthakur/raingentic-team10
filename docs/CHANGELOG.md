@@ -4,6 +4,31 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 5 — the Monad anchor, built and inert
+
+The last unsatisfied track. Written in full and wired to the UI; it activates the moment
+`MONAD_RPC_URL` and `MONAD_PRIVATE_KEY` exist. Nothing else depends on it — a rule version
+works identically unanchored, it simply carries a weaker claim.
+
+- **`anchorRuleVersion()`** sends a zero-value transaction to the sender's own address
+  with `version || sha256(rules)` as calldata. No contract to deploy and none to get
+  wrong; the payload is the point, and it is a real transaction either way.
+- **Why the rule version, not every decision.** Replay proves the rules are data. It does
+  not prove they were not rewritten afterwards to fit a history someone already had, and
+  "trust our timestamps" is no answer because the timestamps are ours. An independent
+  existence proof closes that. Remove it and a specific sentence in the pitch stops being
+  true — which is the test for whether the chain is structural or decorative.
+- **The honest Monad argument:** you *have* to anchor the versions or the audit claim
+  collapses, and that is a handful of writes. You also *want* every decision, and there
+  are thousands. At 50 cents a write you would anchor the rules and give up the decisions.
+  Only somewhere this cheap lets you afford both.
+- Only **active** versions can be anchored — publishing a pending one would assert that a
+  policy exists when nobody has approved it.
+- Verified inert without credentials: `anchoringEnabled: false`, a clear 501, and the rest
+  of the app entirely unaffected.
+
+**To switch it on:** a Monad testnet RPC URL and a funded testnet key in `.env.local`.
+
 ## 2026-08-08 · Iteration 4 — dual control on policy changes
 
 Closes the sharpest criticism of replay: *"you can edit the rules, so the audit proves

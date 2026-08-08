@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
+import { anchoringEnabled } from "@/lib/monad/anchor";
 import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
 
@@ -20,6 +21,7 @@ export async function GET() {
   return NextResponse.json({
     storage: store.kind,
     rainWired: Boolean(process.env.RAIN_API_KEY),
+    anchoringEnabled: anchoringEnabled(),
     decisions,
     ruleSets,
     budgets: budgets.filter(Boolean),
