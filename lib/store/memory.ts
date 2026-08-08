@@ -84,6 +84,12 @@ export function createMemoryStore(): Store {
       return c ? { ...c } : null;
     },
 
+    async recordAcceptedQuote(quote) {
+      const existing = state().quotes.find((x) => x.poNumber === quote.poNumber);
+      if (existing) return; // first terms win, see the interface note
+      state().quotes.push({ ...quote });
+    },
+
     async recordIssuedCard(card) {
       state().cards.push({ ...card });
     },

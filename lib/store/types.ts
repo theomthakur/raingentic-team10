@@ -32,6 +32,17 @@ export interface Store {
   getCardForPO(poNumber: string): Promise<IssuedCardRecord | null>;
 
   /**
+   * A negotiation concluded, so the winning quote becomes an accepted order line on the
+   * record. This is what gives the agent something to be checked *against* — without it
+   * the checker would be comparing the agent's declaration to itself.
+   *
+   * Deliberately does not overwrite an existing line: once an order line exists, a later
+   * run of the same task must be judged against the original terms, not against terms the
+   * retry brought with it. That is what keeps the run-it-twice refusal honest.
+   */
+  recordAcceptedQuote(quote: QuoteRecord): Promise<void>;
+
+  /**
    * The write-back that makes the run-it-twice demo real rather than staged. Once a card
    * exists against a PO, the next identical run reads it and rule 6 refuses.
    */

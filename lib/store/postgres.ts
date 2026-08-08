@@ -175,6 +175,13 @@ export function createPostgresStore(): Store {
       return rows[0] ? (rows[0].data as IssuedCardRecord) : null;
     },
 
+    async recordAcceptedQuote(quote) {
+      const sql = await getSql();
+      // do nothing on conflict: first terms win, see the interface note.
+      await sql`insert into quotes (po_number, data) values (${quote.poNumber}, ${JSON.stringify(quote)})
+                on conflict (po_number) do nothing`;
+    },
+
     async recordIssuedCard(card) {
       const sql = await getSql();
       // do nothing on conflict: the first card for a line wins, always.

@@ -1,4 +1,5 @@
 import type { Cents, PurchaseOrder } from "@/lib/types";
+import { issueScopedCard } from "@/lib/rain-client";
 
 /**
  * 🔴 THE 17:00 JOIN SEAM.
@@ -44,15 +45,29 @@ function simulate(req: IssueRequest): IssuedCard {
 }
 
 /**
- * A: replace the body of this function with the real `issueRainCard()` call.
+ * The real call, through A's client in `lib/rain-client.ts`.
  *
- * Scope the card to exactly `req.limitCents`, single use, expiry no later than
- * `req.po.quoteExpiry`, and merchant-locked to `req.po.vendor` if the endpoint supports
- * it. Return the same shape with `simulated: false`. Nothing else in the app needs to
- * change — the pipeline, the log, replay and the UI all read this interface.
+ * The card is scoped to exactly the approved total — not rounded up, not a standing limit
+ * — and expires with the quote it is bound to, so the instrument cannot outlive the
+ * obligation that justified it.
  */
-async function issueViaRain(_req: IssueRequest): Promise<IssuedCard> {
-  throw new Error("Rain issuance not wired yet — A owns this call.");
+async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
+  const card = await issueScopedCard({
+    limitCents: req.limitCents,
+    expiresAt: req.po.quoteExpiry,
+    reference: req.po.poNumber,
+    // ⚠️ Only set once a Rain engineer confirms exact-merchant locking is supported.
+    // Category-level locking would be a weaker claim, so we do not assert it yet.
+    // merchantLock: req.po.vendor,
+  });
+
+  return {
+    cardId: card.cardId,
+    last4: card.lastFour,
+    limitCents: card.limitCents,
+    expiresAt: card.expiresAt,
+    simulated: false,
+  };
 }
 
 export async function issueCard(req: IssueRequest): Promise<IssuedCard> {

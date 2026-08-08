@@ -1,5 +1,5 @@
 /**
- * Mandate — core domain types.
+ * Mandate — core domain types. The join contract between A's half and B's half.
  *
  * Two things matter here and both are design decisions, not incidental shapes:
  *
@@ -10,12 +10,15 @@
  *    facts that were true at decision time.
  */
 
-/** Money is always integer cents. Never floats, never dollars. */
+/** Money is always integer cents. Never floats, never dollars. See lib/money.ts. */
 export type Cents = number;
 
 /**
  * The purchase order an agent declares before it is allowed to spend.
  * This is the "why" — the thing Rain's control layer never sees.
+ *
+ * Produced by A's `proposePurchase()`, consumed by B's `verify()`. Agree any change here
+ * across both halves; nothing else is shared.
  */
 export interface PurchaseOrder {
   poNumber: string;
@@ -25,7 +28,27 @@ export interface PurchaseOrder {
   quantity: number;
   /** ISO 8601. The quote is only good until this moment. */
   quoteExpiry: string;
+  /** Required: rule 5 has nothing to check a spend against without it. */
   costCentre: string;
+}
+
+/** A quote from one seller, before the negotiation picks a winner. A's side. */
+export interface VendorQuote {
+  vendor: string;
+  sku: string;
+  unitPrice: Cents;
+  quantity: number;
+  /** ISO date. */
+  validUntil: string;
+}
+
+/** The subset of a Rain scoped virtual card A's client returns. */
+export interface ScopedCard {
+  cardId: string;
+  lastFour: string;
+  status: "active" | "inactive";
+  limitCents: Cents;
+  expiresAt: string;
 }
 
 /** Total the agent is asking to spend. Derived, never declared, so it cannot be fudged. */
