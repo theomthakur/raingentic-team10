@@ -7,7 +7,11 @@
  * whether it succeeded, not the response body, so nothing sensitive lands in a terminal
  * you might share a screenshot of.
  */
-import "dotenv/config";
+// Next.js picks up .env.local on its own; a plain tsx script does not, and dotenv's
+// default entrypoint only reads `.env`. Load the file the credentials actually live in.
+import { config } from "dotenv";
+config({ path: ".env.local" });
+config();
 
 async function main() {
   console.log("Checking Rain connectivity...");
