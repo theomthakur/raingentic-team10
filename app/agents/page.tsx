@@ -6,7 +6,7 @@ import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money } from "@/lib/format";
 import { AGENTS } from "@/lib/agents";
-import { Avatar } from "@/components/Avatar";
+import { AgentAvatar } from "@/components/AgentAvatar";
 import { Badge, Panel } from "@/components/ui";
 import { Footer } from "@/components/Footer";
 
@@ -27,13 +27,17 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
   return (
     <Panel>
       <div className="flex items-start gap-3.5 p-5">
-        <Avatar name={agent.name} color={agent.color} size={44} />
+        <AgentAvatar id={id} size={44} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="text-[15px] font-semibold text-ink-900">{agent.name}</p>
+            <p className="text-[15px] font-semibold text-ink-900">
+              This is {agent.name}
+            </p>
             <span className="font-mono text-[10.5px] text-ink-400">{agent.id}</span>
           </div>
-          <p className="text-[12.5px] font-medium text-muted">{agent.role}</p>
+          <p className="text-[12.5px] font-medium" style={{ color: agent.color }}>
+            {agent.role} — deals with {agent.dealsWith}
+          </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-700">{agent.description}</p>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
