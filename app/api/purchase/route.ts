@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { proposePurchase, type Task } from "@/lib/agent";
+import { enrichWithLLMFlavor } from "@/lib/llm";
 import { issueScopedCard, RainApiError } from "@/lib/rain-client";
 import type { CheckResult, PurchaseOrder } from "@/lib/types";
 
@@ -35,6 +36,11 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 422 });
   }
+
+  // Optional, additive, never blocks or changes the outcome: swaps in an LLM-written
+  // seller remark if GROQ_API_KEY is set and responds in time. Falls back silently to the
+  // deterministic note otherwise, the price and the winner were already decided above.
+  negotiation = await enrichWithLLMFlavor(negotiation);
 
   const check = await verifyStub(po);
   if (!check.ok) {
