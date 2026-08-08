@@ -70,7 +70,7 @@ const failed = (r: ReturnType<typeof verify>) => r.failures.map((f) => f.ruleId)
 test("a PO that matches the record in every way is approved", () => {
   const r = verify(po(), record(), RULES);
   assert.equal(r.ok, true, `expected approval, got failures: ${failed(r)}`);
-  assert.equal(r.checks.length, 6);
+  assert.equal(r.checks.length, 7);
 });
 
 // --- rule 1 ----------------------------------------------------------------
@@ -327,6 +327,66 @@ test("every decision in the log accounts for itself in a replay", () => {
     r.unchanged + r.approvedNowRefused.length + r.refusedNowApproved.length,
     r.total
   );
+});
+
+// --- rule 7, delegated authority: held is not refused -------------------------
+
+test("a purchase under the delegated limit needs no human", () => {
+  const r = verify(po(), record(), RULES);
+  assert.equal(r.ok, true, `expected approval, got: ${failed(r)}`);
+  assert.equal(r.escalations.length, 0);
+});
+
+test("a purchase above the delegated limit is escalated, not refused", () => {
+  // $30,000 against a $25,000 limit, with the quote matching so nothing else can trip.
+  const big = po({ unitPrice: 300_000, quantity: 10 });
+  const rec = record({
+    quote: { ...record().quote!, unitPrice: 300_000, quantity: 10 },
+    budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+  });
+  const r = verify(big, rec, RULES);
+
+  assert.equal(r.ok, false, "it must not sail through");
+  // The distinction the whole feature rests on.
+  assert.equal(r.failures.length, 0, "nothing is actually wrong with it");
+  assert.equal(r.escalations.length, 1, "it is waiting for a person");
+  assert.equal(r.escalations[0].ruleId, "requires-approval");
+  assert.equal(r.escalations[0].escalates, true);
+});
+
+test("something genuinely wrong AND large is refused, not merely held", () => {
+  const big = po({ unitPrice: 300_000, quantity: 10, vendor: "Halloway Trading" });
+  const rec = record({
+    quote: { ...record().quote!, unitPrice: 300_000, quantity: 10 },
+    budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+  });
+  const r = verify(big, rec, RULES);
+  // A person should never be asked to rubber-stamp a purchase that fails a hard rule.
+  assert.ok(r.failures.length > 0, "the vendor mismatch is a hard failure");
+  assert.ok(r.failures.some((f) => f.ruleId === "line-matches"));
+});
+
+test("the delegated limit is data, not a constant", () => {
+  const raised = RULES.rules.map((rule) =>
+    rule.id === "requires-approval"
+      ? { ...rule, params: { ...rule.params, thresholdCents: 100_000_000 } }
+      : rule
+  );
+  const v2 = nextRuleSet(RULES, raised, "Raise the limit");
+  const big = po({ unitPrice: 300_000, quantity: 10 });
+  const rec = record({
+    quote: { ...record().quote!, unitPrice: 300_000, quantity: 10 },
+    budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+  });
+
+  assert.equal(verify(big, rec, RULES).escalations.length, 1);
+  assert.equal(verify(big, rec, v2).escalations.length, 0);
+});
+
+test("every rule cites the real-world control it implements", () => {
+  for (const rule of RULES.rules) {
+    assert.ok(rule.basis && rule.basis.length > 20, `${rule.id} has no stated basis`);
+  }
 });
 
 // --- the rule diff, which is what explains a replay --------------------------

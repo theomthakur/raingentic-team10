@@ -94,6 +94,13 @@ export const TASKS: Task[] = [
     note: "Right vendor, right total, wrong line item. No card control can see this.",
     po: fromQuote("PO-4422", { sku: "PL-FRT-EU4" }),
   },
+  {
+    id: "conveyor-capital",
+    label: "Order conveyor line for the new bay",
+    agent: "procurement-02",
+    note: "Nothing wrong with it — just $43,500. Held for a person, not refused.",
+    po: fromQuote("PO-4423"),
+  },
 ];
 
 /** A correct PO, used to prefill the hand-written form so it starts from something that

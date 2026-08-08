@@ -170,6 +170,14 @@ function build(shape: Shape, index: number): Decision {
   const ruleSet = defaultRuleSet();
   const result = verify(po, record, ruleSet);
 
+  // Three outcomes now. A purchase that only tripped the delegated limit was not wrong,
+  // it was large — it waited for a person rather than being rejected.
+  const outcome: Decision["outcome"] = result.ok
+    ? "approved"
+    : result.failures.length > 0
+      ? "refused"
+      : "held";
+
   const total = poTotal(po);
   return {
     id: `dec_seed_${String(index).padStart(3, "0")}`,
@@ -179,8 +187,8 @@ function build(shape: Shape, index: number): Decision {
     record,
     ruleVersion: ruleSet.version,
     checks: result.checks,
-    outcome: result.ok ? "approved" : "refused",
-    card: result.ok
+    outcome,
+    card: outcome === "approved"
       ? {
           cardId: `card_${Math.floor(rand() * 1e12).toString(16)}`,
           last4: String(between(1000, 9999)),
@@ -197,7 +205,8 @@ const decisions = PLAN.map(build).sort((a, b) => (a.createdAt < b.createdAt ? -1
 const out = join(process.cwd(), "lib", "seed", "decisions.json");
 writeFileSync(out, `${JSON.stringify(decisions, null, 2)}\n`);
 
-const approved = decisions.filter((d) => d.outcome === "approved").length;
+const count = (o: string) => decisions.filter((d) => d.outcome === o).length;
 console.log(`wrote ${decisions.length} decisions to ${out}`);
-console.log(`  approved: ${approved}`);
-console.log(`  refused:  ${decisions.length - approved}`);
+console.log(`  approved: ${count("approved")}`);
+console.log(`  held:     ${count("held")}`);
+console.log(`  refused:  ${count("refused")}`);

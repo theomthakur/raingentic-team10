@@ -80,6 +80,18 @@ export const SEED_QUOTES: QuoteRecord[] = [
     quantity: 1,
     quoteExpiry: "2026-08-20T23:59:59.000Z",
   },
+  {
+    // Correct in every way, but $43,500 — above the delegated limit, so it is held for a
+    // person rather than refused. This is the task that demonstrates bounded autonomy.
+    poNumber: "PO-4423",
+    status: "accepted",
+    fulfilled: false,
+    vendor: "Bellweather Industrial",
+    sku: "BW-CONV-90",
+    unitPrice: 145_000,
+    quantity: 30,
+    quoteExpiry: "2026-09-30T23:59:59.000Z",
+  },
 ];
 
 /**
@@ -93,7 +105,8 @@ export const SEED_QUOTES: QuoteRecord[] = [
  */
 export const SEED_BUDGETS: BudgetRecord[] = [
   { costCentre: "CC-OPS", limitCents: 2_500_000, spentCents: 1_180_000 },
-  { costCentre: "CC-ENG", limitCents: 4_000_000, spentCents: 2_640_000 },
+  // Headroom for the $43,500 capital purchase that demonstrates the delegated limit.
+  { costCentre: "CC-ENG", limitCents: 12_000_000, spentCents: 2_640_000 },
   { costCentre: "CC-FAC", limitCents: 1_400_000, spentCents: 812_000 },
   { costCentre: "CC-MKT", limitCents: 1_200_000, spentCents: 1_140_000 },
 ];
@@ -106,6 +119,7 @@ export const PO_COST_CENTRE: Record<string, string> = {
   "PO-4420": "CC-FAC",
   "PO-4421": "CC-FAC",
   "PO-4422": "CC-OPS",
+  "PO-4423": "CC-ENG",
 };
 
 export const AGENTS = ["procurement-01", "procurement-02", "facilities-01"] as const;

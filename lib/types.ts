@@ -106,7 +106,8 @@ export type RuleId =
   | "amount-matches"
   | "line-matches"
   | "within-budget"
-  | "no-existing-card";
+  | "no-existing-card"
+  | "requires-approval";
 
 /** A rule is a row, not an `if`. Params are what a finance team edits without a deploy. */
 export interface Rule {
@@ -115,6 +116,12 @@ export interface Rule {
   label: string;
   enabled: boolean;
   params: Record<string, number | boolean | string>;
+  /**
+   * The real-world control this implements. None of these rules were invented here — they
+   * are controls finance departments already run, moved to before the money is committed.
+   * Saying so is most of the answer to "why should I trust this?". See docs/CONTROLS.md.
+   */
+  basis: string;
 }
 
 export interface RuleSet {
@@ -149,15 +156,41 @@ export interface CheckResult {
   readFrom: string;
   /** true when the rule was disabled in this version, so it did not run. */
   skipped?: boolean;
+  /**
+   * This check did not reject the purchase — it escalated it to a person.
+   *
+   * The distinction matters: a refusal means the purchase was wrong, a hold means it was
+   * merely large enough that a human should look. Conflating the two would either block
+   * legitimate spending or wave through the thing you most wanted a person to see.
+   */
+  escalates?: boolean;
 }
 
 export interface VerifyResult {
+  /** Nothing blocked and nothing escalated: safe to issue immediately. */
   ok: boolean;
   checks: CheckResult[];
+  /** Hard failures. Any of these and the purchase is wrong, not merely large. */
   failures: CheckResult[];
+  /** Rules that want a human to look before an instrument exists. */
+  escalations: CheckResult[];
 }
 
-export type Outcome = "approved" | "refused";
+/**
+ * `held` means every check passed but the amount crossed the delegated authority limit,
+ * so no card exists until a named person releases it. It is not a failure — it is the
+ * escalation path every delegation-of-authority matrix already has for humans.
+ */
+export type Outcome = "approved" | "refused" | "held";
+
+/** Who released a held purchase, when, and why. Written as its own append-only row. */
+export interface Approval {
+  by: string;
+  at: string;
+  note: string;
+  /** The decision this releases. */
+  decisionId: string;
+}
 
 /**
  * How the price on this PO was arrived at.
@@ -200,6 +233,14 @@ export interface Decision {
   agent: string;
   /** Present when this PO came out of a negotiation rather than a fixed quote. */
   negotiation?: NegotiationSummary;
+  /**
+   * Set when a held decision was later released by a person. The original row is never
+   * mutated — this is written on the follow-up row, so the log shows both the hold and
+   * who lifted it.
+   */
+  approval?: Approval;
+  /** For a release row: the held decision it followed from. */
+  releases?: string;
 }
 
 // ---------------------------------------------------------------------------
