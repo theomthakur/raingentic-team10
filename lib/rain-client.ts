@@ -31,8 +31,10 @@ function baseUrl(): string {
 function buildHeaders(): HeadersInit {
   return {
     "content-type": "application/json",
-    // UNCONFIRMED: swap for `"x-api-key": env("RAIN_API_KEY")` if the engineer says so.
-    authorization: `Bearer ${env("RAIN_API_KEY")}`,
+    // CONFIRMED by the API itself: a bearer token returns
+    //   401 {"message":"headers is missing required property 'api-key'"}
+    // so the header is a plain `api-key`, not an Authorization bearer.
+    "api-key": env("RAIN_API_KEY"),
   };
 }
 

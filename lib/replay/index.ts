@@ -29,6 +29,8 @@ export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
       continue;
     }
 
+    const beforeById = new Map(decision.checks.map((c) => [c.ruleId, c]));
+    const afterById = new Map(after.checks.map((c) => [c.ruleId, c]));
     const beforeFailing = new Set(
       decision.checks.filter((c) => !c.passed).map((c) => c.ruleId)
     );
@@ -41,8 +43,17 @@ export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
       totalCents: poTotal(decision.po),
       before: decision.outcome,
       after: outcome,
-      nowFailing: after.failures.filter((c) => !beforeFailing.has(c.ruleId)),
-      nowPassing: decision.checks.filter((c) => !c.passed && !afterFailing.has(c.ruleId)),
+      // Each flip carries both sides, so the UI can say "this passed within a 2%
+      // tolerance and now it doesn't" rather than only naming the rule.
+      nowFailing: after.failures
+        .filter((c) => !beforeFailing.has(c.ruleId))
+        .map((now) => ({ now, previously: beforeById.get(now.ruleId) })),
+      nowPassing: decision.checks
+        .filter((c) => !c.passed && !afterFailing.has(c.ruleId))
+        .map((previously) => ({
+          now: afterById.get(previously.ruleId) ?? previously,
+          previously,
+        })),
     };
 
     if (decision.outcome === "approved") approvedNowRefused.push(change);

@@ -206,6 +206,20 @@ export interface Decision {
 // Replay
 // ---------------------------------------------------------------------------
 
+/**
+ * One rule whose verdict moved, with both sides of the comparison.
+ *
+ * Keeping the previous verdict alongside the new one is what lets the UI say "this used
+ * to pass, within a 2% tolerance, and now it doesn't, because the tolerance is 0" rather
+ * than just naming the rule. The before/after pair is the whole explanation.
+ */
+export interface ReplayFlip {
+  /** The rule's verdict under the version being replayed. */
+  now: CheckResult;
+  /** The same rule's verdict at the time the decision was originally made. */
+  previously?: CheckResult;
+}
+
 export interface ReplayChange {
   decisionId: string;
   poNumber: string;
@@ -214,8 +228,8 @@ export interface ReplayChange {
   before: Outcome;
   after: Outcome;
   /** The checks that differ between the two runs, for the drill-down. */
-  nowFailing: CheckResult[];
-  nowPassing: CheckResult[];
+  nowFailing: ReplayFlip[];
+  nowPassing: ReplayFlip[];
 }
 
 export interface ReplayResult {
