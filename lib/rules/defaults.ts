@@ -86,11 +86,18 @@ export const DEFAULT_RULES: Rule[] = [
     // One global ceiling would give the agent buying chairs the same authority as the one
     // buying capital equipment. A real DoA matrix is per-role, so this is too. Anything
     // not named here falls back to `defaultCents`.
+    //
+    // 🔴 Every limit here must stay at or below rule 7's `thresholdCents`, the company-wide
+    // unattended ceiling. The tighter of the two binds, so a per-agent limit above the
+    // company ceiling is dead data — it can never be the reason anything is held, and it
+    // advertises authority the agent does not actually have. `procurement-02` used to sit
+    // at $50,000 against a $25,000 ceiling, so Prue was documented as trusted to $50,000
+    // while nothing above $25,000 ever ran unattended. There is a test for this invariant.
     params: {
       defaultCents: 500_000,
       "facilities-01": 500_000,
       "procurement-01": 1_000_000,
-      "procurement-02": 5_000_000,
+      "procurement-02": 2_000_000,
       "office-supplies": 200_000,
       "cloud-compute": 1_500_000,
     },

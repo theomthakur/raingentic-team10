@@ -9,7 +9,7 @@ Merging it into `main` is the last task, not the first.
 git checkout iterations && npm install && npm test && npm run dev
 ```
 
-78 tests should pass. The app runs at `localhost:3000` with no configuration.
+82 tests should pass. The app runs at `localhost:3000` with no configuration.
 
 ---
 

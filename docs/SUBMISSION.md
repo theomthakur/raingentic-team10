@@ -80,9 +80,13 @@ once a person has also said so.
 **There is no path in the code where a card gets made first and judged afterwards.** The
 refusal branch simply never reaches Rain.
 
-### The seven checks
+### The eleven checks
 
 Each one returns a sentence a human can act on — never "validation failed."
+
+The first seven read the purchase order in front of them. The last four read the decision
+log, which is why they could only exist once the log did — they are the checks that see a
+pattern rather than a transaction.
 
 | # | The check | What it catches |
 |---|---|---|
@@ -92,7 +96,11 @@ Each one returns a sentence a human can act on — never "validation failed."
 | 4 | Does the supplier **and the item** match the quote? | Right supplier, right total, **wrong item** |
 | 5 | Is there budget left? | Death by a thousand small, individually-fine purchases |
 | 6 | Has a card already been issued for this order? | Paying twice because something was retried |
-| 7 | Is it above the amount the agent may spend alone? | Large purchases going through with nobody looking |
+| 7 | Is it above the amount any agent may spend alone? | Large purchases going through with nobody looking |
+| 8 | Is it a large purchase split into small ones? | The obvious way to beat check 7 — buy twice, just under the limit each time |
+| 9 | Is it inside **this** agent's own limit? | One global ceiling would trust the stationery buyer like the capital buyer |
+| 10 | Have we ever actually paid this supplier? | Invoice fraud almost always arrives as a payee nobody has paid before |
+| 11 | Is this agent spending too fast? | A looping or hijacked agent, whose purchases are each individually perfect |
 
 **Check 4 is worth pausing on.** A card company can limit the amount, the shop, the
 category, how often. It cannot tell you that you bought the *wrong item* from the *right
@@ -102,11 +110,25 @@ shop* at the *right price* — because a card issuer has no idea your order syst
 
 **Check 7 is the answer to the question everyone asks first.** More on that immediately.
 
+**Check 11 is the one nothing else can see.** Every other check judges a purchase on its
+own merits, and a runaway agent's purchases are each perfectly correct. Only the rate is
+wrong, so only a rate limit catches it. It refuses rather than escalating — a runaway
+should stop now, and a person can always raise the limit afterwards.
+
+**Checks 8, 10 and 11 do not run on the seeded history.** They read aggregates that were
+never captured for those rows, and inventing history a decision did not record would make
+replay dishonest. So they show as *not checked* on older decisions rather than quietly
+passing. That is deliberate, and it is visible on screen.
+
 ### None of these rules were invented here
 
 Every one implements a control that finance departments already run. Rules 1–4 are a
 **three-way match**, the purchase-order / delivery / invoice cross-check every ERP ships.
-Rule 6 is an **idempotency key**. Rule 7 is a **delegation of authority matrix**.
+Rule 5 is **budgetary control**. Rule 6 is an **idempotency key**. Rule 7 is a
+**delegation of authority matrix**, and rule 9 the **role-based** version of the same
+thing. Rule 8 is **structuring detection**, which banks have run since the Bank Secrecy
+Act. Rule 10 is **new-payee verification**. Rule 11 is **velocity limiting**, a standard
+card-fraud control pointed at the agent rather than the card.
 
 That matters more than it sounds. The honest answer to *"why should I trust software to
 spend my money?"* is not "our rules are clever." It is:
@@ -376,17 +398,17 @@ disqualified under the event's own rules.
 
 | Where | What |
 |---|---|
-| [lib/checks/](../lib/checks/) | The seven checks. No I/O, no AI, no clock-reading — the same input always gives the same answer |
+| [lib/checks/](../lib/checks/) | The eleven checks. No I/O, no AI, no clock-reading — the same input always gives the same answer. Arithmetic fails closed: a figure a check cannot reason about is refused, never passed |
 | [lib/rules/](../lib/rules/) | Versioned rule data and the fingerprint that gets published to Monad |
 | [lib/replay/](../lib/replay/) | Re-judging past decisions against a different rule version |
 | [lib/store/](../lib/store/) | The permanent record. Postgres when deployed, memory locally |
 | [lib/negotiation.ts](../lib/negotiation.ts) | Competing suppliers, strategies, one counter-offer round |
 | [lib/monad/anchor.ts](../lib/monad/anchor.ts) | Publishing a policy version's fingerprint to Monad testnet |
 | [lib/rain-client.ts](../lib/rain-client.ts) | Everything that talks to Rain, in one place |
-| [lib/pipeline.ts](../lib/pipeline.ts) | The seven steps, in order |
+| [lib/pipeline.ts](../lib/pipeline.ts) | The eight stages, in order — this file *is* the architecture diagram |
 | [app/api/purchase/](../app/api/purchase/) | The full journey: negotiate → propose → verify → issue |
 
-**78 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
+**82 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
 the two claims the pitch rests on: that the same input always gives the same answer, and
 that every threshold lives in editable settings rather than in code.
 
@@ -406,7 +428,7 @@ makes it dangerous.**
 - Nothing bounds **why**. An agent can buy the wrong thing at the right price from an
   allowed supplier, and every control passes.
 - So we make the agent declare the purchase order it negotiated, and we check that against
-  the real record. Six rules, all editable settings.
+  the real record. Eleven rules, all editable settings.
 - If it doesn't hold, **no card is issued.** Not a decline — there's nothing to decline,
   because the card never existed.
 - Which is Rain's own principle, enforcement at issuance, applied one level up.

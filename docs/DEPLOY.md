@@ -71,7 +71,7 @@ one fails by looking empty.
 
 ```bash
 npm install
-npm test        # 78 tests over the checks, hashing, replay and concurrency
+npm test        # 82 tests over the checks, hashing, replay and concurrency
 npm run dev
 ```
 

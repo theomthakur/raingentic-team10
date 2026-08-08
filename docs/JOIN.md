@@ -7,7 +7,7 @@ is deliberately one function.
 
 ## What already works
 
-- The eleven checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 78 tests
+- The eleven checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 82 tests
 - Rules as versioned data, a new version on every edit, sha256 per version
 - Append-only decision log, storing a **snapshot** of the record rather than a pointer
 - Replay across 54 seeded decisions plus everything the demo adds

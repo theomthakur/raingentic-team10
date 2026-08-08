@@ -342,9 +342,16 @@ Each one is a yes/no question. The screen shows them exactly this way.
 | 6 | Has a card already been issued? | A retry must not create a second card. |
 | 7 | Is it inside spending authority? | Over $25,000 a person must release it. Held, not refused. |
 | 8 | Is it a big purchase split up? | Stops an agent buying twice just under the limit to dodge check 7. |
-| 9 | Inside this agent's own limit? | Luca is trusted to $2,000, Prue to $50,000. Not everyone is equal. |
+| 9 | Inside this agent's own limit? | Luca is trusted to $2,000, Prue to $20,000. Not everyone is equal. |
 | 10 | Have we paid this supplier before? | Invoice fraud almost always arrives as a payee nobody has paid. Held, not refused. |
 | 11 | Is it buying too fast? | A looping agent makes purchases that are each perfect. Only the rate is wrong. |
+
+**How checks 7 and 9 interact, if anyone asks.** Check 7 is the company-wide ceiling that
+applies to every agent; check 9 refines it downward per role. The tighter of the two binds,
+so every per-agent limit is set at or below the company ceiling — a per-agent limit *above*
+it could never be the reason anything was held, and would advertise authority the agent does
+not actually have. There is a test enforcing that. It is also why anything over $25,000
+escalates on both at once.
 
 Checks 8 to 11 were added last, and 8 exists specifically because check 7 has an obvious
 weakness: buy twice, just under the limit each time.
@@ -380,7 +387,7 @@ weakness: buy twice, just under the limit each time.
 | Negotiation | Deterministic strategy engine | Same task always produces the same winner, so the result is checkable. |
 | AI | Groq, `llama-3.1-8b-instant` | Writes the suppliers' dialogue. Capped at 40 words, three second timeout, silent fallback. |
 | Documents | jsPDF | A downloadable receipt per decision, loaded only when clicked. |
-| Tests | 78 automated tests | Every check on both sides of its boundary, plus the concurrency race, fail-closed arithmetic, the release path for every escalating rule, and new-payee history. |
+| Tests | 82 automated tests | Every check on both sides of its boundary, plus the concurrency race, fail-closed arithmetic, the release path for every escalating rule, new-payee history, and the per-agent ceiling invariant. |
 
 ### One bug worth knowing about
 
@@ -398,7 +405,7 @@ Say this before anyone asks. Volunteering it is worth far more than being caught
 
 | Part | State |
 |---|---|
-| The eleven checks | **Real**, 78 tests |
+| The eleven checks | **Real**, 82 tests |
 | Negotiation between suppliers | **Real**, deterministic |
 | Append-only decision log | **Real**, in Postgres |
 | Replay across history | **Real** |

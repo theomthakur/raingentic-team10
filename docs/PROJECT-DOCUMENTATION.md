@@ -173,7 +173,7 @@ lib/
   sellers.ts         seller fixtures per task (A)
   agent.ts           task -> negotiation -> PurchaseOrder (A)
   llm.ts             optional seller dialogue, upstream of PROPOSE, never in verify (A)
-  checks/            the eleven checks + verify(), pure functions, 78 tests (B)
+  checks/            the eleven checks + verify(), pure functions, 82 tests (B)
   rules/             versioned rule data + the sha256 anchored on Monad (B)
   replay/            re-judging stored decisions against another rule version (B)
   store/             append-only log; Postgres when DATABASE_URL is set, memory otherwise (B)

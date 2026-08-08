@@ -84,6 +84,11 @@ const START = Date.parse("2026-07-20T09:00:00.000Z");
 const END = Date.parse("2026-08-08T11:30:00.000Z");
 
 function build(shape: Shape, index: number): Decision {
+  // Picked first so it can go into the snapshot. Rule 9 reads `record.agent`, and leaving
+  // it out meant the per-agent authority check could not run on any historical row — so a
+  // seeded decision was judged by fewer rules than a live one, for no better reason than
+  // the order two lines happened to be written in.
+  const agent = pick(AGENTS);
   const item = pick(CATALOGUE);
   const costCentre = pick(COST_CENTRES);
   const quantity = between(2, 40);
@@ -167,7 +172,7 @@ function build(shape: Shape, index: number): Decision {
       break;
   }
 
-  const record: RecordSnapshot = { quote, budget, existingCard, observedAt };
+  const record: RecordSnapshot = { quote, budget, existingCard, observedAt, agent };
   const ruleSet = defaultRuleSet();
   const result = verify(po, record, ruleSet);
 
@@ -183,7 +188,7 @@ function build(shape: Shape, index: number): Decision {
   return {
     id: `dec_seed_${String(index).padStart(3, "0")}`,
     createdAt: observedAt,
-    agent: pick(AGENTS),
+    agent,
     po,
     record,
     ruleVersion: ruleSet.version,
@@ -218,6 +223,7 @@ function build(shape: Shape, index: number): Decision {
  * appending here leaves all forty-seven existing rows byte-identical.
  */
 function buildPrior(vendor: string, sku: string, unit: number, index: number): Decision {
+  const agent = pick(AGENTS);
   const costCentre = pick(COST_CENTRES);
   const quantity = between(2, 8);
   const poNumber = `PO-${3900 + index}`;
@@ -246,7 +252,13 @@ function buildPrior(vendor: string, sku: string, unit: number, index: number): D
   };
 
   // Verified against the same rules as everything else — nothing is asserted approved.
-  const record: RecordSnapshot = { quote: { ...quote, fulfilled: false }, budget, existingCard: null, observedAt };
+  const record: RecordSnapshot = {
+    quote: { ...quote, fulfilled: false },
+    budget,
+    existingCard: null,
+    observedAt,
+    agent,
+  };
   const ruleSet = defaultRuleSet();
   const result = verify(po, record, ruleSet);
   if (!result.ok) {
@@ -258,7 +270,7 @@ function buildPrior(vendor: string, sku: string, unit: number, index: number): D
   return {
     id: `dec_seed_prior_${String(index).padStart(2, "0")}`,
     createdAt: observedAt,
-    agent: pick(AGENTS),
+    agent,
     po,
     record,
     ruleVersion: ruleSet.version,

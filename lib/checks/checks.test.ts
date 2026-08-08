@@ -400,6 +400,19 @@ test("a purchase under the delegated limit needs no human", () => {
   assert.equal(r.escalations.length, 0);
 });
 
+/**
+ * A rule set with one rule switched off, for isolating another.
+ *
+ * Needed because every per-agent limit is now at or below the company-wide ceiling — that
+ * invariant is enforced by its own test, since a per-agent limit above the ceiling can never
+ * bind. The consequence is that anything over the company ceiling is also over every
+ * agent's own limit, so rules 7 and 9 escalate together and neither can be isolated by
+ * choosing a generous agent. Switching the other off is honest about that.
+ */
+function without(id: RuleId): RuleSet {
+  return { ...RULES, rules: RULES.rules.filter((r) => r.id !== id) };
+}
+
 test("a purchase above the delegated limit is escalated, not refused", () => {
   // $30,000 against a $25,000 limit, with the quote matching so nothing else can trip.
   const big = po({ unitPrice: 300_000, quantity: 10 });
@@ -407,7 +420,8 @@ test("a purchase above the delegated limit is escalated, not refused", () => {
     quote: { ...record().quote!, unitPrice: 300_000, quantity: 10 },
     budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
   });
-  const r = verify(big, rec, RULES);
+  // Rule 9 out of the way, so this is about the company ceiling alone.
+  const r = verify(big, rec, without("agent-authority"));
 
   assert.equal(r.ok, false, "it must not sail through");
   // The distinction the whole feature rests on.
@@ -442,8 +456,12 @@ test("the delegated limit is data, not a constant", () => {
     budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
   });
 
-  assert.equal(verify(big, rec, RULES).escalations.length, 1);
-  assert.equal(verify(big, rec, v2).escalations.length, 0);
+  // Rule 9 removed from both sides, so the only variable is rule 7's threshold.
+  const base = without("agent-authority");
+  const raisedOnly = { ...v2, rules: v2.rules.filter((r) => r.id !== "agent-authority") };
+
+  assert.equal(verify(big, rec, base).escalations.length, 1);
+  assert.equal(verify(big, rec, raisedOnly).escalations.length, 0);
 });
 
 test("every rule cites the real-world control it implements", () => {
@@ -536,6 +554,85 @@ asyncTest("a held purchase does not make its vendor a known payee", async () => 
 
   await store.appendDecision(mk("dec_approved", "approved"));
   assert.equal((await ask()).vendorEverPaid, true, "an approved purchase did pay them");
+});
+
+asyncTest("a purchase is not counted against itself when it is released", async () => {
+  // Held rows count as exposure, correctly — but that means the held row for this very
+  // order line is already in the totals when a person releases it, so the release used to
+  // add the amount a second time. A $43,500 purchase looked like $87,000 and was refused on
+  // velocity, which reads as the system contradicting its own approval.
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const { snapshot } = await import("@/lib/store/types");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const order = po({ unitPrice: 4_350_000, quantity: 1, vendor: "Bellweather Industrial" });
+
+  const before = await snapshot(store, order, "procurement-02");
+  const baseline = {
+    count: before.history!.agentCount,
+    total: before.history!.agentTotalCents,
+    line: before.history!.sameVendorCostCentreCents,
+  };
+
+  await store.appendDecision({
+    id: "dec_the_hold",
+    createdAt: new Date().toISOString(),
+    po: order,
+    record: record(),
+    ruleVersion: 1,
+    checks: [],
+    outcome: "held",
+    card: null,
+    agent: "procurement-02",
+  });
+
+  // Compared against the same snapshot taken before the hold existed, because reset()
+  // loads the committed history and absolute totals are not the point — the delta is.
+  const after = await snapshot(store, order, "procurement-02");
+  assert.deepEqual(
+    {
+      count: after.history!.agentCount,
+      total: after.history!.agentTotalCents,
+      line: after.history!.sameVendorCostCentreCents,
+    },
+    baseline,
+    "the held row for this same order line must not inflate its own exposure"
+  );
+});
+
+asyncTest("a different order line to the same vendor does still count", async () => {
+  // The exclusion is scoped to the order line, not the vendor — otherwise structuring
+  // detection would be trivially defeated by using a fresh PO number each time.
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const { snapshot } = await import("@/lib/store/types");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const first = po({ poNumber: "PO-AAA", unitPrice: 1_000_000, quantity: 1, vendor: "Solo Vendor Co" });
+  const second = po({ poNumber: "PO-BBB", unitPrice: 1_000_000, quantity: 1, vendor: "Solo Vendor Co" });
+
+  const before = await snapshot(store, second, "procurement-02");
+
+  await store.appendDecision({
+    id: "dec_first",
+    createdAt: new Date().toISOString(),
+    po: first,
+    record: record(),
+    ruleVersion: 1,
+    checks: [],
+    outcome: "approved",
+    card: null,
+    agent: "procurement-02",
+  });
+
+  const after = await snapshot(store, second, "procurement-02");
+  assert.equal(
+    after.history!.sameVendorCostCentreCents - before.history!.sameVendorCostCentreCents,
+    1_000_000,
+    "a separate order line to the same vendor must still count"
+  );
+  assert.equal(after.history!.agentCount - before.history!.agentCount, 1);
 });
 
 asyncTest("held rows still count toward exposure, so the hold queue cannot be used to structure", async () => {
@@ -810,10 +907,13 @@ for (const [label, order, snap, expectedRule] of ESCALATION_CASES) {
   test(`a hold on ${label} escalates, and is releasable`, () => {
     const first = verify(order, snap, RULES);
     assert.equal(first.failures.length, 0, `${label}: should escalate, not refuse`);
-    assert.deepEqual(
-      first.escalations.map((c) => c.ruleId),
-      [expectedRule],
-      `${label}: expected exactly ${expectedRule} to escalate`
+    const escalated = first.escalations.map((c) => c.ruleId);
+    // `includes` rather than an exact match: a spend over the company ceiling is also over
+    // every agent's own limit, so 7 and 9 legitimately escalate together. What matters is
+    // that the rule under test escalated and that signing off everything raised clears it.
+    assert.ok(
+      escalated.includes(expectedRule),
+      `${label}: expected ${expectedRule} to escalate, got [${escalated}]`
     );
 
     // What releaseHeld() does: lift precisely the rules that escalated on the held row.
@@ -862,6 +962,54 @@ test("every escalating rule is covered by a release test", () => {
     "no-structuring",
   ];
   assert.deepEqual([...escalating].sort(), [...known].sort());
+});
+
+test("no per-agent limit exceeds the company-wide unattended ceiling", () => {
+  // The tighter of rule 7 and rule 9 binds, so a per-agent limit above rule 7's threshold
+  // can never be the reason anything is held — it is dead data that advertises authority
+  // the agent does not have. procurement-02 sat at $50,000 against a $25,000 ceiling, and
+  // the docs duly claimed Prue was trusted to $50,000 while nothing over $25,000 ever ran
+  // unattended.
+  const ceiling = RULES.rules.find((r) => r.id === "requires-approval")!.params
+    .thresholdCents as number;
+  const perAgent = RULES.rules.find((r) => r.id === "agent-authority")!.params;
+
+  const offenders = Object.entries(perAgent)
+    .filter(([, v]) => typeof v === "number" && (v as number) > ceiling)
+    .map(([k, v]) => `${k}=${v}`);
+
+  assert.deepEqual(
+    offenders,
+    [],
+    `these per-agent limits exceed the ${ceiling}-cent company ceiling and can never bind: ${offenders.join(", ")}`
+  );
+});
+
+test("each named agent's limit is the one that actually binds", () => {
+  // The point of rule 9: at a spend above its own limit but below the company ceiling, the
+  // agent's own authority is what stops it. If rule 7 fired first this rule would be inert.
+  const ceiling = RULES.rules.find((r) => r.id === "requires-approval")!.params
+    .thresholdCents as number;
+  const perAgent = RULES.rules.find((r) => r.id === "agent-authority")!.params;
+
+  for (const [agent, limit] of Object.entries(perAgent)) {
+    if (agent === "defaultCents" || typeof limit !== "number") continue;
+    const over = limit + 100;
+    if (over >= ceiling) continue; // nothing to isolate; rule 7 legitimately owns it
+
+    const order = po({ unitPrice: over, quantity: 1 });
+    const snap = record({
+      agent,
+      quote: { ...record().quote!, unitPrice: over, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+    });
+    const escalated = verify(order, snap, RULES).escalations.map((c) => c.ruleId);
+    assert.deepEqual(
+      escalated,
+      ["agent-authority"],
+      `${agent} at ${over} cents should be held by its own limit alone, got [${escalated}]`
+    );
+  }
 });
 
 test("every rule resolves a basis, and it matches the rule data", () => {

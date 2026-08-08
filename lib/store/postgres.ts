@@ -223,9 +223,14 @@ export function createPostgresStore(): Store {
      * counting it made the control defeat itself — the first attempt was held for review,
      * and that hold alone made the vendor "known", so a retry passed with no human input.
      */
-    async getSpendHistory({ agent, vendor, costCentre, windowHours }) {
+    async getSpendHistory({ agent, vendor, costCentre, windowHours, excludePoNumber }) {
       const cutoff = Date.now() - windowHours * 3_600_000;
-      const all = await this.listDecisions();
+      // The order line being judged is excluded from every aggregate, or a purchase is
+      // counted against itself: a held row for this same line is already in the totals
+      // when a person releases it, so the release would add the amount twice.
+      const all = (await this.listDecisions()).filter(
+        (d) => !excludePoNumber || d.po.poNumber !== excludePoNumber
+      );
       const committed = all.filter((d) => d.outcome === "approved" || d.outcome === "held");
       const settled = all.filter((d) => d.outcome === "approved");
       const inWindow = committed.filter((d) => Date.parse(d.createdAt) >= cutoff);

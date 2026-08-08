@@ -51,6 +51,19 @@ export interface Store {
     vendor: string;
     costCentre: string;
     windowHours: number;
+    /**
+     * The order line being judged, excluded from every aggregate.
+     *
+     * Without this a purchase is counted against itself. A held purchase still counts as
+     * exposure — correctly, since it is pending a signature rather than abandoned — so when
+     * a person releases it, the held row for that same order line is already in the totals
+     * and the release adds the amount a second time. A $43,500 purchase looked like $87,000
+     * and was refused on velocity, which read as the system contradicting its own approval.
+     *
+     * The same order line is one obligation, however many rows it has generated. Whether it
+     * has already been paid is rule 6's job, not the rate limit's.
+     */
+    excludePoNumber?: string;
   }): Promise<SpendHistory>;
 
   /**
@@ -106,7 +119,13 @@ export async function snapshot(
     store.getQuote(po.poNumber),
     store.getBudget(po.costCentre),
     store.getCardForPO(po.poNumber),
-    store.getSpendHistory({ agent, vendor: po.vendor, costCentre: po.costCentre, windowHours }),
+    store.getSpendHistory({
+      agent,
+      vendor: po.vendor,
+      costCentre: po.costCentre,
+      windowHours,
+      excludePoNumber: po.poNumber,
+    }),
   ]);
   return {
     quote,

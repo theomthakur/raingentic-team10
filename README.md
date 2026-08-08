@@ -133,7 +133,7 @@ edit would do to history before committing to it.
 ```bash
 npm install
 npm run seed     # regenerate the committed history (deterministic, rarely needed)
-npm test         # 78 tests over the checks, hashing, replay and concurrency
+npm test         # 82 tests over the checks, hashing, replay and concurrency
 npm run dev
 ```
 
