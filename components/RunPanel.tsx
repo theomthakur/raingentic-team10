@@ -1,12 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Task } from "@/lib/fixtures/tasks";
+import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import type { PurchaseOrder } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
 import { Badge, Button, Panel } from "./ui";
 
-const STAGE_ORDER: Stage["name"][] = ["PROPOSE", "VERIFY", "REFUSE", "ISSUE", "SETTLE", "RECORD"];
+const STAGE_ORDER: Stage["name"][] = [
+  "NEGOTIATE",
+  "PROPOSE",
+  "VERIFY",
+  "REFUSE",
+  "ISSUE",
+  "SETTLE",
+  "RECORD",
+];
 
 function StageTrace({ stages }: { stages: Stage[] }) {
   return (
@@ -20,7 +28,7 @@ function StageTrace({ stages }: { stages: Stage[] }) {
             style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
           >
             <span
-              className={`mt-px w-16 shrink-0 rounded-full px-2 py-0.5 text-center font-mono text-[10px] font-semibold ${
+              className={`mt-px w-[5.5rem] shrink-0 rounded-full px-2 py-0.5 text-center font-mono text-[10px] font-semibold ${
                 s.ok ? "bg-mint-100 text-mint-700" : "bg-red-100 text-fail"
               }`}
             >
@@ -93,19 +101,69 @@ function EditablePO({
   );
 }
 
+function TaskRow({
+  label,
+  note,
+  tag,
+  alreadyRun,
+  busy,
+  onRun,
+}: {
+  label: string;
+  note: string;
+  tag: string;
+  alreadyRun: boolean;
+  busy: boolean;
+  onRun: () => void;
+}) {
+  return (
+    <li className="flex items-start gap-3 px-4 py-3">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="text-[13.5px] font-medium text-ink-900">{label}</p>
+          <Badge tone="neutral">{tag}</Badge>
+        </div>
+        <p className="mt-0.5 text-[12px] text-muted">{note}</p>
+      </div>
+      <Button
+        onClick={onRun}
+        disabled={busy}
+        variant={alreadyRun ? "primary" : "default"}
+        title={alreadyRun ? "Nothing has changed except the record the first run wrote" : undefined}
+      >
+        {alreadyRun ? "Run again" : "Run task"}
+      </Button>
+    </li>
+  );
+}
+
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="bg-ink-50 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-ink-500">
+      {children}
+    </li>
+  );
+}
+
 export function RunPanel({
+  negotiatedTasks,
   tasks,
+  blankPO,
   stages,
   busy,
   ranTasks,
+  onRunNegotiated,
   onRunTask,
   onRunPO,
   onReset,
 }: {
+  negotiatedTasks: NegotiatedTask[];
   tasks: Task[];
+  blankPO: PurchaseOrder;
   stages: Stage[];
   busy: boolean;
   ranTasks: Set<string>;
+  onRunNegotiated: (task: NegotiatedTask) => void;
   onRunTask: (task: Task) => void;
   onRunPO: (po: PurchaseOrder) => void;
   onReset: () => void;
@@ -122,32 +180,31 @@ export function RunPanel({
       }
     >
       <ul className="divide-y divide-edge">
-        {tasks.map((t) => {
-          const alreadyRun = ranTasks.has(t.id);
-          return (
-            <li key={t.id} className="flex items-start gap-3 px-4 py-3.5">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-[13.5px] font-medium text-ink-900">{t.label}</p>
-                  <Badge tone="neutral">{t.agent}</Badge>
-                </div>
-                <p className="mt-0.5 text-[12px] text-muted">{t.note}</p>
-              </div>
-              <Button
-                onClick={() => onRunTask(t)}
-                disabled={busy}
-                variant={alreadyRun ? "primary" : "default"}
-                title={
-                  alreadyRun
-                    ? "Nothing has changed except the record the first run wrote"
-                    : undefined
-                }
-              >
-                {alreadyRun ? "Run again" : "Run task"}
-              </Button>
-            </li>
-          );
-        })}
+        <GroupLabel>negotiated — sellers compete, the winner becomes the PO</GroupLabel>
+        {negotiatedTasks.map((t) => (
+          <TaskRow
+            key={t.id}
+            label={t.label}
+            note={t.note}
+            tag={t.task.taskKey}
+            alreadyRun={ranTasks.has(t.id)}
+            busy={busy}
+            onRun={() => onRunNegotiated(t)}
+          />
+        ))}
+
+        <GroupLabel>direct — an agent declares against an existing quote</GroupLabel>
+        {tasks.map((t) => (
+          <TaskRow
+            key={t.id}
+            label={t.label}
+            note={t.note}
+            tag={t.agent}
+            alreadyRun={ranTasks.has(t.id)}
+            busy={busy}
+            onRun={() => onRunTask(t)}
+          />
+        ))}
       </ul>
 
       {stages.length > 0 && (
@@ -166,9 +223,8 @@ export function RunPanel({
         </button>
       </div>
 
-      {openForm && tasks[0] && (
-        <EditablePO po={tasks[0].po} onRun={onRunPO} busy={busy} />
-      )}
+      {/* Prefilled with a PO that passes, so a judge has to actively break it. */}
+      {openForm && <EditablePO po={blankPO} onRun={onRunPO} busy={busy} />}
     </Panel>
   );
 }

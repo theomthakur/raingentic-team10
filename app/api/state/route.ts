@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
-import { TASKS } from "@/lib/fixtures/tasks";
+import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
 
 // node runtime: the rule hash uses node:crypto, and the Postgres driver expects it.
@@ -23,6 +23,8 @@ export async function GET() {
     decisions,
     ruleSets,
     budgets: budgets.filter(Boolean),
+    negotiatedTasks: NEGOTIATED_TASKS,
     tasks: TASKS,
+    blankPO: BLANK_PO,
   });
 }

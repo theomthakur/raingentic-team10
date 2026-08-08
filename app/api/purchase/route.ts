@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { proposePurchase, type Task } from "@/lib/agent";
 import { enrichWithLLMFlavor } from "@/lib/llm";
+import { toSummary } from "@/lib/negotiation-summary";
 import { runPipeline } from "@/lib/pipeline";
 import { getStore } from "@/lib/store";
+import { NEGOTIATED_TASKS } from "@/lib/fixtures/tasks";
 import { poTotal, type QuoteRecord } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -28,12 +30,21 @@ export const dynamic = "force-dynamic";
  * what refuses it.
  */
 export async function POST(request: Request) {
-  let task: Task;
+  let body: (Task & { taskId?: string }) | undefined;
   try {
-    task = (await request.json()) as Task;
+    body = await request.json();
   } catch {
     return NextResponse.json({ error: "Body must be JSON." }, { status: 400 });
   }
+
+  // The console posts a taskId; a raw Task still works for scripting and curl.
+  const named = body?.taskId
+    ? NEGOTIATED_TASKS.find((t) => t.id === body!.taskId)
+    : undefined;
+  if (body?.taskId && !named) {
+    return NextResponse.json({ error: `Unknown task ${body.taskId}.` }, { status: 404 });
+  }
+  const task: Task = named ? named.task : (body as Task);
 
   // 1b NEGOTIATE, then 2 PROPOSE.
   let proposed: ReturnType<typeof proposePurchase>;
@@ -67,7 +78,8 @@ export async function POST(request: Request) {
 
   // 3 VERIFY onwards. Rain is only reached on the pass branch, and that is enforced by
   // the shape of runPipeline, not by a flag here.
-  const { decision, stages } = await runPipeline(po, task.taskKey);
+  const summary = toSummary(negotiation, task.taskKey, task.targetPriceCents);
+  const { decision, stages } = await runPipeline(po, task.taskKey, summary);
 
   return NextResponse.json({
     status: decision.outcome === "approved" ? "issued" : "refused",
