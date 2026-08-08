@@ -182,7 +182,32 @@ The distinction between *refused* and *held* is the important one. A purchase th
 you either block legitimate spending or wave through the thing you most wanted a human to
 look at.
 
-### 5.4 The decision stores a snapshot, not a pointer
+### 5.4 Every rule names the control it descends from
+
+Not one of the eleven rules was invented here. Each one carries, on screen, the established
+control it implements — and this is most of the honest answer to *"why should I trust
+software to spend my money?"*
+
+The answer is not "our rules are clever." It is: **these are the controls your finance team
+already runs, moved to before the money is committed.**
+
+| Rule | The control it is |
+|---|---|
+| 1–4 | The **three-way match** — order, receipt and invoice must agree. Every ERP ships it. |
+| 5 | **Budgetary control** — commitment accounting against a cost centre. |
+| 6 | An **idempotency key**, keyed on the order line. |
+| 7 | A **delegation-of-authority matrix**, as granted to a member of staff. |
+| 8 | **Structuring detection** — banks have flagged deliberately-split transactions since the Bank Secrecy Act. |
+| 9 | **Role-based delegation** — a junior buyer and a capital buyer do not share a signing limit. |
+| 10 | **New-payee verification** — what AP runs, because invoice fraud almost always arrives as a payee nobody has paid before. |
+| 11 | **Velocity limiting** — a standard card-fraud control, pointed at the agent rather than the card. |
+
+You can see this in two places: under each rule in the **Policy** tab, and as a **Basis**
+row on the check that actually refused a purchase, next to what it expected, what it got and
+which record it read. So a refusal is not just an assertion — it cites the control that says
+so.
+
+### 5.5 The decision stores a snapshot, not a pointer
 
 When a decision is made, we save a **frozen copy** of what the records said at that moment,
 not a link to records that will keep changing.
@@ -214,9 +239,13 @@ run falling top to bottom, so a refusal visibly stops partway down.
 **Section 3 — Audit it.** Two tabs:
 
 - **Provenance** — one decision explained in full: what was bought, what happened, and all
-  eleven checks with the reasoning. Plus a *Download PDF* button that produces a real
+  eleven checks with the reasoning. On a check that failed you get four fields of evidence —
+  what it **expected**, what it **got**, which **record** it read, and the **basis**, meaning
+  the established control that rule implements. A judge can audit one decision in five
+  seconds without asking a question. Plus a *Download PDF* button that produces a real
   receipt.
-- **Policy** — the rule editor and the replay tool.
+- **Policy** — the rule editor and the replay tool. Each rule shows the control it descends
+  from underneath its label, so the policy reads as inherited rather than invented.
 
 At the top right, three status badges that always tell the truth:
 
@@ -244,6 +273,9 @@ For a technical judge. Contains the full architecture diagram, a step-by-step wa
 the technology stack with the reason for each choice, all eleven checks explained, why Rain
 specifically, how it maps to the submission tracks, and what we deliberately did **not**
 build.
+
+It also has the panel that answers the sharpest question in the room — **"Where Mandate ends
+and Rain begins."** It is explained in section 10. If a Rain judge is at the screen, open it.
 
 ### 6.5 Agents — `/agents`
 
@@ -348,7 +380,7 @@ weakness: buy twice, just under the limit each time.
 | Negotiation | Deterministic strategy engine | Same task always produces the same winner, so the result is checkable. |
 | AI | Groq, `llama-3.1-8b-instant` | Writes the suppliers' dialogue. Capped at 40 words, three second timeout, silent fallback. |
 | Documents | jsPDF | A downloadable receipt per decision, loaded only when clicked. |
-| Tests | 52 automated tests | Every check tested on both sides of its boundary. |
+| Tests | 55 automated tests | Every check tested on both sides of its boundary, plus the concurrency race and the rule-basis wiring. |
 
 ### One bug worth knowing about
 
@@ -366,7 +398,7 @@ Say this before anyone asks. Volunteering it is worth far more than being caught
 
 | Part | State |
 |---|---|
-| The eleven checks | **Real**, 52 tests |
+| The eleven checks | **Real**, 55 tests |
 | Negotiation between suppliers | **Real**, deterministic |
 | Append-only decision log | **Real**, in Postgres |
 | Replay across history | **Real** |
@@ -376,6 +408,36 @@ Say this before anyone asks. Volunteering it is worth far more than being caught
 | AI writing supplier dialogue | **Real**, Groq |
 | **Card issuance** | **Simulated** |
 | **Monad anchoring** | **Built, switched off** |
+
+### Where Mandate ends and Rain begins — including the overlap
+
+There is a panel for this on the system design page, and you should be honest about it,
+because three of the five judges built the thing you are comparing yourself to.
+
+**Rain's published control dimensions are six:** merchant category codes, **approved
+merchants or payment recipients**, transaction amounts, transaction frequency, the number of
+active agent cards, and card expiry.
+
+Note "approved merchants". **Rain can lock a card to one exact supplier, not just a
+category.** So never say *"Rain would have let the wrong vendor through"* — it would not, and
+claiming otherwise in front of the people who built it is the fastest way to lose the
+argument. Three of our checks partly overlap Rain: the amount, the supplier, and the
+aggregate spend. Say so. Rain decides whether to **allow**; we decide whether to **ask at
+all**.
+
+**What survives is stronger because it is specific.** All six of Rain's dimensions describe
+the **instrument** — how much, where, how often, how long. None describe the **obligation**
+the spend is meant to settle, because a card issuer has no view of a purchase-order system.
+Five things are genuinely beyond any card control at any granularity:
+
+1. Which purchase order this spend settles
+2. Whether that order is still open
+3. Which specific **item**
+4. Whether a card was already issued for that line
+5. Who must approve above a threshold
+
+That is the list to say out loud. It is five concrete things instead of a vague "we check
+why", and every one of them holds up under questioning.
 
 ### Why the cards are simulated — the good version of the answer
 
@@ -497,7 +559,7 @@ Have that sentence ready. It is a genuine difference, but only if you can say it
 | Item | Blocked on |
 |---|---|
 | Real card issuance | The three Rain answers above |
-| Monad anchoring going live | A testnet RPC URL and a funded testnet key |
+| Monad anchoring going live | A funded Monad testnet key in `MONAD_PRIVATE_KEY`, from `faucet.monad.xyz`. `MONAD_RPC_URL` is optional — it defaults to Monad's public testnet endpoint |
 | Deployment | Putting `DATABASE_URL` into Vercel's environment variables — without it the deployed site silently loses the decision log on every cold start, which breaks replay and the duplicate refusal |
 | Submission | The Encode platform. Pitching order follows submission order |
 
