@@ -126,9 +126,9 @@ bounty:
 | Category | How Mandate qualifies |
 |---|---|
 | **Best use of Rain** | Card issuance is the enforcement point, matching Rain's own architecture and their published "at issuance, not after the fact" principle exactly |
-| **General track, "agents actually move money"** | Real settlement through a real scoped virtual card, not a simulation |
-| **Agent negotiation** | The quote stage produces the accepted PO the card is bound to; described honestly as quote-selection rather than an inflated multi-round negotiation |
-| **Monad bounty** | Real testnet transactions (rule-version hashes), where the chain's low cost is structurally why the audit claim can hold at all, not a decorative add-on |
+| **General track, "agents actually move money"** | An agent runs a task end to end, budgets are debited, every decision is filed; settlement across card rails once issuance is live |
+| **Agent negotiation** | Four sellers with distinct strategies and a counter-offer round produce the accepted PO the card is bound to — negotiation *causes* what gets verified, rather than running beside it |
+| **Monad bounty** | Each rule version is hashed for anchoring on testnet, where the chain's low cost is structurally why the audit claim can hold at all. The write itself is the remaining gap |
 
 One pipeline, one architecture, two owners. Not four separate projects chasing four prizes.
 
@@ -166,19 +166,37 @@ submissions are disqualified per the event's own rules.
 
 ```
 lib/
-  types.ts          shared PurchaseOrder / VendorQuote / CheckResult shapes (A + B contract)
-  money.ts          integer cents, never floats
+  types.ts           shared PurchaseOrder / VendorQuote / ScopedCard shapes (A + B contract)
+  money.ts           integer cents, never floats
   rain-client.ts     Rain API wrapper (A)
-  quotes.ts          vendor quote fixtures + selection (A)
-  agent.ts           task -> PurchaseOrder (A)
-  verify.ts          the six checks, rule versioning, replay (B)
-  db.ts              append-only decision log storage (B)
+  negotiation.ts     competing sellers, strategies, one counter-offer round (A)
+  sellers.ts         seller fixtures per task (A)
+  agent.ts           task -> negotiation -> PurchaseOrder (A)
+  llm.ts             optional seller dialogue, upstream of PROPOSE, never in verify (A)
+  checks/            the six checks + verify(), pure functions, 29 tests (B)
+  rules/             versioned rule data + the sha256 anchored on Monad (B)
+  replay/            re-judging stored decisions against another rule version (B)
+  store/             append-only log; Postgres when DATABASE_URL is set, memory otherwise (B)
+  pipeline.ts        the seven stages in order (B)
+  rain/issuer.ts     the issue seam: verify passes -> rain-client is called
+  seed/              47 committed historical decisions, deterministically generated (B)
 app/
   api/rain/ping/     the first-authenticated-call milestone
-  api/purchase/      the 17:00 join: agent proposes -> verify -> issue
-  api/replay/        re-run history against an edited rule version (B)
-docs/                this file, and the full planning trail
+  api/purchase/      the full join: negotiate -> propose -> verify -> issue
+  api/run/           run a task or a hand-written PO through the same pipeline
+  api/replay/        re-run history against an edited rule version
+  api/rules/         list rule versions, save an edit as the next version
+  api/state/         everything the console renders
+docs/                this file, SUBMISSION.md, and the full planning trail
 ```
+
+**Status, stated plainly so nothing is overclaimed in front of judges:** the checks, rule
+versioning, replay, the append-only log, the negotiation and the run-it-twice refusal are
+all built and tested. Card issuance currently returns a **simulated** card, labelled as
+such in the UI, because the Rain endpoint paths still need confirming on site — the client
+is written and wired, so it is one function swap. The Monad anchor is **not yet written**;
+the hash and the storage for its transaction reference exist. See `SUBMISSION.md` §5 for
+the honest per-track breakdown.
 
 Repo: `github.com/theomthakur/raingentic-team10`, public per the event's rules,
 `.env.local` never committed, only `.env.local.example`.
