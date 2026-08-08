@@ -1,0 +1,88 @@
+"use client";
+
+import type { Decision } from "@/lib/types";
+import { poTotal } from "@/lib/types";
+import { money, shortDate, shortTime } from "@/lib/format";
+import { Badge, Empty, Panel } from "./ui";
+
+/**
+ * The append-only log, newest first.
+ *
+ * Live rows are marked apart from seeded history so nothing on screen overstates what
+ * just happened in front of the judge.
+ */
+export function DecisionFeed({
+  decisions,
+  selectedId,
+  onSelect,
+}: {
+  decisions: Decision[];
+  selectedId: string | null;
+  onSelect: (d: Decision) => void;
+}) {
+  const live = decisions.filter((d) => !d.seeded).length;
+  const refused = decisions.filter((d) => d.outcome === "refused").length;
+
+  return (
+    <Panel
+      title="Decision log"
+      className="flex min-h-0 flex-1 flex-col"
+      right={
+        <div className="flex items-center gap-2">
+          <Badge tone="neutral">{decisions.length} total</Badge>
+          <Badge tone="fail">{refused} refused</Badge>
+          {live > 0 && <Badge tone="pass">{live} this session</Badge>}
+        </div>
+      }
+    >
+      {decisions.length === 0 ? (
+        <Empty>Nothing recorded yet.</Empty>
+      ) : (
+        <ul className="min-h-0 flex-1 divide-y divide-edge/60 overflow-y-auto">
+          {decisions.map((d) => {
+            const refusedRow = d.outcome === "refused";
+            const selected = d.id === selectedId;
+            const firstFailure = d.checks.find((c) => !c.passed && !c.skipped);
+
+            return (
+              <li key={d.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(d)}
+                  className={`flex w-full items-start gap-3 px-4 py-2.5 text-left transition ${
+                    selected ? "bg-edge/60" : "hover:bg-edge/30"
+                  }`}
+                >
+                  <span
+                    className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                      refusedRow ? "bg-fail" : "bg-pass"
+                    }`}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline justify-between gap-3">
+                      <span className="truncate font-mono text-[13px] text-slate-200">
+                        {d.po.poNumber}
+                        <span className="ml-2 text-muted">{d.po.vendor}</span>
+                      </span>
+                      <span className="tabular shrink-0 font-mono text-[13px] text-slate-300">
+                        {money(poTotal(d.po))}
+                      </span>
+                    </span>
+                    <span className="mt-0.5 flex items-baseline justify-between gap-3">
+                      <span className="truncate text-[12px] text-muted">
+                        {refusedRow && firstFailure ? firstFailure.reason : `${d.po.quantity} × ${d.po.sku}`}
+                      </span>
+                      <span className="tabular shrink-0 font-mono text-[11px] text-slate-600">
+                        {d.seeded ? shortDate(d.createdAt) : shortTime(d.createdAt)}
+                      </span>
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Panel>
+  );
+}

@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-ink text-slate-200 antialiased;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Numbers in the feed and the provenance panel must line up column to column, or a judge
+   scanning amounts has to read rather than glance. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-edge rounded-full;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

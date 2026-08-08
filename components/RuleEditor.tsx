@@ -1,0 +1,191 @@
+"use client";
+
+import type { Rule, RuleSet } from "@/lib/types";
+import { Badge, Button, Panel } from "./ui";
+
+/**
+ * The rule editor.
+ *
+ * Every threshold on this screen is a row in a versioned table, and saving writes the
+ * next version rather than editing the one in front of you. That is the difference
+ * between a policy the customer owns and a policy that needs a deploy — and it is what
+ * makes the replay next to it mean anything.
+ */
+
+function ParamField({
+  name,
+  value,
+  onChange,
+}: {
+  name: string;
+  value: number | boolean | string;
+  onChange: (v: number | boolean | string) => void;
+}) {
+  if (typeof value === "boolean") {
+    return (
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-3.5 w-3.5 accent-emerald-500"
+        />
+        <span className="font-mono text-[11px] text-muted">{name}</span>
+      </label>
+    );
+  }
+
+  if (typeof value === "number") {
+    return (
+      <label className="flex items-center gap-2">
+        <span className="font-mono text-[11px] text-muted">{name}</span>
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="tabular w-20 rounded border border-edge bg-ink px-1.5 py-0.5 text-right font-mono text-[11px] text-slate-200 outline-none focus:border-slate-500"
+        />
+      </label>
+    );
+  }
+
+  return (
+    <label className="flex items-center gap-2">
+      <span className="font-mono text-[11px] text-muted">{name}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-28 rounded border border-edge bg-ink px-1.5 py-0.5 font-mono text-[11px] text-slate-200 outline-none focus:border-slate-500"
+      />
+    </label>
+  );
+}
+
+export function RuleEditor({
+  rules,
+  ruleSets,
+  current,
+  dirty,
+  busy,
+  onChange,
+  onPreview,
+  onSave,
+  onRevert,
+}: {
+  rules: Rule[];
+  ruleSets: RuleSet[];
+  current: RuleSet;
+  dirty: boolean;
+  busy: boolean;
+  onChange: (rules: Rule[]) => void;
+  onPreview: () => void;
+  onSave: () => void;
+  onRevert: (version: number) => void;
+}) {
+  const update = (id: string, patch: Partial<Rule>) =>
+    onChange(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+
+  return (
+    <Panel
+      title="Policy"
+      right={
+        <div className="flex items-center gap-2">
+          <Badge tone={dirty ? "warn" : "neutral"}>
+            {dirty ? "unsaved edit" : `v${current.version} active`}
+          </Badge>
+        </div>
+      }
+    >
+      <ul className="divide-y divide-edge/60">
+        {rules.map((rule, i) => (
+          <li key={rule.id} className="px-4 py-2.5">
+            <div className="flex items-start gap-2.5">
+              <input
+                type="checkbox"
+                checked={rule.enabled}
+                onChange={(e) => update(rule.id, { enabled: e.target.checked })}
+                className="mt-1 h-3.5 w-3.5 accent-emerald-500"
+                title="Disable this rule"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p
+                    className={`text-[13px] font-medium ${
+                      rule.enabled ? "text-slate-200" : "text-slate-600 line-through"
+                    }`}
+                  >
+                    <span className="mr-1.5 font-mono text-[11px] text-slate-600">{i + 1}</span>
+                    {rule.label}
+                  </p>
+                  <code className="shrink-0 font-mono text-[10px] text-slate-600">{rule.id}</code>
+                </div>
+                {Object.keys(rule.params).length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                    {Object.entries(rule.params).map(([k, v]) => (
+                      <ParamField
+                        key={k}
+                        name={k}
+                        value={v}
+                        onChange={(nv) => update(rule.id, { params: { ...rule.params, [k]: nv } })}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex items-center gap-2 border-t border-edge px-4 py-2.5">
+        <Button onClick={onPreview} disabled={busy} variant="primary">
+          Replay against history
+        </Button>
+        <Button onClick={onSave} disabled={busy || !dirty}>
+          Save as v{current.version + 1}
+        </Button>
+      </div>
+
+      {/* Version history. The old version is still here, which is the point. */}
+      <div className="border-t border-edge px-4 py-2.5">
+        <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-600">
+          versions
+        </p>
+        <ul className="space-y-1">
+          {ruleSets.map((rs) => (
+            <li key={rs.version} className="flex items-center gap-2 text-[12px]">
+              <span
+                className={`font-mono ${
+                  rs.version === current.version ? "text-slate-200" : "text-muted"
+                }`}
+              >
+                v{rs.version}
+              </span>
+              <span className="truncate text-muted">{rs.note}</span>
+              <code
+                className="ml-auto shrink-0 font-mono text-[10px] text-slate-600"
+                title={`sha256 ${rs.hash}${rs.anchorTxHash ? `\nMonad tx ${rs.anchorTxHash}` : "\nnot yet anchored"}`}
+              >
+                {rs.hash.slice(0, 10)}
+              </code>
+              {rs.anchorTxHash ? (
+                <Badge tone="pass">anchored</Badge>
+              ) : (
+                <Badge tone="neutral">local</Badge>
+              )}
+              {rs.version !== current.version && (
+                <button
+                  type="button"
+                  onClick={() => onRevert(rs.version)}
+                  className="text-[11px] text-muted underline-offset-2 hover:text-slate-200 hover:underline"
+                >
+                  load
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Panel>
+  );
+}

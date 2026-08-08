@@ -1,0 +1,4547 @@
+[
+  {
+    "id": "dec_seed_045",
+    "createdAt": "2026-07-20T14:16:11.381Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4236",
+      "vendor": "Verity Office Group",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 24900,
+      "quantity": 32,
+      "quoteExpiry": "2026-08-03T14:16:11.381Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4236",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 32,
+        "quoteExpiry": "2026-08-03T14:16:11.381Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 2696800,
+        "spentCents": 2378080
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-20T14:16:11.381Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4236 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4236 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $7,968.00 against a quoted $7,968.00, within the 2.00% tolerance.",
+        "expected": "$7,968.00 ± $159.36",
+        "actual": "$7,968.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-CHAIR-M4 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-CHAIR-M4",
+        "actual": "Verity Office Group / VO-CHAIR-M4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": false,
+        "reason": "CC-FAC has $3,187.20 left this period and this purchase is $7,968.00. It would overspend by $4,780.80.",
+        "expected": "at most $3,187.20 remaining",
+        "actual": "$7,968.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4236 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_019",
+    "createdAt": "2026-07-21T13:45:43.009Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4159",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 96000,
+      "quantity": 38,
+      "quoteExpiry": "2026-08-13T13:45:43.009Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4159",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 38,
+        "quoteExpiry": "2026-08-13T13:45:43.009Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 7648000,
+        "spentCents": 2700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-21T13:45:43.009Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4159 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4159 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $36,480.00 against a quoted $36,480.00, within the 2.00% tolerance.",
+        "expected": "$36,480.00 ± $729.60",
+        "actual": "$36,480.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$36,480.00 against $49,480.00 remaining in CC-ENG.",
+        "expected": "at most $49,480.00 remaining",
+        "actual": "$36,480.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4159 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_f59429c23",
+      "last4": "2071",
+      "limitCents": 3648000,
+      "expiresAt": "2026-08-13T13:45:43.009Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_036",
+    "createdAt": "2026-07-22T08:21:14.523Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4208",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 42699,
+      "quantity": 25,
+      "quoteExpiry": "2026-08-16T08:21:14.523Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4208",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 25,
+        "quoteExpiry": "2026-08-16T08:21:14.523Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4337500,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-22T08:21:14.523Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4208 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4208 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": false,
+        "reason": "The card was requested for $10,674.75 but the accepted quote is $10,375.00, a difference of $299.75 (2.89%). Tolerance is 2.00%.",
+        "expected": "$10,375.00 ± $207.50",
+        "actual": "$10,674.75"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$10,674.75 against $17,375.00 remaining in CC-MKT.",
+        "expected": "at most $17,375.00 remaining",
+        "actual": "$10,674.75"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4208 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_021",
+    "createdAt": "2026-07-22T15:21:50.643Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4165",
+      "vendor": "Kestrel Components",
+      "sku": "KC-SEN-118",
+      "unitPrice": 8900,
+      "quantity": 30,
+      "quoteExpiry": "2026-08-13T15:21:50.643Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4165",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-SEN-118",
+        "unitPrice": 8900,
+        "quantity": 30,
+        "quoteExpiry": "2026-08-13T15:21:50.643Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 1767000,
+        "spentCents": 500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-22T15:21:50.643Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4165 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4165 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $2,670.00 against a quoted $2,670.00, within the 2.00% tolerance.",
+        "expected": "$2,670.00 ± $53.40",
+        "actual": "$2,670.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-SEN-118 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-SEN-118",
+        "actual": "Kestrel Components / KC-SEN-118"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$2,670.00 against $12,670.00 remaining in CC-ENG.",
+        "expected": "at most $12,670.00 remaining",
+        "actual": "$2,670.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4165 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_50713ba665",
+      "last4": "3145",
+      "limitCents": 267000,
+      "expiresAt": "2026-08-13T15:21:50.643Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_010",
+    "createdAt": "2026-07-23T04:35:35.471Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4130",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 96000,
+      "quantity": 18,
+      "quoteExpiry": "2026-08-18T04:35:35.471Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4130",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 18,
+        "quoteExpiry": "2026-08-18T04:35:35.471Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 3828000,
+        "spentCents": 1700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-23T04:35:35.471Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4130 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4130 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $17,280.00 against a quoted $17,280.00, within the 2.00% tolerance.",
+        "expected": "$17,280.00 ± $345.60",
+        "actual": "$17,280.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$17,280.00 against $21,280.00 remaining in CC-MKT.",
+        "expected": "at most $21,280.00 remaining",
+        "actual": "$17,280.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4130 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_777cc4ab6a",
+      "last4": "8593",
+      "limitCents": 1728000,
+      "expiresAt": "2026-08-18T04:35:35.471Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_024",
+    "createdAt": "2026-07-23T23:46:00.675Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4174",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 25,
+      "quoteExpiry": "2026-08-17T23:46:00.675Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4174",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 25,
+        "quoteExpiry": "2026-08-17T23:46:00.675Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 6025000,
+        "spentCents": 900000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-23T23:46:00.675Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4174 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4174 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $36,250.00 against a quoted $36,250.00, within the 2.00% tolerance.",
+        "expected": "$36,250.00 ± $725.00",
+        "actual": "$36,250.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$36,250.00 against $51,250.00 remaining in CC-ENG.",
+        "expected": "at most $51,250.00 remaining",
+        "actual": "$36,250.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4174 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_af06904456",
+      "last4": "3179",
+      "limitCents": 3625000,
+      "expiresAt": "2026-08-17T23:46:00.675Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_027",
+    "createdAt": "2026-07-24T00:12:48.471Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4182",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145769,
+      "quantity": 39,
+      "quoteExpiry": "2026-08-10T00:12:48.471Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4182",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 39,
+        "quoteExpiry": "2026-08-10T00:12:48.471Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 6855000,
+        "spentCents": 500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-24T00:12:48.471Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4182 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4182 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $56,849.91 against a quoted $56,550.00, within the 2.00% tolerance.",
+        "expected": "$56,550.00 ± $1,131.00",
+        "actual": "$56,849.91"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$56,849.91 against $63,550.00 remaining in CC-ENG.",
+        "expected": "at most $63,550.00 remaining",
+        "actual": "$56,849.91"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4182 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_cdf8de49c7",
+      "last4": "8291",
+      "limitCents": 5684991,
+      "expiresAt": "2026-08-10T00:12:48.471Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_006",
+    "createdAt": "2026-07-24T03:44:00.833Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4119",
+      "vendor": "Ardent Materials",
+      "sku": "AM-ALLOY-7",
+      "unitPrice": 31000,
+      "quantity": 13,
+      "quoteExpiry": "2026-08-20T03:44:00.833Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4119",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Ardent Materials",
+        "sku": "AM-ALLOY-7",
+        "unitPrice": 31000,
+        "quantity": 13,
+        "quoteExpiry": "2026-08-20T03:44:00.833Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 4503000,
+        "spentCents": 2700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-24T03:44:00.833Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4119 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4119 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $4,030.00 against a quoted $4,030.00, within the 2.00% tolerance.",
+        "expected": "$4,030.00 ± $80.60",
+        "actual": "$4,030.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Ardent Materials and SKU AM-ALLOY-7 both match the accepted quote.",
+        "expected": "Ardent Materials / AM-ALLOY-7",
+        "actual": "Ardent Materials / AM-ALLOY-7"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$4,030.00 against $18,030.00 remaining in CC-FAC.",
+        "expected": "at most $18,030.00 remaining",
+        "actual": "$4,030.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4119 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_6cd687b041",
+      "last4": "2664",
+      "limitCents": 403000,
+      "expiresAt": "2026-08-20T03:44:00.833Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_042",
+    "createdAt": "2026-07-25T07:47:08.982Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4226",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU4",
+      "unitPrice": 96000,
+      "quantity": 4,
+      "quoteExpiry": "2026-08-22T07:47:08.982Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4226",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 4,
+        "quoteExpiry": "2026-08-22T07:47:08.982Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 3484000,
+        "spentCents": 1600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-25T07:47:08.982Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4226 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4226 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $3,840.00 against a quoted $3,840.00, within the 2.00% tolerance.",
+        "expected": "$3,840.00 ± $76.80",
+        "actual": "$3,840.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.sku",
+        "passed": false,
+        "reason": "The quote for PO-4226 is for PL-FRT-EU3, but the agent is buying PL-FRT-EU4. Right vendor, right total, wrong item — no card control can see this.",
+        "expected": "PL-FRT-EU3",
+        "actual": "PL-FRT-EU4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$3,840.00 against $18,840.00 remaining in CC-FAC.",
+        "expected": "at most $18,840.00 remaining",
+        "actual": "$3,840.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4226 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_043",
+    "createdAt": "2026-07-25T09:26:26.224Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4230",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41500,
+      "quantity": 22,
+      "quoteExpiry": "2026-08-09T09:26:26.224Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4230",
+        "status": "accepted",
+        "fulfilled": true,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 22,
+        "quoteExpiry": "2026-08-09T09:26:26.224Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4113000,
+        "spentCents": 2200000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-25T09:26:26.224Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4230 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": false,
+        "reason": "Purchase order PO-4230 is already fulfilled. Paying it again would be a duplicate spend.",
+        "expected": "an open, unfulfilled order line",
+        "actual": "already fulfilled"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $9,130.00 against a quoted $9,130.00, within the 2.00% tolerance.",
+        "expected": "$9,130.00 ± $182.60",
+        "actual": "$9,130.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$9,130.00 against $19,130.00 remaining in CC-MKT.",
+        "expected": "at most $19,130.00 remaining",
+        "actual": "$9,130.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4230 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_008",
+    "createdAt": "2026-07-25T13:52:51.306Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4124",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 40,
+      "quoteExpiry": "2026-08-01T13:52:51.306Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4124",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 40,
+        "quoteExpiry": "2026-08-01T13:52:51.306Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 9600000,
+        "spentCents": 2500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-25T13:52:51.306Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4124 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4124 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $58,000.00 against a quoted $58,000.00, within the 2.00% tolerance.",
+        "expected": "$58,000.00 ± $1,160.00",
+        "actual": "$58,000.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$58,000.00 against $71,000.00 remaining in CC-MKT.",
+        "expected": "at most $71,000.00 remaining",
+        "actual": "$58,000.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4124 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_3085c7064e",
+      "last4": "1375",
+      "limitCents": 5800000,
+      "expiresAt": "2026-08-01T13:52:51.306Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_020",
+    "createdAt": "2026-07-25T20:45:19.598Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4160",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41500,
+      "quantity": 4,
+      "quoteExpiry": "2026-08-17T20:45:19.598Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4160",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 4,
+        "quoteExpiry": "2026-08-17T20:45:19.598Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2566000,
+        "spentCents": 1200000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-25T20:45:19.598Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4160 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4160 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,660.00 against a quoted $1,660.00, within the 2.00% tolerance.",
+        "expected": "$1,660.00 ± $33.20",
+        "actual": "$1,660.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,660.00 against $13,660.00 remaining in CC-OPS.",
+        "expected": "at most $13,660.00 remaining",
+        "actual": "$1,660.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4160 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_2ce88b32db",
+      "last4": "4411",
+      "limitCents": 166000,
+      "expiresAt": "2026-08-17T20:45:19.598Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_015",
+    "createdAt": "2026-07-26T00:53:37.708Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4147",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-08T00:53:37.708Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4147",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-08T00:53:37.708Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4760000,
+        "spentCents": 2500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-26T00:53:37.708Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4147 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4147 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $11,600.00 against a quoted $11,600.00, within the 2.00% tolerance.",
+        "expected": "$11,600.00 ± $232.00",
+        "actual": "$11,600.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$11,600.00 against $22,600.00 remaining in CC-MKT.",
+        "expected": "at most $22,600.00 remaining",
+        "actual": "$11,600.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4147 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_8e2a1f9507",
+      "last4": "5876",
+      "limitCents": 1160000,
+      "expiresAt": "2026-08-08T00:53:37.708Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_018",
+    "createdAt": "2026-07-26T03:13:00.385Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4155",
+      "vendor": "Verity Office Group",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 24900,
+      "quantity": 15,
+      "quoteExpiry": "2026-08-09T03:13:00.385Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4155",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 15,
+        "quoteExpiry": "2026-08-09T03:13:00.385Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2773500,
+        "spentCents": 1200000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-26T03:13:00.385Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4155 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4155 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $3,735.00 against a quoted $3,735.00, within the 2.00% tolerance.",
+        "expected": "$3,735.00 ± $74.70",
+        "actual": "$3,735.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-CHAIR-M4 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-CHAIR-M4",
+        "actual": "Verity Office Group / VO-CHAIR-M4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$3,735.00 against $15,735.00 remaining in CC-ENG.",
+        "expected": "at most $15,735.00 remaining",
+        "actual": "$3,735.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4155 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_1c1af6ff3f",
+      "last4": "1346",
+      "limitCents": 373500,
+      "expiresAt": "2026-08-09T03:13:00.385Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_031",
+    "createdAt": "2026-07-26T13:34:29.073Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4193",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-SEAL-91",
+      "unitPrice": 3260,
+      "quantity": 18,
+      "quoteExpiry": "2026-08-12T13:34:29.073Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4193",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-SEAL-91",
+        "unitPrice": 3200,
+        "quantity": 18,
+        "quoteExpiry": "2026-08-12T13:34:29.073Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 1657600,
+        "spentCents": 600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-26T13:34:29.073Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4193 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4193 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $586.80 against a quoted $576.00, within the 2.00% tolerance.",
+        "expected": "$576.00 ± $11.52",
+        "actual": "$586.80"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-SEAL-91 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-SEAL-91",
+        "actual": "Nordhaven Supply Co / NH-SEAL-91"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$586.80 against $10,576.00 remaining in CC-MKT.",
+        "expected": "at most $10,576.00 remaining",
+        "actual": "$586.80"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4193 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_db4204a1a9",
+      "last4": "9937",
+      "limitCents": 58680,
+      "expiresAt": "2026-08-12T13:34:29.073Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_022",
+    "createdAt": "2026-07-27T18:53:28.123Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4168",
+      "vendor": "Kestrel Components",
+      "sku": "KC-RLY-04",
+      "unitPrice": 15600,
+      "quantity": 4,
+      "quoteExpiry": "2026-08-03T18:53:28.123Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4168",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-RLY-04",
+        "unitPrice": 15600,
+        "quantity": 4,
+        "quoteExpiry": "2026-08-03T18:53:28.123Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 3662400,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-27T18:53:28.123Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4168 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4168 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $624.00 against a quoted $624.00, within the 2.00% tolerance.",
+        "expected": "$624.00 ± $12.48",
+        "actual": "$624.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-RLY-04 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-RLY-04",
+        "actual": "Kestrel Components / KC-RLY-04"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$624.00 against $10,624.00 remaining in CC-FAC.",
+        "expected": "at most $10,624.00 remaining",
+        "actual": "$624.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4168 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_914fc9dfa8",
+      "last4": "4575",
+      "limitCents": 62400,
+      "expiresAt": "2026-08-03T18:53:28.123Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_035",
+    "createdAt": "2026-07-28T02:47:03.075Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4207",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 100781,
+      "quantity": 21,
+      "quoteExpiry": "2026-08-05T02:47:03.075Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4207",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 21,
+        "quoteExpiry": "2026-08-05T02:47:03.075Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4716000,
+        "spentCents": 2200000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-28T02:47:03.075Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4207 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4207 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": false,
+        "reason": "The card was requested for $21,164.01 but the accepted quote is $20,160.00, a difference of $1,004.01 (4.98%). Tolerance is 2.00%.",
+        "expected": "$20,160.00 ± $403.20",
+        "actual": "$21,164.01"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$21,164.01 against $25,160.00 remaining in CC-MKT.",
+        "expected": "at most $25,160.00 remaining",
+        "actual": "$21,164.01"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4207 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_002",
+    "createdAt": "2026-07-28T16:54:07.493Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4107",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-BRK-2200",
+      "unitPrice": 12450,
+      "quantity": 13,
+      "quoteExpiry": "2026-08-23T16:54:07.493Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4107",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-BRK-2200",
+        "unitPrice": 12450,
+        "quantity": 13,
+        "quoteExpiry": "2026-08-23T16:54:07.493Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 3361850,
+        "spentCents": 1700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-28T16:54:07.493Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4107 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4107 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,618.50 against a quoted $1,618.50, within the 2.00% tolerance.",
+        "expected": "$1,618.50 ± $32.37",
+        "actual": "$1,618.50"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-BRK-2200 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-BRK-2200",
+        "actual": "Nordhaven Supply Co / NH-BRK-2200"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,618.50 against $16,618.50 remaining in CC-FAC.",
+        "expected": "at most $16,618.50 remaining",
+        "actual": "$1,618.50"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4107 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_c3aa9a507c",
+      "last4": "4758",
+      "limitCents": 161850,
+      "expiresAt": "2026-08-23T16:54:07.493Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_040",
+    "createdAt": "2026-07-28T23:40:39.815Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4221",
+      "vendor": "Meridian Parts Direct",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 24900,
+      "quantity": 27,
+      "quoteExpiry": "2026-08-14T23:40:39.815Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4221",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 27,
+        "quoteExpiry": "2026-08-14T23:40:39.815Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 3972300,
+        "spentCents": 3000000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-28T23:40:39.815Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4221 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4221 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $6,723.00 against a quoted $6,723.00, within the 2.00% tolerance.",
+        "expected": "$6,723.00 ± $134.46",
+        "actual": "$6,723.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor",
+        "passed": false,
+        "reason": "The card would be issued to Meridian Parts Direct, but PO-4221 was negotiated with Verity Office Group. Right price, wrong counterparty.",
+        "expected": "Verity Office Group",
+        "actual": "Meridian Parts Direct"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$6,723.00 against $9,723.00 remaining in CC-ENG.",
+        "expected": "at most $9,723.00 remaining",
+        "actual": "$6,723.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4221 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_026",
+    "createdAt": "2026-07-29T05:02:02.926Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4178",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 97200,
+      "quantity": 38,
+      "quoteExpiry": "2026-08-07T05:02:02.926Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4178",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 38,
+        "quoteExpiry": "2026-08-07T05:02:02.926Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 5748000,
+        "spentCents": 600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-29T05:02:02.926Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4178 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4178 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $36,936.00 against a quoted $36,480.00, within the 2.00% tolerance.",
+        "expected": "$36,480.00 ± $729.60",
+        "actual": "$36,936.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$36,936.00 against $51,480.00 remaining in CC-FAC.",
+        "expected": "at most $51,480.00 remaining",
+        "actual": "$36,936.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4178 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_a2308c67b9",
+      "last4": "7754",
+      "limitCents": 3693600,
+      "expiresAt": "2026-08-07T05:02:02.926Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_017",
+    "createdAt": "2026-07-29T06:38:39.817Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4152",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-BRK-2200",
+      "unitPrice": 12450,
+      "quantity": 17,
+      "quoteExpiry": "2026-08-22T06:38:39.817Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4152",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-BRK-2200",
+        "unitPrice": 12450,
+        "quantity": 17,
+        "quoteExpiry": "2026-08-22T06:38:39.817Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 3711650,
+        "spentCents": 3000000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-29T06:38:39.817Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4152 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4152 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $2,116.50 against a quoted $2,116.50, within the 2.00% tolerance.",
+        "expected": "$2,116.50 ± $42.33",
+        "actual": "$2,116.50"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-BRK-2200 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-BRK-2200",
+        "actual": "Nordhaven Supply Co / NH-BRK-2200"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$2,116.50 against $7,116.50 remaining in CC-OPS.",
+        "expected": "at most $7,116.50 remaining",
+        "actual": "$2,116.50"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4152 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_b60fbc9bde",
+      "last4": "2586",
+      "limitCents": 211650,
+      "expiresAt": "2026-08-22T06:38:39.817Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_004",
+    "createdAt": "2026-07-30T06:16:04.675Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4113",
+      "vendor": "Kestrel Components",
+      "sku": "KC-SEN-118",
+      "unitPrice": 8900,
+      "quantity": 14,
+      "quoteExpiry": "2026-08-09T06:16:04.675Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4113",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-SEN-118",
+        "unitPrice": 8900,
+        "quantity": 14,
+        "quoteExpiry": "2026-08-09T06:16:04.675Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4524600,
+        "spentCents": 2900000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-30T06:16:04.675Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4113 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4113 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,246.00 against a quoted $1,246.00, within the 2.00% tolerance.",
+        "expected": "$1,246.00 ± $24.92",
+        "actual": "$1,246.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-SEN-118 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-SEN-118",
+        "actual": "Kestrel Components / KC-SEN-118"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,246.00 against $16,246.00 remaining in CC-MKT.",
+        "expected": "at most $16,246.00 remaining",
+        "actual": "$1,246.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4113 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_d3bccd38c0",
+      "last4": "6802",
+      "limitCents": 124600,
+      "expiresAt": "2026-08-09T06:16:04.675Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_003",
+    "createdAt": "2026-07-30T15:13:25.611Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4109",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41500,
+      "quantity": 34,
+      "quoteExpiry": "2026-08-29T15:13:25.611Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4109",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 34,
+        "quoteExpiry": "2026-08-29T15:13:25.611Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2211000,
+        "spentCents": 500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-30T15:13:25.611Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4109 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4109 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $14,110.00 against a quoted $14,110.00, within the 2.00% tolerance.",
+        "expected": "$14,110.00 ± $282.20",
+        "actual": "$14,110.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$14,110.00 against $17,110.00 remaining in CC-ENG.",
+        "expected": "at most $17,110.00 remaining",
+        "actual": "$14,110.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4109 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_422a1d6e6c",
+      "last4": "8543",
+      "limitCents": 1411000,
+      "expiresAt": "2026-08-29T15:13:25.611Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_038",
+    "createdAt": "2026-07-31T00:37:43.480Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4216",
+      "vendor": "Colt & Rowe Supplies",
+      "sku": "AM-ALLOY-7",
+      "unitPrice": 31000,
+      "quantity": 33,
+      "quoteExpiry": "2026-08-13T00:37:43.480Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4216",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Ardent Materials",
+        "sku": "AM-ALLOY-7",
+        "unitPrice": 31000,
+        "quantity": 33,
+        "quoteExpiry": "2026-08-13T00:37:43.480Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 3923000,
+        "spentCents": 2200000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-31T00:37:43.480Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4216 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4216 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $10,230.00 against a quoted $10,230.00, within the 2.00% tolerance.",
+        "expected": "$10,230.00 ± $204.60",
+        "actual": "$10,230.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor",
+        "passed": false,
+        "reason": "The card would be issued to Colt & Rowe Supplies, but PO-4216 was negotiated with Ardent Materials. Right price, wrong counterparty.",
+        "expected": "Ardent Materials",
+        "actual": "Colt & Rowe Supplies"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$10,230.00 against $17,230.00 remaining in CC-OPS.",
+        "expected": "at most $17,230.00 remaining",
+        "actual": "$10,230.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4216 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_025",
+    "createdAt": "2026-07-31T05:40:28.222Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4175",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 96000,
+      "quantity": 37,
+      "quoteExpiry": "2026-08-20T05:40:28.222Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4175",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 37,
+        "quoteExpiry": "2026-08-20T05:40:28.222Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 4652000,
+        "spentCents": 700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-31T05:40:28.222Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4175 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4175 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $35,520.00 against a quoted $35,520.00, within the 2.00% tolerance.",
+        "expected": "$35,520.00 ± $710.40",
+        "actual": "$35,520.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$35,520.00 against $39,520.00 remaining in CC-FAC.",
+        "expected": "at most $39,520.00 remaining",
+        "actual": "$35,520.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4175 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_35a11eb272",
+      "last4": "3989",
+      "limitCents": 3552000,
+      "expiresAt": "2026-08-20T05:40:28.222Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_016",
+    "createdAt": "2026-07-31T11:58:40.683Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4148",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-SEAL-91",
+      "unitPrice": 3200,
+      "quantity": 5,
+      "quoteExpiry": "2026-08-10T11:58:40.683Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4148",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-SEAL-91",
+        "unitPrice": 3200,
+        "quantity": 5,
+        "quoteExpiry": "2026-08-10T11:58:40.683Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 3016000,
+        "spentCents": 1500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-31T11:58:40.683Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4148 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4148 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $160.00 against a quoted $160.00, within the 2.00% tolerance.",
+        "expected": "$160.00 ± $3.20",
+        "actual": "$160.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-SEAL-91 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-SEAL-91",
+        "actual": "Nordhaven Supply Co / NH-SEAL-91"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$160.00 against $15,160.00 remaining in CC-ENG.",
+        "expected": "at most $15,160.00 remaining",
+        "actual": "$160.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4148 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_416ae3e765",
+      "last4": "3996",
+      "limitCents": 16000,
+      "expiresAt": "2026-08-10T11:58:40.683Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_028",
+    "createdAt": "2026-07-31T20:44:49.393Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4184",
+      "vendor": "Kestrel Components",
+      "sku": "KC-RLY-04",
+      "unitPrice": 15694,
+      "quantity": 15,
+      "quoteExpiry": "2026-08-08T20:44:49.393Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4184",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-RLY-04",
+        "unitPrice": 15600,
+        "quantity": 15,
+        "quoteExpiry": "2026-08-08T20:44:49.393Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2934000,
+        "spentCents": 2000000
+      },
+      "existingCard": null,
+      "observedAt": "2026-07-31T20:44:49.393Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4184 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4184 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $2,354.10 against a quoted $2,340.00, within the 2.00% tolerance.",
+        "expected": "$2,340.00 ± $46.80",
+        "actual": "$2,354.10"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-RLY-04 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-RLY-04",
+        "actual": "Kestrel Components / KC-RLY-04"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$2,354.10 against $9,340.00 remaining in CC-ENG.",
+        "expected": "at most $9,340.00 remaining",
+        "actual": "$2,354.10"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4184 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_30e71d0b56",
+      "last4": "5269",
+      "limitCents": 235410,
+      "expiresAt": "2026-08-08T20:44:49.393Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_009",
+    "createdAt": "2026-08-01T08:50:03.201Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4129",
+      "vendor": "Kestrel Components",
+      "sku": "KC-SEN-118",
+      "unitPrice": 8900,
+      "quantity": 35,
+      "quoteExpiry": "2026-08-29T08:50:03.201Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4129",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-SEN-118",
+        "unitPrice": 8900,
+        "quantity": 35,
+        "quoteExpiry": "2026-08-29T08:50:03.201Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 2711500,
+        "spentCents": 1600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-01T08:50:03.201Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4129 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4129 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $3,115.00 against a quoted $3,115.00, within the 2.00% tolerance.",
+        "expected": "$3,115.00 ± $62.30",
+        "actual": "$3,115.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-SEN-118 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-SEN-118",
+        "actual": "Kestrel Components / KC-SEN-118"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$3,115.00 against $11,115.00 remaining in CC-MKT.",
+        "expected": "at most $11,115.00 remaining",
+        "actual": "$3,115.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4129 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_238ffc8f7f",
+      "last4": "7143",
+      "limitCents": 311500,
+      "expiresAt": "2026-08-29T08:50:03.201Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_039",
+    "createdAt": "2026-08-01T21:05:33.322Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4218",
+      "vendor": "Meridian Parts Direct",
+      "sku": "AM-ALLOY-7",
+      "unitPrice": 31000,
+      "quantity": 30,
+      "quoteExpiry": "2026-08-15T21:05:33.322Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4218",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Ardent Materials",
+        "sku": "AM-ALLOY-7",
+        "unitPrice": 31000,
+        "quantity": 30,
+        "quoteExpiry": "2026-08-15T21:05:33.322Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2730000,
+        "spentCents": 1100000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-01T21:05:33.322Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4218 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4218 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $9,300.00 against a quoted $9,300.00, within the 2.00% tolerance.",
+        "expected": "$9,300.00 ± $186.00",
+        "actual": "$9,300.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor",
+        "passed": false,
+        "reason": "The card would be issued to Meridian Parts Direct, but PO-4218 was negotiated with Ardent Materials. Right price, wrong counterparty.",
+        "expected": "Ardent Materials",
+        "actual": "Meridian Parts Direct"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$9,300.00 against $16,300.00 remaining in CC-ENG.",
+        "expected": "at most $16,300.00 remaining",
+        "actual": "$9,300.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4218 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_046",
+    "createdAt": "2026-08-02T07:34:59.757Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4239",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-BRK-2200",
+      "unitPrice": 12450,
+      "quantity": 31,
+      "quoteExpiry": "2026-08-31T07:34:59.757Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4239",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-BRK-2200",
+        "unitPrice": 12450,
+        "quantity": 31,
+        "quoteExpiry": "2026-08-31T07:34:59.757Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2185950,
+        "spentCents": 1200000
+      },
+      "existingCard": {
+        "cardId": "card_3985048d",
+        "poNumber": "PO-4239",
+        "issuedAt": "2026-08-02T06:34:59.757Z"
+      },
+      "observedAt": "2026-08-02T07:34:59.757Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4239 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4239 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $3,859.50 against a quoted $3,859.50, within the 2.00% tolerance.",
+        "expected": "$3,859.50 ± $77.19",
+        "actual": "$3,859.50"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-BRK-2200 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-BRK-2200",
+        "actual": "Nordhaven Supply Co / NH-BRK-2200"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$3,859.50 against $9,859.50 remaining in CC-OPS.",
+        "expected": "at most $9,859.50 remaining",
+        "actual": "$3,859.50"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": false,
+        "reason": "Card card_3985048d was already issued for PO-4239 at 06:34. A retry returns that card, it does not create a second one.",
+        "expected": "no card yet for this PO",
+        "actual": "card card_3985048d issued 2026-08-02 06:34"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_011",
+    "createdAt": "2026-08-02T10:30:43.184Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4133",
+      "vendor": "Verity Office Group",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 24900,
+      "quantity": 25,
+      "quoteExpiry": "2026-08-29T10:30:43.184Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4133",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 25,
+        "quoteExpiry": "2026-08-29T10:30:43.184Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 4322500,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-02T10:30:43.184Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4133 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4133 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $6,225.00 against a quoted $6,225.00, within the 2.00% tolerance.",
+        "expected": "$6,225.00 ± $124.50",
+        "actual": "$6,225.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-CHAIR-M4 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-CHAIR-M4",
+        "actual": "Verity Office Group / VO-CHAIR-M4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$6,225.00 against $17,225.00 remaining in CC-FAC.",
+        "expected": "at most $17,225.00 remaining",
+        "actual": "$6,225.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4133 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_112d5b2a8e",
+      "last4": "7712",
+      "limitCents": 622500,
+      "expiresAt": "2026-08-29T10:30:43.184Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_032",
+    "createdAt": "2026-08-02T13:19:41.533Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4198",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S2",
+      "unitPrice": 41965,
+      "quantity": 29,
+      "quoteExpiry": "2026-08-10T13:19:41.533Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4198",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 29,
+        "quoteExpiry": "2026-08-10T13:19:41.533Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 3303500,
+        "spentCents": 1500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-02T13:19:41.533Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4198 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4198 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $12,169.85 against a quoted $12,035.00, within the 2.00% tolerance.",
+        "expected": "$12,035.00 ± $240.70",
+        "actual": "$12,169.85"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-DESK-S2 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-DESK-S2",
+        "actual": "Verity Office Group / VO-DESK-S2"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$12,169.85 against $18,035.00 remaining in CC-OPS.",
+        "expected": "at most $18,035.00 remaining",
+        "actual": "$12,169.85"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4198 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_b0fdc2ad57",
+      "last4": "3861",
+      "limitCents": 1216985,
+      "expiresAt": "2026-08-10T13:19:41.533Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_012",
+    "createdAt": "2026-08-02T14:13:47.985Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4138",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-SEAL-91",
+      "unitPrice": 3200,
+      "quantity": 17,
+      "quoteExpiry": "2026-08-14T14:13:47.985Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4138",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-SEAL-91",
+        "unitPrice": 3200,
+        "quantity": 17,
+        "quoteExpiry": "2026-08-14T14:13:47.985Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 2254400,
+        "spentCents": 1400000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-02T14:13:47.985Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4138 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4138 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $544.00 against a quoted $544.00, within the 2.00% tolerance.",
+        "expected": "$544.00 ± $10.88",
+        "actual": "$544.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-SEAL-91 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-SEAL-91",
+        "actual": "Nordhaven Supply Co / NH-SEAL-91"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$544.00 against $8,544.00 remaining in CC-MKT.",
+        "expected": "at most $8,544.00 remaining",
+        "actual": "$544.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4138 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_c2fd2234fc",
+      "last4": "7235",
+      "limitCents": 54400,
+      "expiresAt": "2026-08-14T14:13:47.985Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_007",
+    "createdAt": "2026-08-02T16:10:29.266Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4121",
+      "vendor": "Pallas Logistics",
+      "sku": "PL-FRT-EU3",
+      "unitPrice": 96000,
+      "quantity": 33,
+      "quoteExpiry": "2026-08-28T16:10:29.266Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4121",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Pallas Logistics",
+        "sku": "PL-FRT-EU3",
+        "unitPrice": 96000,
+        "quantity": 33,
+        "quoteExpiry": "2026-08-28T16:10:29.266Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 6268000,
+        "spentCents": 2800000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-02T16:10:29.266Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4121 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4121 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $31,680.00 against a quoted $31,680.00, within the 2.00% tolerance.",
+        "expected": "$31,680.00 ± $633.60",
+        "actual": "$31,680.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Pallas Logistics and SKU PL-FRT-EU3 both match the accepted quote.",
+        "expected": "Pallas Logistics / PL-FRT-EU3",
+        "actual": "Pallas Logistics / PL-FRT-EU3"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$31,680.00 against $34,680.00 remaining in CC-ENG.",
+        "expected": "at most $34,680.00 remaining",
+        "actual": "$31,680.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4121 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_d30535b9d0",
+      "last4": "3935",
+      "limitCents": 3168000,
+      "expiresAt": "2026-08-28T16:10:29.266Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_001",
+    "createdAt": "2026-08-02T18:55:47.857Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4104",
+      "vendor": "Kestrel Components",
+      "sku": "KC-RLY-04",
+      "unitPrice": 15600,
+      "quantity": 14,
+      "quoteExpiry": "2026-09-01T18:55:47.857Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4104",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-RLY-04",
+        "unitPrice": 15600,
+        "quantity": 14,
+        "quoteExpiry": "2026-09-01T18:55:47.857Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2818400,
+        "spentCents": 1800000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-02T18:55:47.857Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4104 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4104 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $2,184.00 against a quoted $2,184.00, within the 2.00% tolerance.",
+        "expected": "$2,184.00 ± $43.68",
+        "actual": "$2,184.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-RLY-04 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-RLY-04",
+        "actual": "Kestrel Components / KC-RLY-04"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$2,184.00 against $10,184.00 remaining in CC-ENG.",
+        "expected": "at most $10,184.00 remaining",
+        "actual": "$2,184.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4104 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_1fecb88315",
+      "last4": "4056",
+      "limitCents": 218400,
+      "expiresAt": "2026-09-01T18:55:47.857Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_041",
+    "createdAt": "2026-08-04T12:49:59.321Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4223",
+      "vendor": "Verity Office Group",
+      "sku": "VO-DESK-S4",
+      "unitPrice": 41500,
+      "quantity": 23,
+      "quoteExpiry": "2026-08-26T12:49:59.321Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4223",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-DESK-S2",
+        "unitPrice": 41500,
+        "quantity": 23,
+        "quoteExpiry": "2026-08-26T12:49:59.321Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 3854500,
+        "spentCents": 2500000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-04T12:49:59.321Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4223 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4223 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $9,545.00 against a quoted $9,545.00, within the 2.00% tolerance.",
+        "expected": "$9,545.00 ± $190.90",
+        "actual": "$9,545.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.sku",
+        "passed": false,
+        "reason": "The quote for PO-4223 is for VO-DESK-S2, but the agent is buying VO-DESK-S4. Right vendor, right total, wrong item — no card control can see this.",
+        "expected": "VO-DESK-S2",
+        "actual": "VO-DESK-S4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$9,545.00 against $13,545.00 remaining in CC-FAC.",
+        "expected": "at most $13,545.00 remaining",
+        "actual": "$9,545.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4223 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_005",
+    "createdAt": "2026-08-04T15:25:53.061Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4115",
+      "vendor": "Ardent Materials",
+      "sku": "AM-ALLOY-7",
+      "unitPrice": 31000,
+      "quantity": 6,
+      "quoteExpiry": "2026-08-15T15:25:53.061Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4115",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Ardent Materials",
+        "sku": "AM-ALLOY-7",
+        "unitPrice": 31000,
+        "quantity": 6,
+        "quoteExpiry": "2026-08-15T15:25:53.061Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2486000,
+        "spentCents": 1600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-04T15:25:53.061Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4115 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4115 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,860.00 against a quoted $1,860.00, within the 2.00% tolerance.",
+        "expected": "$1,860.00 ± $37.20",
+        "actual": "$1,860.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Ardent Materials and SKU AM-ALLOY-7 both match the accepted quote.",
+        "expected": "Ardent Materials / AM-ALLOY-7",
+        "actual": "Ardent Materials / AM-ALLOY-7"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,860.00 against $8,860.00 remaining in CC-OPS.",
+        "expected": "at most $8,860.00 remaining",
+        "actual": "$1,860.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4115 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_9c5fbe9b5c",
+      "last4": "9320",
+      "limitCents": 186000,
+      "expiresAt": "2026-08-15T15:25:53.061Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_034",
+    "createdAt": "2026-08-04T23:53:21.180Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4202",
+      "vendor": "Ardent Materials",
+      "sku": "AM-ALLOY-7",
+      "unitPrice": 31986,
+      "quantity": 21,
+      "quoteExpiry": "2026-08-24T23:53:21.180Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4202",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Ardent Materials",
+        "sku": "AM-ALLOY-7",
+        "unitPrice": 31000,
+        "quantity": 21,
+        "quoteExpiry": "2026-08-24T23:53:21.180Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2451000,
+        "spentCents": 600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-04T23:53:21.180Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4202 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4202 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": false,
+        "reason": "The card was requested for $6,717.06 but the accepted quote is $6,510.00, a difference of $207.06 (3.18%). Tolerance is 2.00%.",
+        "expected": "$6,510.00 ± $130.20",
+        "actual": "$6,717.06"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Ardent Materials and SKU AM-ALLOY-7 both match the accepted quote.",
+        "expected": "Ardent Materials / AM-ALLOY-7",
+        "actual": "Ardent Materials / AM-ALLOY-7"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$6,717.06 against $18,510.00 remaining in CC-ENG.",
+        "expected": "at most $18,510.00 remaining",
+        "actual": "$6,717.06"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4202 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_029",
+    "createdAt": "2026-08-05T07:37:02.663Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4189",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 147291,
+      "quantity": 26,
+      "quoteExpiry": "2026-09-01T07:37:02.663Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4189",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 26,
+        "quoteExpiry": "2026-09-01T07:37:02.663Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 6470000,
+        "spentCents": 1400000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T07:37:02.663Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4189 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4189 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $38,295.66 against a quoted $37,700.00, within the 2.00% tolerance.",
+        "expected": "$37,700.00 ± $754.00",
+        "actual": "$38,295.66"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$38,295.66 against $50,700.00 remaining in CC-ENG.",
+        "expected": "at most $50,700.00 remaining",
+        "actual": "$38,295.66"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4189 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_3572ac2c4",
+      "last4": "4558",
+      "limitCents": 3829566,
+      "expiresAt": "2026-09-01T07:37:02.663Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_013",
+    "createdAt": "2026-08-05T08:11:10.088Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4141",
+      "vendor": "Kestrel Components",
+      "sku": "KC-SEN-118",
+      "unitPrice": 8900,
+      "quantity": 35,
+      "quoteExpiry": "2026-08-18T08:11:10.088Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4141",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-SEN-118",
+        "unitPrice": 8900,
+        "quantity": 35,
+        "quoteExpiry": "2026-08-18T08:11:10.088Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 1511500,
+        "spentCents": 900000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T08:11:10.088Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4141 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4141 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $3,115.00 against a quoted $3,115.00, within the 2.00% tolerance.",
+        "expected": "$3,115.00 ± $62.30",
+        "actual": "$3,115.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-SEN-118 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-SEN-118",
+        "actual": "Kestrel Components / KC-SEN-118"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$3,115.00 against $6,115.00 remaining in CC-FAC.",
+        "expected": "at most $6,115.00 remaining",
+        "actual": "$3,115.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4141 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_aacc523f0",
+      "last4": "7587",
+      "limitCents": 311500,
+      "expiresAt": "2026-08-18T08:11:10.088Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_030",
+    "createdAt": "2026-08-05T09:11:24.680Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4190",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-SEAL-91",
+      "unitPrice": 3236,
+      "quantity": 35,
+      "quoteExpiry": "2026-08-20T09:11:24.680Z",
+      "costCentre": "CC-FAC"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4190",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-SEAL-91",
+        "unitPrice": 3200,
+        "quantity": 35,
+        "quoteExpiry": "2026-08-20T09:11:24.680Z"
+      },
+      "budget": {
+        "costCentre": "CC-FAC",
+        "limitCents": 3712000,
+        "spentCents": 2100000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T09:11:24.680Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4190 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4190 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,132.60 against a quoted $1,120.00, within the 2.00% tolerance.",
+        "expected": "$1,120.00 ± $22.40",
+        "actual": "$1,132.60"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-SEAL-91 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-SEAL-91",
+        "actual": "Nordhaven Supply Co / NH-SEAL-91"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,132.60 against $16,120.00 remaining in CC-FAC.",
+        "expected": "at most $16,120.00 remaining",
+        "actual": "$1,132.60"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4190 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_203969bfd1",
+      "last4": "6436",
+      "limitCents": 113260,
+      "expiresAt": "2026-08-20T09:11:24.680Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_044",
+    "createdAt": "2026-08-05T11:26:32.739Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4232",
+      "vendor": "Kestrel Components",
+      "sku": "KC-SEN-118",
+      "unitPrice": 8900,
+      "quantity": 28,
+      "quoteExpiry": "2026-08-25T11:26:32.739Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4232",
+        "status": "accepted",
+        "fulfilled": true,
+        "vendor": "Kestrel Components",
+        "sku": "KC-SEN-118",
+        "unitPrice": 8900,
+        "quantity": 28,
+        "quoteExpiry": "2026-08-25T11:26:32.739Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 2349200,
+        "spentCents": 1400000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T11:26:32.739Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4232 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": false,
+        "reason": "Purchase order PO-4232 is already fulfilled. Paying it again would be a duplicate spend.",
+        "expected": "an open, unfulfilled order line",
+        "actual": "already fulfilled"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $2,492.00 against a quoted $2,492.00, within the 2.00% tolerance.",
+        "expected": "$2,492.00 ± $49.84",
+        "actual": "$2,492.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-SEN-118 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-SEN-118",
+        "actual": "Kestrel Components / KC-SEN-118"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$2,492.00 against $9,492.00 remaining in CC-ENG.",
+        "expected": "at most $9,492.00 remaining",
+        "actual": "$2,492.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4232 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_000",
+    "createdAt": "2026-08-05T23:46:45.154Z",
+    "agent": "facilities-01",
+    "po": {
+      "poNumber": "PO-4102",
+      "vendor": "Bellweather Industrial",
+      "sku": "BW-CONV-90",
+      "unitPrice": 145000,
+      "quantity": 21,
+      "quoteExpiry": "2026-08-15T23:46:45.154Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4102",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Bellweather Industrial",
+        "sku": "BW-CONV-90",
+        "unitPrice": 145000,
+        "quantity": 21,
+        "quoteExpiry": "2026-08-15T23:46:45.154Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 6245000,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-05T23:46:45.154Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4102 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4102 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $30,450.00 against a quoted $30,450.00, within the 2.00% tolerance.",
+        "expected": "$30,450.00 ± $609.00",
+        "actual": "$30,450.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Bellweather Industrial and SKU BW-CONV-90 both match the accepted quote.",
+        "expected": "Bellweather Industrial / BW-CONV-90",
+        "actual": "Bellweather Industrial / BW-CONV-90"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$30,450.00 against $36,450.00 remaining in CC-OPS.",
+        "expected": "at most $36,450.00 remaining",
+        "actual": "$30,450.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4102 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_53481e8bef",
+      "last4": "8186",
+      "limitCents": 3045000,
+      "expiresAt": "2026-08-15T23:46:45.154Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_037",
+    "createdAt": "2026-08-06T02:15:01.438Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4211",
+      "vendor": "Verity Office Group",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 25724,
+      "quantity": 29,
+      "quoteExpiry": "2026-08-23T02:15:01.438Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4211",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 29,
+        "quoteExpiry": "2026-08-23T02:15:01.438Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 3522100,
+        "spentCents": 1700000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-06T02:15:01.438Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4211 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4211 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": false,
+        "reason": "The card was requested for $7,459.96 but the accepted quote is $7,221.00, a difference of $238.96 (3.31%). Tolerance is 2.00%.",
+        "expected": "$7,221.00 ± $144.42",
+        "actual": "$7,459.96"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-CHAIR-M4 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-CHAIR-M4",
+        "actual": "Verity Office Group / VO-CHAIR-M4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$7,459.96 against $18,221.00 remaining in CC-OPS.",
+        "expected": "at most $18,221.00 remaining",
+        "actual": "$7,459.96"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4211 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "refused",
+    "card": null,
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_014",
+    "createdAt": "2026-08-06T10:39:30.313Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4143",
+      "vendor": "Kestrel Components",
+      "sku": "KC-RLY-04",
+      "unitPrice": 15600,
+      "quantity": 8,
+      "quoteExpiry": "2026-08-29T10:39:30.313Z",
+      "costCentre": "CC-OPS"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4143",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Kestrel Components",
+        "sku": "KC-RLY-04",
+        "unitPrice": 15600,
+        "quantity": 8,
+        "quoteExpiry": "2026-08-29T10:39:30.313Z"
+      },
+      "budget": {
+        "costCentre": "CC-OPS",
+        "limitCents": 2424800,
+        "spentCents": 1900000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-06T10:39:30.313Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4143 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4143 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,248.00 against a quoted $1,248.00, within the 2.00% tolerance.",
+        "expected": "$1,248.00 ± $24.96",
+        "actual": "$1,248.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Kestrel Components and SKU KC-RLY-04 both match the accepted quote.",
+        "expected": "Kestrel Components / KC-RLY-04",
+        "actual": "Kestrel Components / KC-RLY-04"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,248.00 against $5,248.00 remaining in CC-OPS.",
+        "expected": "at most $5,248.00 remaining",
+        "actual": "$1,248.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4143 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_ac89759f7e",
+      "last4": "4359",
+      "limitCents": 124800,
+      "expiresAt": "2026-08-29T10:39:30.313Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_033",
+    "createdAt": "2026-08-07T12:14:08.279Z",
+    "agent": "procurement-02",
+    "po": {
+      "poNumber": "PO-4201",
+      "vendor": "Verity Office Group",
+      "sku": "VO-CHAIR-M4",
+      "unitPrice": 25283,
+      "quantity": 34,
+      "quoteExpiry": "2026-08-24T12:14:08.279Z",
+      "costCentre": "CC-MKT"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4201",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Verity Office Group",
+        "sku": "VO-CHAIR-M4",
+        "unitPrice": 24900,
+        "quantity": 34,
+        "quoteExpiry": "2026-08-24T12:14:08.279Z"
+      },
+      "budget": {
+        "costCentre": "CC-MKT",
+        "limitCents": 4146600,
+        "spentCents": 2600000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-07T12:14:08.279Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4201 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4201 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $8,596.22 against a quoted $8,466.00, within the 2.00% tolerance.",
+        "expected": "$8,466.00 ± $169.32",
+        "actual": "$8,596.22"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Verity Office Group and SKU VO-CHAIR-M4 both match the accepted quote.",
+        "expected": "Verity Office Group / VO-CHAIR-M4",
+        "actual": "Verity Office Group / VO-CHAIR-M4"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$8,596.22 against $15,466.00 remaining in CC-MKT.",
+        "expected": "at most $15,466.00 remaining",
+        "actual": "$8,596.22"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4201 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_630b07ba4d",
+      "last4": "5360",
+      "limitCents": 859622,
+      "expiresAt": "2026-08-24T12:14:08.279Z"
+    },
+    "seeded": true
+  },
+  {
+    "id": "dec_seed_023",
+    "createdAt": "2026-08-07T16:44:12.275Z",
+    "agent": "procurement-01",
+    "po": {
+      "poNumber": "PO-4171",
+      "vendor": "Nordhaven Supply Co",
+      "sku": "NH-SEAL-91",
+      "unitPrice": 3200,
+      "quantity": 37,
+      "quoteExpiry": "2026-08-20T16:44:12.275Z",
+      "costCentre": "CC-ENG"
+    },
+    "record": {
+      "quote": {
+        "poNumber": "PO-4171",
+        "status": "accepted",
+        "fulfilled": false,
+        "vendor": "Nordhaven Supply Co",
+        "sku": "NH-SEAL-91",
+        "unitPrice": 3200,
+        "quantity": 37,
+        "quoteExpiry": "2026-08-20T16:44:12.275Z"
+      },
+      "budget": {
+        "costCentre": "CC-ENG",
+        "limitCents": 3618400,
+        "spentCents": 2000000
+      },
+      "existingCard": null,
+      "observedAt": "2026-08-07T16:44:12.275Z"
+    },
+    "ruleVersion": 1,
+    "checks": [
+      {
+        "ruleId": "po-exists",
+        "label": "PO exists and is accepted",
+        "readFrom": "record.quote",
+        "passed": true,
+        "reason": "Purchase order PO-4171 is on record and accepted.",
+        "expected": "status accepted",
+        "actual": "status accepted"
+      },
+      {
+        "ruleId": "po-open",
+        "label": "PO still open and the quote has not expired",
+        "readFrom": "record.quote.fulfilled",
+        "passed": true,
+        "reason": "Purchase order PO-4171 is open and its quote is still valid.",
+        "expected": "open and unexpired",
+        "actual": "open and unexpired"
+      },
+      {
+        "ruleId": "amount-matches",
+        "label": "Amount matches the accepted quote",
+        "readFrom": "record.quote.unitPrice × quantity",
+        "passed": true,
+        "reason": "Requested $1,184.00 against a quoted $1,184.00, within the 2.00% tolerance.",
+        "expected": "$1,184.00 ± $23.68",
+        "actual": "$1,184.00"
+      },
+      {
+        "ruleId": "line-matches",
+        "label": "Vendor and SKU match the accepted quote",
+        "readFrom": "record.quote.vendor / .sku",
+        "passed": true,
+        "reason": "Vendor Nordhaven Supply Co and SKU NH-SEAL-91 both match the accepted quote.",
+        "expected": "Nordhaven Supply Co / NH-SEAL-91",
+        "actual": "Nordhaven Supply Co / NH-SEAL-91"
+      },
+      {
+        "ruleId": "within-budget",
+        "label": "Within the cost centre's remaining budget",
+        "readFrom": "record.budget",
+        "passed": true,
+        "reason": "$1,184.00 against $16,184.00 remaining in CC-ENG.",
+        "expected": "at most $16,184.00 remaining",
+        "actual": "$1,184.00"
+      },
+      {
+        "ruleId": "no-existing-card",
+        "label": "No card already issued for this PO",
+        "readFrom": "record.existingCard",
+        "passed": true,
+        "reason": "No card has been issued against PO-4171 yet.",
+        "expected": "no card yet for this PO",
+        "actual": "none"
+      }
+    ],
+    "outcome": "approved",
+    "card": {
+      "cardId": "card_212b3e3d75",
+      "last4": "4543",
+      "limitCents": 118400,
+      "expiresAt": "2026-08-20T16:44:12.275Z"
+    },
+    "seeded": true
+  }
+]
