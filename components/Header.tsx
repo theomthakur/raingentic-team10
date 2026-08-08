@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Badge } from "./ui";
 
 /**
@@ -25,7 +26,7 @@ export function Header({
             M
           </div>
           <div>
-            <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-ink-900">
+            <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
               Mandate
             </h1>
             <p className="mt-1.5 max-w-xl text-[14.5px] leading-relaxed text-muted">
@@ -47,19 +48,27 @@ export function Header({
             <Badge tone="neutral">policy v{ruleVersion}</Badge>
           </div>
 
-          <div className="flex items-center gap-2.5 rounded-full border border-edge bg-ink-50 py-1.5 pl-3 pr-3.5">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-ink-400">
-              Built for
-            </span>
-            <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-rain-600">
-              <span className="h-2 w-2 rounded-full bg-rain-500" />
-              Rain
-            </span>
-            <span className="text-ink-300">×</span>
-            <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-monad-700">
-              <span className="h-2 w-2 rounded-full bg-monad-500" />
-              Monad
-            </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/architecture"
+              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
+            >
+              System design →
+            </Link>
+            <div className="flex items-center gap-2.5 rounded-full border border-edge bg-ink-50 py-1.5 pl-3 pr-3.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-ink-400">
+                Built for
+              </span>
+              <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-rain-600">
+                <span className="h-2 w-2 rounded-full bg-rain-500" />
+                Rain
+              </span>
+              <span className="text-ink-300">×</span>
+              <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-monad-700">
+                <span className="h-2 w-2 rounded-full bg-monad-500" />
+                Monad
+              </span>
+            </div>
           </div>
         </div>
       </div>
