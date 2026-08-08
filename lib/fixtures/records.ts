@@ -92,6 +92,36 @@ export const SEED_QUOTES: QuoteRecord[] = [
     quantity: 30,
     quoteExpiry: "2026-09-30T23:59:59.000Z",
   },
+  // The same conveyor order, raised as two halves.
+  //
+  // This is the interesting attack, because nothing here is a lie: both quotes are real,
+  // both are accepted, and each is comfortably under the delegated limit. An agent that
+  // wanted to avoid a signature would not need to forge anything — it would just buy the
+  // thing twice. Only a rule that looks at the running total on the same vendor and cost
+  // centre sees it, which is why one check reads the pattern rather than the move.
+  {
+    poNumber: "PO-4424-A",
+    status: "accepted",
+    fulfilled: false,
+    vendor: "Bellweather Industrial",
+    sku: "BW-CONV-90",
+    unitPrice: 145_000,
+    // 13, not 15: each half must sit under procurement-02's own $20,000 authority, or
+    // agent-authority fires too and the refusal cites two rules instead of the one the
+    // demo exists to show. Only the running total should cross the line.
+    quantity: 13,
+    quoteExpiry: "2026-09-30T23:59:59.000Z",
+  },
+  {
+    poNumber: "PO-4424-B",
+    status: "accepted",
+    fulfilled: false,
+    vendor: "Bellweather Industrial",
+    sku: "BW-CONV-90",
+    unitPrice: 145_000,
+    quantity: 13,
+    quoteExpiry: "2026-09-30T23:59:59.000Z",
+  },
 ];
 
 /**
@@ -120,6 +150,8 @@ export const PO_COST_CENTRE: Record<string, string> = {
   "PO-4421": "CC-FAC",
   "PO-4422": "CC-OPS",
   "PO-4423": "CC-ENG",
+  "PO-4424-A": "CC-ENG",
+  "PO-4424-B": "CC-ENG",
 };
 
 export const AGENTS = ["procurement-01", "procurement-02", "facilities-01"] as const;

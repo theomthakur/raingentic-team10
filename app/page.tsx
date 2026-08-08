@@ -12,6 +12,7 @@ import type {
 import type { Stage } from "@/lib/pipeline";
 import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import { RunPanel } from "@/components/RunPanel";
+import { ChallengePanel } from "@/components/ChallengePanel";
 import { NegotiationPanel } from "@/components/NegotiationPanel";
 import { ApprovalInbox } from "@/components/ApprovalInbox";
 import { DecisionFeed } from "@/components/DecisionFeed";
@@ -131,9 +132,9 @@ export default function Page() {
 
   async function run(
     url: "/api/run" | "/api/purchase",
-    body: { taskId?: string; po?: PurchaseOrder },
+    body: { taskId?: string; po?: PurchaseOrder; agent?: string },
     taskId?: string
-  ) {
+  ): Promise<Decision | null> {
     setBusy(true);
     setRacing(true);
     setError(null);
@@ -158,12 +159,25 @@ export default function Page() {
       // puts the refusal and its four provenance fields on screen with no clicking.
       setSelectedId(decision.id);
       setTab("provenance");
+      return decision;
     } catch (err) {
       setError((err as Error).message);
       setRacing(false);
+      return null;
     } finally {
       setBusy(false);
     }
+  }
+
+  /**
+   * The challenge panel needs the decision back to score the attempt. Everything else —
+   * the stage reveal, the log, the provenance jump — is the same path a task takes, so
+   * there is no separate code for "the judge's attempt" that could behave differently.
+   */
+  async function attempt(po: PurchaseOrder, agent?: string): Promise<Decision> {
+    const decision = await run("/api/run", { po, agent });
+    if (!decision) throw new Error("The attempt could not be run.");
+    return decision;
   }
 
   async function approve(decisionId: string, by: string, note: string) {
@@ -335,6 +349,12 @@ export default function Page() {
               }}
             />
             <BudgetMeter budgets={state.budgets} />
+            <ChallengePanel
+              blankPO={state.blankPO}
+              rules={currentRuleSet.rules}
+              busy={busy}
+              onAttempt={attempt}
+            />
           </section>
 
           {/* right: audit one decision, or change the policy and re-judge all of them */}

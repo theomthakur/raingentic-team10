@@ -4,6 +4,43 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Beat the checks — hand the judge the attack
+
+From the Monad workshop's Split or Steal demo. Building a side game would have cost hours
+and blurred the thesis: Split or Steal solves untrusted parties with incentives, and this
+project's whole argument is that you don't need to trust anyone if claims are checked
+against the record. But the game-theory framing was worth taking.
+
+- **A challenge panel that invites you to break it.** A purchase order that would pass,
+  eleven checks in the way, and shortcuts for the obvious attacks. A judge who tries to get
+  money out and fails believes it far more than one who watches a scripted run succeed.
+- **"Defeated" is a deliberately hard bar.** A refusal is the check *working*. A check only
+  counts as defeated if a card is issued for an order that doesn't match the record — so
+  the headline counter reads zero and stays there. The second counter, checks you've run
+  into, is the one that moves.
+- Every attempt goes through **the same `/api/run` path a task takes**, so there is no
+  separate code for "the judge's attempt" that could behave differently.
+
+**The structuring check had no demo path at all.** It was built and tested but nothing in
+the UI could trigger it, because any deviation from a quote trips an earlier rule first. So
+`PO-4424-A` and `PO-4424-B` now exist: the same conveyor order raised as two halves.
+
+Sizing them took a second pass. At 15 units each half is $21,750, which is over
+`procurement-02`'s own $20,000 authority — so the refusal cited two rules and the point
+blurred. At 13 units each half is $18,850: comfortably inside that agent's authority, and
+only the $37,700 running total crosses the company limit. Now the first half is **approved
+with nothing against it**, and the second is held by `no-structuring` alone:
+
+> *"On its own this is $18,850.00, under the $25,000.00 limit — but $18,850.00 has already
+> gone to Bellweather Industrial…"*
+
+Both halves are genuine accepted quotes. Nothing is forged. That is exactly the point.
+
+- The architecture page now says why the last four checks exist: *every check assumes the
+  agent is playing to win; splitting a purchase isn't a lie, it's a strategy, so they check
+  the pattern rather than the move.*
+
+
 ## 2026-08-08 · Iteration 8 — make the deploy failure loud
 
 The likeliest way to lose the demo, and dangerous precisely because it works perfectly on

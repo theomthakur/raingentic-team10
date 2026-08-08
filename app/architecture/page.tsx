@@ -88,6 +88,15 @@ export default function ArchitecturePage() {
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
             The eleven checks that decide step 3
           </p>
+          {/* The framing that makes the last four checks make sense. Without it they look
+              like extra validation; with it they are the answer to a player who is trying
+              to win rather than trying to lie. */}
+          <p className="mb-3 max-w-2xl text-[14px] leading-relaxed text-ink-700">
+            Every check here assumes the agent is playing to win. Splitting a purchase to
+            duck an approval limit isn&apos;t a lie — every individual line is true — it&apos;s a
+            strategy. So the last four check the{" "}
+            <strong className="font-semibold text-ink-900">pattern</strong>, not the move.
+          </p>
           <Panel>
             <ul className="divide-y divide-edge">
               {CHECKS.map((c, i) => (
