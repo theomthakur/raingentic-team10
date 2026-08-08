@@ -46,7 +46,15 @@ export default function ArchitecturePage() {
             </span>
             ← Back to Mandate
           </Link>
-          <Badge tone="neutral">system design</Badge>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/presentation"
+              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
+            >
+              Presentation →
+            </Link>
+            <Badge tone="neutral">system design</Badge>
+          </div>
         </div>
       </header>
 
