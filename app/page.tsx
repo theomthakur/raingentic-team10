@@ -28,6 +28,7 @@ interface State {
   storage: "memory" | "postgres";
   rainWired: boolean;
   anchoringEnabled: boolean;
+  ephemeralInProduction: boolean;
   decisions: Decision[];
   ruleSets: RuleSet[];
   budgets: BudgetRecord[];
@@ -278,7 +279,17 @@ export default function Page() {
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
             1 · How it works
           </p>
-          <PipelineDiagram stages={stages} racing={racing} />
+          {/* The one failure that works perfectly on a laptop and breaks on the deployed
+          URL. Loud, because a quiet version of this warning is how it gets missed. */}
+      {state.ephemeralInProduction && (
+        <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-2.5 text-[13px] text-danger-700">
+          <strong>No database is configured on this deployment.</strong> The decision log
+          is in memory and will empty on the next cold start, which silently breaks replay.
+          Set <code className="font-mono">DATABASE_URL</code> and redeploy.
+        </div>
+      )}
+
+      <PipelineDiagram stages={stages} racing={racing} />
         </section>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">

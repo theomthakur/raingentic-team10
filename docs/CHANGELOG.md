@@ -4,6 +4,22 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 8 — make the deploy failure loud
+
+The likeliest way to lose the demo, and dangerous precisely because it works perfectly on
+a laptop either way.
+
+Vercel is serverless: module memory does not survive a cold start. Deployed without
+`DATABASE_URL` the decision log empties whenever the instance goes idle, so replay — the
+feature that cannot be cut — has nothing to replay. It looks fine when you test it and is
+empty when a judge opens the link ten minutes later.
+
+- The app now **says so on screen**, in red, when running in production with no database.
+  A quiet version of this warning is exactly how it would get missed.
+- [DEPLOY.md](DEPLOY.md) has the three-minute fix and a pre-demo checklist whose real
+  item is *"wait ten minutes, reload, are the decisions still there?"* — everything else
+  fails loudly; this one fails by looking empty.
+
 ## 2026-08-08 · Iteration 7 — idempotency under concurrency (a real bug, found and fixed)
 
 Fired two identical purchase requests at the same instant. **Both were approved and two
