@@ -71,6 +71,19 @@ export const AGENTS: Record<string, AgentPersona> = {
     face: "luca",
     description: "Runs the office-supplies negotiation: four sellers, one counter-offer round, cheapest qualifying bid wins. Luca never sees a price the negotiation didn't already settle.",
   },
+  // Purchases a person made by hand from the catalogue, rather than an agent raising them.
+  // Worth naming: a controller scanning the log should be able to tell at a glance which
+  // rows a human caused and which an agent did, and both go through identical checks.
+  catalog: {
+    id: "catalog",
+    name: "a person",
+    role: "Bought by hand from the catalogue",
+    dealsWith: "purchases someone made themselves",
+    why: "Not an agent at all. Ordering from the catalogue takes the same path through the same six checks, which is the point — the rules do not care who is asking.",
+    color: "#4b5160",
+    face: "generic",
+    description: "A purchase raised by a person on the catalogue page instead of by an agent. It runs the identical pipeline, so nothing is trusted more for having come from a human.",
+  },
   "cloud-compute": {
     id: "cloud-compute",
     name: "Cody",

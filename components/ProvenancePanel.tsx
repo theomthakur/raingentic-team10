@@ -3,53 +3,83 @@
 import type { CheckResult, Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
+import { departmentName, outcomeSummary, productName, ruleQuestion } from "@/lib/plain";
 import { generateReceipt } from "@/lib/receipt";
 import { Avatar } from "./Avatar";
 import { AgentTag } from "./AgentTag";
-import { Badge, Button, Dot, Empty, Panel } from "./ui";
+import { Badge, Button, Empty, Panel } from "./ui";
 
 /**
- * The audit view for one decision.
+ * The audit view for one decision, written for the person who has to sign off on it.
  *
- * The whole point is that a judge can settle any single decision in about five seconds
- * without asking a question: which rule failed, what it expected, what it got, and which
- * field of the record it read. Those four fields are the ones on screen, deliberately,
- * because the last time this work lived in the code it scored nothing.
+ * Three sections, deliberately in this order: what was bought, what happened and why, and
+ * then the evidence. Someone who only reads the first two paragraphs should still come
+ * away with the right answer; the codes and the raw snapshot are underneath for the
+ * auditor who needs to verify rather than understand.
  */
 
 function CheckRow({ check }: { check: CheckResult }) {
-  const state = check.skipped ? "skip" : check.passed ? "pass" : "fail";
   const failed = !check.passed && !check.skipped;
+  const escalated = check.escalates && !check.passed;
+
+  const mark = check.skipped
+    ? { glyph: "–", cls: "bg-ink-100 text-ink-400", word: "Not checked" }
+    : escalated
+      ? { glyph: "⏸", cls: "bg-amber-100 text-warn", word: "Needs a person" }
+      : check.passed
+        ? { glyph: "✓", cls: "bg-mint-100 text-mint-700", word: "Yes" }
+        : { glyph: "✕", cls: "bg-red-100 text-fail", word: "No" };
 
   return (
-    <li
-      className={`border-l-2 px-4 py-3 ${
-        failed ? "border-l-fail bg-red-50/60" : "border-l-transparent"
-      }`}
-    >
-      <div className="flex items-start gap-2.5">
-        <span className="mt-1.5">
-          <Dot state={state} />
+    <li className={`px-5 py-3 ${failed && !escalated ? "bg-red-50/50" : escalated ? "bg-amber-50/40" : ""}`}>
+      <div className="flex items-start gap-3">
+        <span
+          className={`mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${mark.cls}`}
+          title={mark.word}
+        >
+          {mark.glyph}
         </span>
+
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
-            <p className="text-[13px] font-medium text-ink-900">{check.label}</p>
-            <code className="shrink-0 font-mono text-[11px] text-ink-400">{check.ruleId}</code>
+            <p className="text-[13px] font-medium text-ink-900">{ruleQuestion(check.ruleId)}</p>
+            <span
+              className={`shrink-0 text-[12px] font-semibold ${
+                check.skipped
+                  ? "text-ink-400"
+                  : escalated
+                    ? "text-warn"
+                    : check.passed
+                      ? "text-mint-700"
+                      : "text-fail"
+              }`}
+            >
+              {mark.word}
+            </span>
           </div>
-          <p className={`mt-1 text-[13px] leading-snug ${failed ? "text-ink-900" : "text-muted"}`}>
+
+          <p className={`mt-0.5 text-[12.5px] leading-relaxed ${failed ? "text-ink-800" : "text-muted"}`}>
             {check.reason}
           </p>
 
-          {/* The four fields. Shown for failures; a passing check does not need auditing. */}
+          {/* The evidence, only where it decided something. */}
           {failed && (
-            <dl className="mt-2.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 border-t border-edge pt-2.5 font-mono text-[11px]">
-              <dt className="text-ink-400">expected</dt>
-              <dd className="tabular text-mint-700">{check.expected}</dd>
-              <dt className="text-ink-400">actual</dt>
-              <dd className="tabular text-fail">{check.actual}</dd>
-              <dt className="text-ink-400">read from</dt>
-              <dd className="text-ink-600">{check.readFrom}</dd>
-            </dl>
+            <table className="mt-2 w-full border-separate border-spacing-0 text-left">
+              <tbody className="font-mono text-[11px]">
+                <tr>
+                  <th className="w-24 py-0.5 pr-3 font-normal text-ink-400">Expected</th>
+                  <td className="tabular py-0.5 text-mint-700">{check.expected}</td>
+                </tr>
+                <tr>
+                  <th className="py-0.5 pr-3 font-normal text-ink-400">Got</th>
+                  <td className="tabular py-0.5 text-fail">{check.actual}</td>
+                </tr>
+                <tr>
+                  <th className="py-0.5 pr-3 font-normal text-ink-400">Read from</th>
+                  <td className="py-0.5 text-ink-500">{check.readFrom}</td>
+                </tr>
+              </tbody>
+            </table>
           )}
         </div>
       </div>
@@ -60,57 +90,82 @@ function CheckRow({ check }: { check: CheckResult }) {
 export function ProvenancePanel({ decision }: { decision: Decision | null }) {
   if (!decision) {
     return (
-      <Panel title="Provenance">
-        <Empty>Select a decision from the log to audit it.</Empty>
+      <Panel title="Why this was allowed, or wasn't">
+        <Empty>Pick a purchase from the list to see exactly how it was decided.</Empty>
       </Panel>
     );
   }
 
   const { po, record, checks, outcome } = decision;
   const total = poTotal(po);
-  const statusTone = outcome === "refused" ? "fail" : outcome === "held" ? "warn" : "pass";
+  const summary = outcomeSummary(outcome);
+  const tone = outcome === "approved" ? "pass" : outcome === "held" ? "warn" : "fail";
+  const answered = checks.filter((c) => !c.skipped).length;
+  const passed = checks.filter((c) => c.passed && !c.skipped).length;
 
   return (
     <Panel
-      title="Provenance"
+      title="Why this was allowed, or wasn't"
       right={
         <div className="flex items-center gap-2">
-          <Badge tone="neutral">policy v{decision.ruleVersion}</Badge>
-          <Badge tone={statusTone}>{outcome.toUpperCase()}</Badge>
+          <Badge tone={tone}>{summary.label}</Badge>
           <Button variant="ghost" onClick={() => generateReceipt(decision)}>
             Download PDF
           </Button>
         </div>
       }
     >
-      <div className="border-b border-edge px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <Avatar name={po.vendor} size={30} />
+      {/* 1 — what was bought */}
+      <div className="border-b border-edge px-5 py-4">
+        <div className="flex items-start gap-3">
+          <Avatar name={po.vendor} size={34} />
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-3">
-              <p className="font-mono text-sm text-ink-900">{po.poNumber}</p>
-              <p className="tabular font-mono text-sm text-ink-900">{money(total)}</p>
+              <p className="text-[15px] font-semibold text-ink-900">
+                {po.quantity} × {productName(po.sku)}
+              </p>
+              <p className="tabular font-mono text-[15px] font-semibold text-ink-900">
+                {money(total)}
+              </p>
             </div>
-            <p className="text-[13px] text-muted">
-              {po.quantity} × {po.sku} from {po.vendor} · {po.costCentre}
+            <p className="mt-0.5 text-[13px] text-muted">
+              from {po.vendor} · {money(po.unitPrice)} each · {departmentName(po.costCentre)} budget
             </p>
           </div>
         </div>
-        <div className="mt-2.5">
+
+        <div className="mt-3">
           <AgentTag id={decision.agent} />
         </div>
+      </div>
 
-        {decision.card ? (
-          <p className="mt-2 font-mono text-[11px] text-mint-700">
+      {/* 2 — what happened, in one sentence */}
+      <div
+        className={`border-b border-edge px-5 py-3.5 ${
+          outcome === "approved" ? "bg-mint-50/50" : outcome === "held" ? "bg-amber-50/50" : "bg-red-50/50"
+        }`}
+      >
+        <p className="text-[13.5px] font-semibold text-ink-900">{summary.label}</p>
+        <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-700">{summary.meaning}</p>
+
+        {/* The card details, where one exists. The no-card case is already covered by the
+            sentence above, so repeating it here would just be saying it twice. */}
+        {decision.card && (
+          <p className="mt-2 font-mono text-[11.5px] text-mint-700">
             card ••••{decision.card.last4} · limit {money(decision.card.limitCents)} · expires{" "}
             {shortDate(decision.card.expiresAt)}
           </p>
-        ) : (
-          // The sentence the whole architecture exists to make true.
-          <p className="mt-2 font-mono text-[11px] text-fail">
-            no card was created — there is nothing to decline
-          </p>
         )}
+      </div>
+
+      {/* 3 — the evidence */}
+      <div className="flex items-baseline justify-between gap-3 border-b border-edge bg-ink-50/60 px-5 py-2">
+        <p className="text-[11.5px] font-semibold uppercase tracking-wider text-muted">
+          The checks it had to pass
+        </p>
+        <p className="tabular font-mono text-[11.5px] text-ink-500">
+          {passed} of {answered} · policy v{decision.ruleVersion}
+        </p>
       </div>
 
       <ul className="divide-y divide-edge">
@@ -120,10 +175,14 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
       </ul>
 
       {/* The snapshot, not a pointer. This is what a replay re-judges. */}
-      <details className="border-t border-edge px-4 py-2.5">
+      <details className="border-t border-edge px-5 py-2.5">
         <summary className="cursor-pointer text-[12px] text-muted hover:text-ink-900">
-          Record snapshot as read at {record.observedAt.replace("T", " ").slice(0, 19)}
+          For auditors: the record exactly as it was read, {record.observedAt.replace("T", " ").slice(0, 19)}
         </summary>
+        <p className="mt-2 text-[11.5px] leading-relaxed text-muted">
+          Stored with the decision rather than looked up again later, so re-running this
+          judges the facts as they were at the time, not as they are now.
+        </p>
         <pre className="mt-2 max-h-64 overflow-auto rounded-lg bg-ink-50 p-3 font-mono text-[11px] leading-relaxed text-ink-600">
           {JSON.stringify(record, null, 2)}
         </pre>

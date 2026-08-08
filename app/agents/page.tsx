@@ -81,7 +81,8 @@ export default function AgentsPage() {
   // event see themselves at the top of the roster rather than three cards down.
   const ids = useMemo(() => {
     const hostOrder = { Rain: 0, Monad: 1, Encode: 2 } as const;
-    return Object.keys(AGENTS).sort((a, b) => {
+    // `catalog` is a person buying by hand, not an agent, so it stays off the roster.
+    return Object.keys(AGENTS).filter((k) => k !== "catalog").sort((a, b) => {
       const ha = AGENTS[a].host;
       const hb = AGENTS[b].host;
       if (ha && hb) return hostOrder[ha] - hostOrder[hb];

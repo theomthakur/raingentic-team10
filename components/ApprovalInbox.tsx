@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Decision } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
+import { departmentName, productName } from "@/lib/plain";
 import { Avatar } from "./Avatar";
 import { AgentTag } from "./AgentTag";
 import { Badge, Button, Panel } from "./ui";
@@ -42,7 +43,7 @@ export function ApprovalInbox({
 
   return (
     <Panel
-      title="Awaiting approval"
+      title="Waiting for someone to approve"
       right={
         <div className="flex items-center gap-2">
           {actionable.length > 0 && <Badge tone="warn">{actionable.length} to action</Badge>}
@@ -68,18 +69,18 @@ export function ApprovalInbox({
                 <Avatar name={d.po.vendor} size={26} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-3">
-                    <span className="flex min-w-0 items-baseline gap-2">
-                      <span className="truncate font-mono text-[13px] text-ink-900">
-                        {d.po.poNumber}
-                      </span>
-                      <span className="truncate text-[12px] text-muted">{d.po.vendor}</span>
+                    <span className="truncate text-[13.5px] font-medium text-ink-900">
+                      {d.po.quantity} × {productName(d.po.sku)}
                     </span>
-                    <span className="tabular shrink-0 font-mono text-[13px] font-semibold text-ink-900">
+                    <span className="tabular shrink-0 font-mono text-[13.5px] font-semibold text-ink-900">
                       {money(poTotal(d.po))}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-[12px] text-muted">
-                    {d.po.quantity} × {d.po.sku} · {d.po.costCentre} · {shortDate(d.createdAt)}
+                  <p className="mt-0.5 truncate text-[12.5px] text-muted">
+                    {d.po.vendor} · {departmentName(d.po.costCentre)} · {shortDate(d.createdAt)}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[10.5px] text-ink-300">
+                    {d.po.poNumber} · {d.po.sku}
                   </p>
                 </div>
               </div>
