@@ -56,7 +56,8 @@ exists*.
 
 ## 3. How it works
 
-Seven steps. Money only moves if step 3 passes.
+Eight stages. Money only moves if stage 4 passes — and for large purchases, only
+once a person has also said so.
 
 ```
  1  TASK        an agent is given a job to do
@@ -64,18 +65,22 @@ Seven steps. Money only moves if step 3 passes.
  3  PROPOSE     it declares the winning quote as a purchase order
  4  VERIFY      plain code checks that declaration against the real records
         |
-     pass │ fail
-        |     └──►  REFUSE — no card, ever. A plain-English reason. Written down.
+        ├── fails ──►  REFUSE   no card, ever. A plain-English reason. Written down.
+        |
+        ├── too big ─►  HOLD    everything checked out, but it needs a person.
+        |                       Still no card. A named human releases it, and
+        |                       every check runs again on fresh records.
         ▼
  5  ISSUE       Rain creates a card scoped to exactly this purchase order
  6  SETTLE      the purchase happens; the records are updated
- 7  RECORD      everything is filed permanently and can never be edited
+ 7  REVOKE      the card is retired — it existed for exactly this purchase
+ 8  RECORD      everything is filed permanently and can never be edited
 ```
 
 **There is no path in the code where a card gets made first and judged afterwards.** The
 refusal branch simply never reaches Rain.
 
-### The six checks
+### The seven checks
 
 Each one returns a sentence a human can act on — never "validation failed."
 
@@ -87,12 +92,82 @@ Each one returns a sentence a human can act on — never "validation failed."
 | 4 | Does the supplier **and the item** match the quote? | Right supplier, right total, **wrong item** |
 | 5 | Is there budget left? | Death by a thousand small, individually-fine purchases |
 | 6 | Has a card already been issued for this order? | Paying twice because something was retried |
+| 7 | Is it above the amount the agent may spend alone? | Large purchases going through with nobody looking |
 
 **Check 4 is worth pausing on.** A card company can limit the amount, the shop, the
 category, how often. It cannot tell you that you bought the *wrong item* from the *right
 shop* at the *right price* — because a card issuer has no idea your order system exists.
 
 **Check 6 is the one that carries the demo.** More on that below.
+
+**Check 7 is the answer to the question everyone asks first.** More on that immediately.
+
+### None of these rules were invented here
+
+Every one implements a control that finance departments already run. Rules 1–4 are a
+**three-way match**, the purchase-order / delivery / invoice cross-check every ERP ships.
+Rule 6 is an **idempotency key**. Rule 7 is a **delegation of authority matrix**.
+
+That matters more than it sounds. The honest answer to *"why should I trust software to
+spend my money?"* is not "our rules are clever." It is:
+
+> **These are the controls your finance team already runs. We moved them to before the
+> money is committed instead of after.**
+
+Each rule states its basis on screen and in the code. Sources in
+[CONTROLS.md](CONTROLS.md).
+
+---
+
+## 3b. "But there's no human in the loop"
+
+This is the first objection anyone raises, and it deserves a real answer rather than
+reassurance.
+
+### There is a human — above a limit you set
+
+No company gives an employee unlimited spending authority either. It gives **bounded
+autonomy with an escalation path**: approve up to $X alone, above that someone senior signs
+off. An agent gets exactly the same deal.
+
+Above the configured limit ($25,000 by default) a purchase is **held** — not refused. Every
+check passed; it is simply large enough that a person should look.
+
+**Three details that matter:**
+
+1. **No card exists while it waits.** Approving is what *creates* the instrument. A
+   rejected escalation has nothing to cancel, dispute or claw back.
+2. **The approver must be named.** An unattributed approval is not an approval — the whole
+   point of the control is that someone accepted responsibility.
+3. **Releasing re-runs every check** against fresh records. The world moves while things
+   sit in queues; approval is permission to proceed, not a promise the facts still hold.
+
+If two approvers both hit release, the second is refused — by rule 6, reading the record
+the first release wrote. Idempotency protecting a *human* race, not just a machine retry.
+
+### "Fine, but the AI could just decide it's allowed"
+
+It cannot. **There is no AI anywhere in the decision path.** The agent proposes; ordinary,
+readable, testable code decides. Most "AI safety" claims ask you to trust a model's
+judgement about a model. This one does not ask that at all.
+
+### "Then couldn't you just change the rules?"
+
+The sharpest version of the criticism, and the one that would make the audit worthless.
+
+So changing policy takes **two people**. A rule change is written down as a *pending*
+version that decides nothing, and **the person who wrote it cannot be the person who
+activates it** — segregation of duties, the same control that stops whoever raises an
+invoice from also paying it. Every version is kept, hashed, and can be published to a
+public chain, so it also cannot be backdated.
+
+| Your worry | The answer |
+|---|---|
+| No human is involved | There is, above a limit you set |
+| The AI decides what's allowed | It does not decide anything — it proposes |
+| The rules could be wrong | They're the three-way match you already run |
+| You could change the rules | Two people, and every version is kept and hashed |
+| Prove it | Change a rule and re-run all history against it |
 
 ### The two ideas that make it more than a script
 
@@ -128,13 +203,22 @@ nothing.
    filled and already has a card. Rain is never contacted.
 3. **Click the refusal.** Four fields: which rule failed, what it expected, what it got, and
    exactly which record it read. Anyone can audit it in five seconds.
-4. **Change a rule and hit replay.** See what that change would have done to all history.
-5. **Hand over the keyboard.** There's a form where anyone can write their own purchase
+4. **Run the capital purchase.** $43,500 of conveyor line. Everything checks out — and it
+   is **held**, not refused, because it is above what the agent may spend alone. No card
+   exists. Type a name, release it, and *that* is what creates the card.
+5. **Change a rule and hit replay.** *"Across 47 decisions, 8 approvals would now be
+   refused."* Each row shows what the rule expected before and after, and why it flipped.
+6. **Try to approve your own rule change.** Propose it under one name, then attempt to
+   activate it under the same name. Refused. Ask someone else to type their name instead.
+7. **Hand over the keyboard.** There's a form where anyone can write their own purchase
    order — change the supplier, the item, a single cent — and press issue. It goes through
    the identical code path. Nothing is special-cased for the demo.
 
 Step 2 is the important one. Most demos show a failure the team wrote in advance. Ours is
 caused by the first half of our own demo. It can't be staged, because nothing was staged.
+
+Steps 4 and 6 are the ones that answer *"why would I trust this?"* — and they answer it by
+being refused on stage, not by being asserted.
 
 ---
 
@@ -157,7 +241,7 @@ Status is marked honestly:
 | Card expiry is tied to the quote's expiry, so it can't outlive the job | ✅ |
 | One card per order line, with the order line as the key, so retries can't double-spend | ✅ |
 | Real calls to Rain's card-issuance API | 🟡 client written, endpoints need confirming on site |
-| Retire the card once the job is done | ⬜ needs confirming that the endpoint exists |
+| Retire the card once the job is done | ✅ built — `PATCH /issuing/cards/{id}` confirmed; the status value it accepts is the last unknown |
 
 **Why this is the strongest possible Rain submission:** most teams will either rebuild
 Rain's control layer or ignore it. We extend it. Rain answers *how much* and *where*. We
@@ -208,7 +292,8 @@ are genuinely solid — and one of the judges does agent orchestration for a liv
 |---|---|
 | Every rule version gets a fingerprint (SHA-256), stable and reproducible | ✅ |
 | Storage for the on-chain transaction reference, and the UI badge that shows it | ✅ |
-| **Writing that fingerprint to Monad testnet** | ⬜ **not built yet — the main gap** |
+| The transaction itself — sends `version + fingerprint` to Monad testnet | ✅ written and wired |
+| **Actually running it** | 🟡 **needs a testnet RPC URL and a funded key** |
 
 **Why Monad genuinely matters here, rather than being decoration:**
 
@@ -229,18 +314,41 @@ transaction?"* — honestly:
 
 That's a real engineering trade-off, said plainly, rather than a token on-chain gesture.
 
-**To close this gap:** hash → send → save the transaction reference. The fingerprint and the
-storage already exist ([lib/rules/hash.ts](../lib/rules/hash.ts), `store.setAnchor()`). It's
-one function and roughly one transaction per rule version.
+**How it's built.** A zero-value transaction to our own address, carrying the version
+number and fingerprint as its payload — no smart contract to deploy and none to get wrong.
+Only *active* policy versions can be anchored: publishing a pending one would assert a
+policy exists when nobody has approved it.
+
+**What's left:** a Monad testnet RPC URL and a funded testnet key. The code activates the
+moment those exist ([lib/monad/anchor.ts](../lib/monad/anchor.ts)). Without them the button
+is simply absent and everything else is unaffected — nothing in the decision path depends
+on the chain being reachable.
 
 ### Where we stand overall
 
 | Track | Ready to demo | Gap |
 |---|---|---|
-| Best use of Rain | Yes | Real card call — client written, needs endpoint confirmation |
+| Best use of Rain | Yes | Card issuance path and auth **confirmed against the live sandbox**; no collateral is linked yet, so cards have no spending power |
 | Agents move money | Yes | Same |
 | Agent negotiation | **Yes, fully** | None |
-| Monad bounty | Partly | The chain write itself |
+| Monad bounty | Yes, minus the send | A testnet RPC URL and a funded key |
+
+**What we confirmed against Rain's live sandbox**, rather than inferring from public docs
+— detail in [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md):
+
+- The auth header is `api-key`, not an `Authorization` bearer. The API named the header in
+  its own error message, so this is settled rather than guessed.
+- The whole surface lives under `/issuing`. Card creation is
+  `POST /issuing/users/{userId}/cards`.
+- Our KYC is approved and the account is active.
+- **No collateral contract is linked to the user**, so a card issued today has no spending
+  power behind it. That is the open question for a Rain engineer, and it is the one thing
+  standing between the current build and money genuinely moving.
+
+One thing worth showing a judge: creating a card with Rain's *minimum* body gives you an
+active card, **no spending limit, and a six-year expiry**. That is the exact instrument
+Mandate exists to prevent — and the contrast with a card scoped to one purchase order and
+expiring with its quote makes the argument better than any slide could.
 
 ---
 
@@ -268,16 +376,17 @@ disqualified under the event's own rules.
 
 | Where | What |
 |---|---|
-| [lib/checks/](../lib/checks/) | The six checks. No I/O, no AI, no clock-reading — the same input always gives the same answer |
+| [lib/checks/](../lib/checks/) | The seven checks. No I/O, no AI, no clock-reading — the same input always gives the same answer |
 | [lib/rules/](../lib/rules/) | Versioned rule data and the fingerprint that gets published to Monad |
 | [lib/replay/](../lib/replay/) | Re-judging past decisions against a different rule version |
 | [lib/store/](../lib/store/) | The permanent record. Postgres when deployed, memory locally |
 | [lib/negotiation.ts](../lib/negotiation.ts) | Competing suppliers, strategies, one counter-offer round |
+| [lib/monad/anchor.ts](../lib/monad/anchor.ts) | Publishing a policy version's fingerprint to Monad testnet |
 | [lib/rain-client.ts](../lib/rain-client.ts) | Everything that talks to Rain, in one place |
 | [lib/pipeline.ts](../lib/pipeline.ts) | The seven steps, in order |
 | [app/api/purchase/](../app/api/purchase/) | The full journey: negotiate → propose → verify → issue |
 
-**29 automated tests** cover the checks, the fingerprinting, and replay. They exist to prove
+**41 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
 the two claims the pitch rests on: that the same input always gives the same answer, and
 that every threshold lives in editable settings rather than in code.
 
@@ -303,3 +412,8 @@ makes it dangerous.**
 - Which is Rain's own principle, enforcement at issuance, applied one level up.
 - And because there's no AI in the checking step, we can re-run every past decision against
   a new rule and trust the difference.
+- Above a limit you set, a **named person** releases it — bounded autonomy, the same deal
+  a company gives an employee. No card exists while it waits, so approving is what creates
+  the instrument rather than reviewing one already out in the world.
+- And changing the rules takes **two people**, because whoever can raise a threshold could
+  otherwise approve anything.

@@ -28,6 +28,8 @@ import { diffRules } from "@/lib/rules/diff";
 interface State {
   storage: "memory" | "postgres";
   rainWired: boolean;
+  anchoringEnabled: boolean;
+  ephemeralInProduction: boolean;
   decisions: Decision[];
   ruleSets: RuleSet[];
   budgets: BudgetRecord[];
@@ -189,13 +191,47 @@ export default function Page() {
     }
   }
 
-  async function save() {
+  /** Write the edit down as the next version — pending, deciding nothing yet. */
+  async function propose(proposedBy: string) {
     if (!draftRules) return;
     setBusy(true);
     setError(null);
     try {
-      await post("/api/rules", { rules: draftRules, note: "Edited in the console" });
+      await post("/api/rules", {
+        rules: draftRules,
+        note: "Edited in the console",
+        proposedBy,
+      });
+      await load();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Publish a version's hash to Monad, so it has a timestamp we do not control. */
+  async function anchor(version: number) {
+    setBusy(true);
+    setError(null);
+    try {
+      await post("/api/anchor", { version });
+      await load();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** The second pair of eyes. Rejected server-side if it is the same person. */
+  async function activate(version: number, approvedBy: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      await post("/api/rules/activate", { version, approvedBy });
       const data = await load();
+      // Now that it decides things, show it as the working copy.
       setDraftRules(latest(data.ruleSets).rules);
     } catch (err) {
       setError((err as Error).message);
@@ -244,7 +280,17 @@ export default function Page() {
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
             1 · How it works
           </p>
-          <PipelineDiagram stages={stages} racing={racing} />
+          {/* The one failure that works perfectly on a laptop and breaks on the deployed
+          URL. Loud, because a quiet version of this warning is how it gets missed. */}
+      {state.ephemeralInProduction && (
+        <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-2.5 text-[13px] text-danger-700">
+          <strong>No database is configured on this deployment.</strong> The decision log
+          is in memory and will empty on the next cold start, which silently breaks replay.
+          Set <code className="font-mono">DATABASE_URL</code> and redeploy.
+        </div>
+      )}
+
+      <PipelineDiagram stages={stages} racing={racing} />
         </section>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
@@ -323,7 +369,10 @@ export default function Page() {
                   busy={busy}
                   onChange={setDraftRules}
                   onPreview={preview}
-                  onSave={save}
+                  onPropose={propose}
+                  onActivate={activate}
+                  onAnchor={anchor}
+                  anchoringEnabled={state.anchoringEnabled}
                   onRevert={(v) => {
                     const rs = state.ruleSets.find((r) => r.version === v);
                     if (rs) setDraftRules(rs.rules);
@@ -348,6 +397,16 @@ export default function Page() {
   );
 }
 
+/**
+ * The version that actually decides things: the highest **active** one.
+ *
+ * A pending version has a higher number but no authority — treating it as current would
+ * show the console governing by a policy nobody has approved yet, which is exactly the
+ * thing dual control exists to prevent.
+ */
 function latest(ruleSets: RuleSet[]): RuleSet {
-  return ruleSets.reduce((a, b) => (b.version > a.version ? b : a));
+  const active = ruleSets.filter((r) => r.status === "active");
+  return (active.length ? active : ruleSets).reduce((a, b) =>
+    b.version > a.version ? b : a
+  );
 }

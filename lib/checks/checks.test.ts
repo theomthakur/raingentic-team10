@@ -7,7 +7,7 @@
 import assert from "node:assert/strict";
 import type { PurchaseOrder, RecordSnapshot, Rule, RuleSet } from "@/lib/types";
 import { verify } from "@/lib/checks";
-import { defaultRuleSet, nextRuleSet } from "@/lib/rules/defaults";
+import { activateRuleSet, defaultRuleSet, nextRuleSet } from "@/lib/rules/defaults";
 import { hashRules } from "@/lib/rules/hash";
 import { replay } from "@/lib/replay";
 import { diffRules } from "@/lib/rules/diff";
@@ -278,6 +278,38 @@ test("a new version never mutates the one it came from", () => {
   assert.equal(JSON.stringify(RULES), before);
 });
 
+// --- dual control on policy changes ----------------------------------------
+
+test("a new version starts pending, not active", () => {
+  const v2 = nextRuleSet(RULES, RULES.rules, "tweak", "princy");
+  assert.equal(v2.status, "pending");
+  assert.equal(v2.proposedBy, "princy");
+  assert.equal(v2.approvedBy, undefined);
+});
+
+test("the author cannot approve their own policy change", () => {
+  const v2 = nextRuleSet(RULES, RULES.rules, "tweak", "princy");
+  assert.throws(() => activateRuleSet(v2, "princy"), /cannot also approve/);
+  // Case and padding must not be a way around it.
+  assert.throws(() => activateRuleSet(v2, "  PRINCY "), /cannot also approve/);
+});
+
+test("a second person can activate it, and is recorded", () => {
+  const v2 = nextRuleSet(RULES, RULES.rules, "tweak", "princy");
+  const active = activateRuleSet(v2, "om");
+  assert.equal(active.status, "active");
+  assert.equal(active.approvedBy, "om");
+  assert.ok(active.approvedAt);
+  // Activation must not quietly alter the policy it approves.
+  assert.equal(active.hash, v2.hash);
+  assert.deepEqual(active.rules, v2.rules);
+});
+
+test("an already-active version cannot be activated again", () => {
+  const v2 = activateRuleSet(nextRuleSet(RULES, RULES.rules, "tweak", "princy"), "om");
+  assert.throws(() => activateRuleSet(v2, "someone-else"), /already active/);
+});
+
 // --- replay over the committed history -------------------------------------
 
 const history = seeded as unknown as Decision[];
@@ -418,11 +450,70 @@ test("an unchanged policy produces an empty diff", () => {
   assert.deepEqual(diffRules(RULES.rules, RULES.rules), []);
 });
 
+// --- concurrency: idempotency as a property, not a claim ---------------------
+
+const asyncTests: [string, () => Promise<void>][] = [];
+function asyncTest(name: string, fn: () => Promise<void>) {
+  asyncTests.push([name, fn]);
+}
+
+asyncTest("two concurrent claims on the same order line: exactly one wins", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const results = await Promise.all(
+    Array.from({ length: 8 }, () => store.claimOrderLine("PO-RACE"))
+  );
+  assert.equal(
+    results.filter(Boolean).length,
+    1,
+    "exactly one caller may hold an order line"
+  );
+});
+
+asyncTest("different order lines do not block each other", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  const results = await Promise.all([
+    store.claimOrderLine("PO-A"),
+    store.claimOrderLine("PO-B"),
+    store.claimOrderLine("PO-C"),
+  ]);
+  assert.deepEqual(results, [true, true, true]);
+});
+
+asyncTest("a released line can be claimed again, so a failure is not a permanent lock", async () => {
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  assert.equal(await store.claimOrderLine("PO-RETRY"), true);
+  assert.equal(await store.claimOrderLine("PO-RETRY"), false);
+  await store.releaseOrderLine("PO-RETRY");
+  assert.equal(await store.claimOrderLine("PO-RETRY"), true);
+});
+
 // --- report ----------------------------------------------------------------
 
-if (failures.length) {
-  console.error(`\n✗ ${failures.length} failing, ${passed} passing\n`);
-  for (const f of failures) console.error(`  ✗ ${f}\n`);
-  process.exit(1);
+async function run() {
+  for (const [name, fn] of asyncTests) {
+    try {
+      await fn();
+      passed++;
+    } catch (err) {
+      failures.push(`${name}\n    ${(err as Error).message.split("\n")[0]}`);
+    }
+  }
+
+  if (failures.length) {
+    console.error(`\n✗ ${failures.length} failing, ${passed} passing\n`);
+    for (const f of failures) console.error(`  ✗ ${f}\n`);
+    process.exit(1);
+  }
+  console.log(`✓ ${passed} passing`);
 }
-console.log(`✓ ${passed} passing`);
+
+run();

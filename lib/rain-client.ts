@@ -123,8 +123,18 @@ export async function issueScopedCard(params: IssueCardParams): Promise<ScopedCa
 
 /** Design decision from RETHINK.md: deactivate once the job is done. Confirm the endpoint
  * exists before relying on it in the demo; if it doesn't, this stage is simply skipped. */
-export async function revokeCard(cardId: string): Promise<void> {
-  await rainFetch(`/cards/${cardId}`, { method: "DELETE" });
+/**
+ * Set a card's status. `PATCH /issuing/cards/{id}` is confirmed to exist against the live
+ * sandbox — `DELETE /cards/{id}`, which this used to call, returns 404.
+ *
+ * 🔴 The accepted status value is NOT yet confirmed: `"inactive"` returns 400. Ask a Rain
+ * engineer for the enum and set `RAIN_CARD_INACTIVE_STATUS` in `.env.local`.
+ */
+export async function setCardStatus(cardId: string, status: string): Promise<void> {
+  await rainFetch(`/issuing/cards/${cardId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
 }
 
 export async function listCards(): Promise<ScopedCard[]> {

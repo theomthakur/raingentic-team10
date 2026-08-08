@@ -4,6 +4,112 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Iteration 8 — make the deploy failure loud
+
+The likeliest way to lose the demo, and dangerous precisely because it works perfectly on
+a laptop either way.
+
+Vercel is serverless: module memory does not survive a cold start. Deployed without
+`DATABASE_URL` the decision log empties whenever the instance goes idle, so replay — the
+feature that cannot be cut — has nothing to replay. It looks fine when you test it and is
+empty when a judge opens the link ten minutes later.
+
+- The app now **says so on screen**, in red, when running in production with no database.
+  A quiet version of this warning is exactly how it would get missed.
+- [DEPLOY.md](DEPLOY.md) has the three-minute fix and a pre-demo checklist whose real
+  item is *"wait ten minutes, reload, are the decisions still there?"* — everything else
+  fails loudly; this one fails by looking empty.
+
+## 2026-08-08 · Iteration 7 — idempotency under concurrency (a real bug, found and fixed)
+
+Fired two identical purchase requests at the same instant. **Both were approved and two
+cards were issued.** Rule 6 only ever protected the sequential case: both requests took
+their snapshot before either wrote a card, so both honestly read "no card yet" — they
+just read it a moment too early.
+
+This is exactly what a judge who builds high-throughput transactional systems would probe
+first, and the pitch claims idempotency out loud, so the claim had to become a property.
+
+- **The order line is now reserved before anything is created.** `claimOrderLine` is
+  atomic: in Postgres a primary-key insert with `on conflict do nothing ... returning`, so
+  two concurrent callers cannot both win; in memory a check-and-set with no `await`
+  between the two halves, since an await there would reopen the exact window it closes.
+- The losing request is **refused with a reason that says what really happened**, rather
+  than the stale check that passed a moment earlier.
+- A failed issuance **releases the line**, so a transient error is not a permanent lock.
+- Re-verified: two simultaneous identical requests now produce **exactly one card**.
+- Three concurrency tests added. 44 passing.
+
+In payments this is not hypothetical — it is a double-click, a retried webhook, two queue
+workers draining the same job.
+
+## 2026-08-08 · Iteration 6 — stage 7 REVOKE, the card dies
+
+Rain's own framing is that an agent's card is *"retired automatically once the job is
+done."* Every team this weekend will demo a card being born. Nobody will demo one dying.
+
+- After settlement the card is retired, and the trace now runs the whole lifecycle:
+  `NEGOTIATE → PROPOSE → VERIFY → ISSUE → SETTLE → REVOKE → RECORD`.
+- It pre-empts *"what stops the agent reusing the card"* without having to argue: the
+  instrument exists for exactly the duration of the obligation and not a minute longer.
+- A retired card **still blocks re-issuance** (`countRevoked`), so the run-it-twice refusal
+  is unaffected — the obligation was met once, and that does not become untrue.
+- `DELETE /cards/{id}`, which the client used to call, returns 404. Replaced with the
+  confirmed `PATCH /issuing/cards/{id}`.
+- 🔴 **The accepted status value is still unknown** — `"inactive"` returns 400. It is
+  isolated to `RAIN_CARD_INACTIVE_STATUS`: ask a Rain engineer, put the answer in
+  `.env.local`, and real revocation starts working with no code change. Until then cards
+  retire locally and the UI says *simulated* rather than claiming a revocation that did
+  not happen. A card that genuinely could not be retired reports a failed stage.
+
+## 2026-08-08 · Iteration 5 — the Monad anchor, built and inert
+
+The last unsatisfied track. Written in full and wired to the UI; it activates the moment
+`MONAD_RPC_URL` and `MONAD_PRIVATE_KEY` exist. Nothing else depends on it — a rule version
+works identically unanchored, it simply carries a weaker claim.
+
+- **`anchorRuleVersion()`** sends a zero-value transaction to the sender's own address
+  with `version || sha256(rules)` as calldata. No contract to deploy and none to get
+  wrong; the payload is the point, and it is a real transaction either way.
+- **Why the rule version, not every decision.** Replay proves the rules are data. It does
+  not prove they were not rewritten afterwards to fit a history someone already had, and
+  "trust our timestamps" is no answer because the timestamps are ours. An independent
+  existence proof closes that. Remove it and a specific sentence in the pitch stops being
+  true — which is the test for whether the chain is structural or decorative.
+- **The honest Monad argument:** you *have* to anchor the versions or the audit claim
+  collapses, and that is a handful of writes. You also *want* every decision, and there
+  are thousands. At 50 cents a write you would anchor the rules and give up the decisions.
+  Only somewhere this cheap lets you afford both.
+- Only **active** versions can be anchored — publishing a pending one would assert that a
+  policy exists when nobody has approved it.
+- Verified inert without credentials: `anchoringEnabled: false`, a clear 501, and the rest
+  of the app entirely unaffected.
+
+**To switch it on:** a Monad testnet RPC URL and a funded testnet key in `.env.local`.
+
+## 2026-08-08 · Iteration 4 — dual control on policy changes
+
+Closes the sharpest criticism of replay: *"you can edit the rules, so the audit proves
+nothing."* Whoever can raise a threshold could otherwise approve anything.
+
+- **A new version is written as `pending` and decides nothing** until someone other than
+  its author activates it. Segregation of duties, the same control that stops the person
+  raising an invoice from also paying it.
+- **The author cannot approve their own change**, and case and padding are not a way
+  around it. Enforced in `activateRuleSet`, not in the UI, so a direct API call cannot
+  walk around it either.
+- `latestRuleSet()` returns the highest **active** version everywhere — store, API and UI.
+  Verified: while v2 sat pending, purchases still ran under v1; the moment a second person
+  activated it, they ran under v2.
+- One pending change at a time. Two competing drafts would make "which policy is next"
+  ambiguous, and the point of this is that the answer never is.
+- **Previewing a change stays ungated** — seeing what an edit would do to history is
+  exactly what an approver needs before deciding, so gating it behind approval would be
+  backwards.
+- Version history shows proposer, approver and pending state. 41 tests passing.
+
+Working on branch `iterations` from here; merge to `main` at the end.
+
 ## 2026-08-08 · Iteration 3 — human oversight, and controls that cite their source
 
 Answers the first objection anyone raises: *"no human is in the loop, why would I trust

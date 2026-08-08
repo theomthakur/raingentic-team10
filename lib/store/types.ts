@@ -18,8 +18,15 @@ export interface Store {
   // --- rule versions (append-only, never mutated) -------------------------
   listRuleSets(): Promise<RuleSet[]>;
   getRuleSet(version: number): Promise<RuleSet | null>;
+  /**
+   * The version that actually decides things: the highest **active** one. A pending
+   * version has been written down but not yet activated by a second person, and until
+   * then it must not affect a single purchase.
+   */
   latestRuleSet(): Promise<RuleSet>;
   appendRuleSet(ruleSet: RuleSet): Promise<RuleSet>;
+  /** Replace a pending version with its activated self. */
+  activateRuleSet(ruleSet: RuleSet): Promise<void>;
   setAnchor(version: number, txHash: string): Promise<void>;
 
   // --- decision log (append-only, never mutated) --------------------------
@@ -46,6 +53,20 @@ export interface Store {
    * The write-back that makes the run-it-twice demo real rather than staged. Once a card
    * exists against a PO, the next identical run reads it and rule 6 refuses.
    */
+  /**
+   * Atomically reserve an order line for issuance. Returns false if someone else already
+   * holds it.
+   *
+   * Rule 6 alone is not enough under concurrency: two identical requests both take their
+   * snapshot before either writes a card, so both see "no card yet" and both issue. The
+   * check is honest about what it read — it just read it a moment too early. This closes
+   * that window, and it is the difference between idempotency as a claim and idempotency
+   * as a property.
+   */
+  claimOrderLine(poNumber: string): Promise<boolean>;
+  /** Give the line back when issuance failed, so a retry is not locked out forever. */
+  releaseOrderLine(poNumber: string): Promise<void>;
+
   recordIssuedCard(card: IssuedCardRecord): Promise<void>;
   chargeBudget(costCentre: string, cents: number): Promise<void>;
   markFulfilled(poNumber: string): Promise<void>;

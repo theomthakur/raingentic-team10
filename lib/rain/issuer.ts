@@ -79,3 +79,34 @@ export async function issueCard(req: IssueRequest): Promise<IssuedCard> {
     return simulate(req);
   }
 }
+
+/**
+ * Stage 7 — retire the card once the obligation behind it is done.
+ *
+ * Rain's own framing is that an agent's card is "retired automatically once the job is
+ * done." Every team this weekend will demo a card being born; this is the other half. It
+ * also pre-empts "what stops the agent reusing the card" without having to argue: the
+ * instrument exists for exactly the duration of the obligation and not a minute longer.
+ *
+ * 🔴 `RAIN_CARD_INACTIVE_STATUS` is the one unknown. `PATCH /issuing/cards/{id}` exists
+ * and accepts a body, but `{"status":"inactive"}` returns 400, so the accepted enum value
+ * has not been confirmed. Ask a Rain engineer, put the answer in `.env.local`, and this
+ * starts working with no code change. Until then a simulated card is retired locally and
+ * the UI says so rather than claiming a revocation that did not happen.
+ */
+export async function revokeCard(cardId: string): Promise<{ revoked: boolean; simulated: boolean }> {
+  const status = process.env.RAIN_CARD_INACTIVE_STATUS;
+
+  if (!process.env.RAIN_API_KEY || !status || cardId.startsWith("sim_")) {
+    return { revoked: true, simulated: true };
+  }
+
+  try {
+    const { setCardStatus } = await import("@/lib/rain-client");
+    await setCardStatus(cardId, status);
+    return { revoked: true, simulated: false };
+  } catch {
+    // A card we could not retire is worth knowing about — do not report success.
+    return { revoked: false, simulated: false };
+  }
+}

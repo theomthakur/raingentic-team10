@@ -124,6 +124,16 @@ export interface Rule {
   basis: string;
 }
 
+/**
+ * A version is proposed by one person and activated by another.
+ *
+ * Editing the rules is the most powerful action in the system — whoever can raise a
+ * threshold can approve anything. Without a second pair of eyes, the honest criticism of
+ * replay is "you can change the rules, so the audit proves nothing". Segregation of duties
+ * is the standard answer, and it is what makes the version history worth trusting.
+ */
+export type RuleSetStatus = "pending" | "active";
+
 export interface RuleSet {
   version: number;
   createdAt: string;
@@ -134,6 +144,12 @@ export interface RuleSet {
   hash: string;
   /** Monad testnet tx hash, once anchored. Owned by A, stored here. */
   anchorTxHash?: string;
+
+  status: RuleSetStatus;
+  /** Who wrote the change. Cannot be the same person who activates it. */
+  proposedBy: string;
+  approvedBy?: string;
+  approvedAt?: string;
 }
 
 // ---------------------------------------------------------------------------

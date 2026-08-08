@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
+import { anchoringEnabled } from "@/lib/monad/anchor";
 import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
 
@@ -20,6 +21,13 @@ export async function GET() {
   return NextResponse.json({
     storage: store.kind,
     rainWired: Boolean(process.env.RAIN_API_KEY),
+    anchoringEnabled: anchoringEnabled(),
+    // Deployed with no database: the log lives in serverless memory and empties on the
+    // next cold start, so replay silently breaks on the exact URL we submit. It works
+    // perfectly on a laptop either way, which is what makes it dangerous — so say it
+    // loudly on screen rather than discovering it in front of a judge.
+    ephemeralInProduction:
+      store.kind === "memory" && process.env.NODE_ENV === "production",
     decisions,
     ruleSets,
     budgets: budgets.filter(Boolean),

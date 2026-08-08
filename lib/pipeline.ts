@@ -1,14 +1,21 @@
-import type { Approval, Decision, NegotiationSummary, PurchaseOrder } from "@/lib/types";
+import type {
+  Approval,
+  CheckResult,
+  Decision,
+  NegotiationSummary,
+  PurchaseOrder,
+} from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
-import { issueCard } from "@/lib/rain/issuer";
+import { issueCard, revokeCard } from "@/lib/rain/issuer";
 import { getStore, snapshot } from "@/lib/store";
 
 /**
- * The six stages, in order, as one function.
+ * The stages, in order, as one function.
  *
- * The shape of this file is the architecture diagram: PROPOSE, VERIFY, then ISSUE only
- * on the pass branch. There is no code path where a card is created and then judged.
+ * The shape of this file is the architecture diagram: PROPOSE, VERIFY, then ISSUE only on
+ * the pass branch. There is no code path where a card is created and then judged, and no
+ * path where a card outlives the obligation that justified it.
  */
 
 export type StageName =
@@ -20,6 +27,7 @@ export type StageName =
   | "REFUSE"
   | "ISSUE"
   | "SETTLE"
+  | "REVOKE"
   | "RECORD";
 
 export interface Stage {
@@ -141,8 +149,45 @@ export async function runPipeline(
     return { decision, stages };
   }
 
+  // Reserve the order line before creating anything.
+  //
+  // Rule 6 is honest about what it read — it just read it a moment too early. Two
+  // identical requests arriving together both snapshot before either writes, so both see
+  // "no card yet" and both would issue. In payments that is not hypothetical; it is a
+  // double-click, a retried webhook, two queue workers. The claim closes the window, and
+  // it is what makes idempotency a property rather than a claim.
+  if (!(await store.claimOrderLine(po.poNumber))) {
+    const clash: CheckResult = {
+      ruleId: "no-existing-card",
+      label: "No card already issued for this PO",
+      passed: false,
+      reason: `Another request is already issuing a card for ${po.poNumber}. Exactly one card exists per order line, even when two requests arrive at the same instant.`,
+      expected: "sole claim on this order line",
+      actual: "another request holds it",
+      readFrom: "store.claimOrderLine",
+    };
+    stages.push({ name: "REFUSE", detail: clash.reason, ok: false });
+    const decision: Decision = {
+      ...base,
+      outcome: "refused",
+      card: null,
+      // Record what actually decided it, not the stale check that passed a moment ago.
+      checks: base.checks.map((c) => (c.ruleId === clash.ruleId ? clash : c)),
+    };
+    await store.appendDecision(decision);
+    stages.push({ name: "RECORD", detail: `Refusal written to the log as ${decision.id}`, ok: true });
+    return { decision, stages };
+  }
+
   // 4 ISSUE — a card scoped to exactly the approved amount, expiring with the quote.
-  const card = await issueCard({ po, limitCents: total });
+  let card: Awaited<ReturnType<typeof issueCard>>;
+  try {
+    card = await issueCard({ po, limitCents: total });
+  } catch (err) {
+    // Give the line back, or a transient failure would lock it out forever.
+    await store.releaseOrderLine(po.poNumber);
+    throw err;
+  }
   stages.push({
     name: "ISSUE",
     detail: `Card ••••${card.last4} issued, limit ${(total / 100).toFixed(2)}, expires ${card.expiresAt.slice(0, 10)}${card.simulated ? " (simulated)" : ""}`,
@@ -163,7 +208,28 @@ export async function runPipeline(
     ok: true,
   });
 
-  // 6 RECORD — append-only, never updated in place.
+  // 7 REVOKE — the obligation is discharged, so the instrument stops existing as a live
+  // thing. Everyone will demo a card being born; this is the other half, and it answers
+  // "what stops the agent reusing it" without needing to argue the point.
+  const revokedAt = new Date().toISOString();
+  const { revoked, simulated } = await revokeCard(card.cardId);
+  if (revoked) {
+    await store.revokeCard(po.poNumber, revokedAt);
+    stages.push({
+      name: "REVOKE",
+      detail: `Card ••••${card.last4} retired — it existed for exactly this purchase${simulated ? " (simulated)" : ""}`,
+      ok: true,
+    });
+  } else {
+    // Say so rather than claiming a revocation that did not happen.
+    stages.push({
+      name: "REVOKE",
+      detail: `Could not retire card ••••${card.last4} — it is still live`,
+      ok: false,
+    });
+  }
+
+  // 8 RECORD — append-only, never updated in place.
   const decision: Decision = {
     ...base,
     outcome: "approved",

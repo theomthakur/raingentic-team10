@@ -77,16 +77,51 @@ export function defaultRuleSet(): RuleSet {
     note: "Initial policy",
     rules: DEFAULT_RULES,
     hash: hashRules(DEFAULT_RULES),
+    // The baseline policy is active by definition — there was nothing before it to
+    // segregate duties against.
+    status: "active",
+    proposedBy: "system",
+    approvedBy: "system",
+    approvedAt: new Date("2026-08-08T09:00:00.000Z").toISOString(),
   };
 }
 
-/** Build the next version from an edited rule list. The old version is never touched. */
-export function nextRuleSet(previous: RuleSet, rules: Rule[], note: string): RuleSet {
+/**
+ * Build the next version from an edited rule list. The old version is never touched, and
+ * the new one starts **pending** — it does not decide anything until someone other than
+ * its author activates it.
+ */
+export function nextRuleSet(
+  previous: RuleSet,
+  rules: Rule[],
+  note: string,
+  proposedBy = "unattributed"
+): RuleSet {
   return {
     version: previous.version + 1,
     createdAt: new Date().toISOString(),
     note: note || `Revision of v${previous.version}`,
     rules,
     hash: hashRules(rules),
+    status: "pending",
+    proposedBy,
+  };
+}
+
+/** Activate a pending version. The author may not be the approver. */
+export function activateRuleSet(pending: RuleSet, approvedBy: string): RuleSet {
+  if (pending.status === "active") {
+    throw new Error(`Policy v${pending.version} is already active.`);
+  }
+  if (approvedBy.trim().toLowerCase() === pending.proposedBy.trim().toLowerCase()) {
+    throw new Error(
+      `${pending.proposedBy} proposed v${pending.version} and cannot also approve it. That is the point of the control.`
+    );
+  }
+  return {
+    ...pending,
+    status: "active",
+    approvedBy: approvedBy.trim(),
+    approvedAt: new Date().toISOString(),
   };
 }

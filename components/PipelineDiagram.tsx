@@ -21,14 +21,19 @@ const PROPOSE: Node = { key: "PROPOSE", n: 1, label: "Propose", hint: "agent dec
 const VERIFY: Node = { key: "VERIFY", n: 2, label: "Verify", hint: "checked against the record" };
 const ISSUE: Node = { key: "ISSUE", n: 3, label: "Issue", hint: "Rain issues a scoped card" };
 const REFUSE: Node = { key: "REFUSE", n: 3, label: "Refuse", hint: "no card is ever created" };
+const HOLD: Node = { key: "HOLD", n: 3, label: "Hold", hint: "waiting on a person" };
 const SETTLE: Node = { key: "SETTLE", n: 4, label: "Settle", hint: "the purchase happens" };
-const RECORD: Node = { key: "RECORD", n: 5, label: "Record", hint: "written, append-only" };
+const REVOKE: Node = { key: "REVOKE", n: 5, label: "Revoke", hint: "the card is retired" };
+const RECORD: Node = { key: "RECORD", n: 6, label: "Record", hint: "written, append-only" };
 
-type NodeState = "idle" | "pass" | "fail" | "skipped";
+type NodeState = "idle" | "pass" | "fail" | "held" | "skipped";
 
 function stateFor(stages: Stage[], key: Stage["name"]): NodeState {
   const s = stages.find((x) => x.name === key);
   if (!s) return stages.length > 0 ? "skipped" : "idle";
+  // A hold is not a failure — it is the escalation path, and colouring it red would say
+  // the purchase was wrong when it was only large.
+  if (key === "HOLD") return "held";
   return s.ok ? "pass" : "fail";
 }
 
@@ -37,6 +42,7 @@ function NodeBubble({ node, state }: { node: Node; state: NodeState }) {
     idle: "border-edge bg-white text-ink-400",
     pass: "border-mint-500 bg-mint-50 text-mint-700 animate-pop",
     fail: "border-fail bg-red-50 text-fail animate-pop",
+    held: "border-warn bg-amber-50 text-warn animate-pop",
     skipped: "border-edge bg-ink-50 text-ink-300",
   };
   return (
@@ -44,7 +50,7 @@ function NodeBubble({ node, state }: { node: Node; state: NodeState }) {
       <div
         className={`flex h-11 w-11 items-center justify-center rounded-full border-2 font-mono text-[13px] font-bold transition-all duration-300 ${styles[state]}`}
       >
-        {state === "pass" ? "✓" : state === "fail" ? "✕" : node.n}
+        {state === "pass" ? "✓" : state === "fail" ? "✕" : state === "held" ? "⏸" : node.n}
       </div>
       <div>
         <p
@@ -85,12 +91,16 @@ function ThinkingBubble() {
 
 export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; racing?: boolean }) {
   const refused = stages.some((s) => s.name === "REFUSE");
-  const branch = refused ? REFUSE : ISSUE;
+  const held = stages.some((s) => s.name === "HOLD");
+  const branch = refused ? REFUSE : held ? HOLD : ISSUE;
+  // Both a refusal and a hold stop before any money moves, so everything downstream of
+  // the branch is greyed rather than shown as having run.
+  const stopsEarly = refused || held;
   const running = stages.length === 0 && !racing;
 
   // Which named node is the race currently sitting on, i.e. the last one revealed so far,
   // used only to decide where the thinking bubble goes while more are still to come.
-  const order: Stage["name"][] = ["PROPOSE", "VERIFY", branch.key, "SETTLE", "RECORD"];
+  const order: Stage["name"][] = ["PROPOSE", "VERIFY", branch.key, "SETTLE", "REVOKE", "RECORD"];
   const revealedTo = stages.length ? order.indexOf(stages[stages.length - 1].name) : -1;
   const stillRacing = racing && revealedTo < order.length - 1;
 
@@ -102,7 +112,11 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
         </p>
         {!running && !stillRacing && (
           <p className="text-[12px] font-medium text-ink-600">
-            {refused ? "Refused before a card could exist" : "Approved and issued end to end"}
+            {refused
+              ? "Refused before a card could exist"
+              : held
+                ? "Held for a person — no card exists yet"
+                : "Approved, issued, settled and retired"}
           </p>
         )}
         {stillRacing && <p className="text-[12px] font-medium text-rain-600">Working through it…</p>}
@@ -122,11 +136,17 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
         ) : (
           <NodeBubble node={branch} state={stateFor(stages, branch.key)} />
         )}
-        <Arrow dim={running || refused} />
-        {stillRacing && !refused && revealedTo === order.indexOf("SETTLE") - 1 ? (
+        <Arrow dim={running || stopsEarly} />
+        {stillRacing && !stopsEarly && revealedTo === order.indexOf("SETTLE") - 1 ? (
           <ThinkingBubble />
         ) : (
-          <NodeBubble node={SETTLE} state={refused ? "skipped" : stateFor(stages, "SETTLE")} />
+          <NodeBubble node={SETTLE} state={stopsEarly ? "skipped" : stateFor(stages, "SETTLE")} />
+        )}
+        <Arrow dim={running || stopsEarly} />
+        {stillRacing && !stopsEarly && revealedTo === order.indexOf("REVOKE") - 1 ? (
+          <ThinkingBubble />
+        ) : (
+          <NodeBubble node={REVOKE} state={stopsEarly ? "skipped" : stateFor(stages, "REVOKE")} />
         )}
         <Arrow dim={running} />
         {stillRacing && revealedTo === order.length - 2 ? (

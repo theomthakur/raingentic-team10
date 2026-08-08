@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Rule, RuleSet } from "@/lib/types";
 import { Badge, Button, Panel } from "./ui";
 
@@ -73,8 +74,11 @@ export function RuleEditor({
   busy,
   onChange,
   onPreview,
-  onSave,
+  onPropose,
+  onActivate,
+  onAnchor,
   onRevert,
+  anchoringEnabled = false,
 }: {
   rules: Rule[];
   ruleSets: RuleSet[];
@@ -83,9 +87,16 @@ export function RuleEditor({
   busy: boolean;
   onChange: (rules: Rule[]) => void;
   onPreview: () => void;
-  onSave: () => void;
+  onPropose: (proposedBy: string) => void;
+  onActivate: (version: number, approvedBy: string) => void;
+  onAnchor: (version: number) => void;
   onRevert: (version: number) => void;
+  anchoringEnabled?: boolean;
 }) {
+  const [proposer, setProposer] = useState("");
+  const [approver, setApprover] = useState("");
+  const pending = ruleSets.find((r) => r.status === "pending");
+
   const update = (id: string, patch: Partial<Rule>) =>
     onChange(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -141,14 +152,62 @@ export function RuleEditor({
         ))}
       </ul>
 
-      <div className="flex items-center gap-2 border-t border-edge px-4 py-2.5">
+      <div className="flex flex-wrap items-center gap-2 border-t border-edge px-4 py-2.5">
         <Button onClick={onPreview} disabled={busy} variant="primary">
           Replay against history
         </Button>
-        <Button onClick={onSave} disabled={busy || !dirty}>
-          Save as v{current.version + 1}
-        </Button>
+        {pending ? (
+          <span className="text-[12px] text-muted">
+            v{pending.version} is waiting for approval — one change at a time.
+          </span>
+        ) : (
+          <>
+            <input
+              value={proposer}
+              onChange={(e) => setProposer(e.target.value)}
+              placeholder="your name"
+              className="w-32 rounded-lg border border-edge bg-white px-2 py-1 text-[12px] text-ink-900 outline-none focus:border-rain-400"
+            />
+            <Button
+              onClick={() => onPropose(proposer.trim())}
+              disabled={busy || !dirty || proposer.trim().length === 0}
+              title="Saves as the next version, pending a second person's approval"
+            >
+              Propose v{current.version + 1}
+            </Button>
+          </>
+        )}
       </div>
+
+      {/* Dual control. Whoever can raise a threshold could otherwise approve anything,
+          so the author of a change may not be the one who activates it. */}
+      {pending && (
+        <div className="space-y-2 border-t border-edge bg-rain-50/60 px-4 py-3">
+          <p className="text-[12px] text-ink-900">
+            <span className="font-semibold">v{pending.version} proposed by {pending.proposedBy}</span>
+            {pending.note ? ` — ${pending.note}` : ""}
+          </p>
+          <p className="text-[12px] text-muted">
+            It decides nothing until someone else activates it. {pending.proposedBy} cannot
+            approve their own change.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={approver}
+              onChange={(e) => setApprover(e.target.value)}
+              placeholder="approver name"
+              className="w-40 rounded-lg border border-edge bg-white px-2 py-1 text-[12px] text-ink-900 outline-none focus:border-rain-400"
+            />
+            <Button
+              variant="primary"
+              disabled={busy || approver.trim().length === 0}
+              onClick={() => onActivate(pending.version, approver.trim())}
+            >
+              Activate v{pending.version}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Version history. The old version is still here, which is the point. */}
       <div className="border-t border-edge px-4 py-2.5">
@@ -168,12 +227,36 @@ export function RuleEditor({
               <span className="truncate text-muted">{rs.note}</span>
               <code
                 className="ml-auto shrink-0 font-mono text-[10px] text-ink-400"
-                title={`sha256 ${rs.hash}${rs.anchorTxHash ? `\nMonad tx ${rs.anchorTxHash}` : "\nnot yet anchored"}`}
+                title={[
+                  `sha256 ${rs.hash}`,
+                  `proposed by ${rs.proposedBy}`,
+                  rs.approvedBy ? `approved by ${rs.approvedBy}` : "awaiting approval",
+                  rs.anchorTxHash ? `Monad tx ${rs.anchorTxHash}` : "not yet anchored",
+                ].join("\n")}
               >
                 {rs.hash.slice(0, 10)}
               </code>
-              {rs.anchorTxHash ? (
-                <Badge tone="monad">anchored on monad</Badge>
+              {rs.status === "pending" ? (
+                <Badge tone="warn">pending</Badge>
+              ) : rs.anchorTxHash ? (
+                <a
+                  href={`https://testnet.monadexplorer.com/tx/${rs.anchorTxHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={rs.anchorTxHash}
+                >
+                  <Badge tone="monad">anchored on monad</Badge>
+                </a>
+              ) : anchoringEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => onAnchor(rs.version)}
+                  disabled={busy}
+                  className="rounded-full border border-monad-300 bg-monad-50 px-2 py-0.5 font-mono text-[10px] text-monad-700 transition hover:bg-monad-100 disabled:opacity-40"
+                  title="Publish this version's hash to Monad testnet"
+                >
+                  anchor
+                </button>
               ) : (
                 <Badge tone="neutral">local</Badge>
               )}
