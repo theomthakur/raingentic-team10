@@ -4,6 +4,38 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · One navigation, and a map of the six pages
+
+The site had grown a page at a time and nobody had looked at the whole thing. An audit
+found three real problems, one of them serious.
+
+- 🔴 **The console had no navigation at all.** `Header.tsx` imported `SiteNav` on line 2
+  and never rendered it. The page a judge lands on was a dead end — catalogue, agents,
+  system design and the deck were all unreachable from the front door.
+- **The workspace had a second, competing nav** of its own whose links went nowhere else
+  in the site, so it was effectively a separate little app sharing a domain. It now uses
+  the same bar as everything else, with its section anchors demoted to an "on this page"
+  row underneath — two clear levels instead of two competing ones.
+- **A failed load stranded you completely.** The loading screen showed the error and
+  offered nothing else: no retry, no way out, even though every other page is static and
+  would have loaded fine. It now carries a retry and the full nav.
+- The brand mark now points at the console from **every** page. It used to go somewhere
+  different depending on where you were, which is how people get lost.
+- Nav items carry a `blurb` — "Catalogue" could be anything until you read "what an agent
+  can buy".
+
+**The system design page now answers the question directly**, with a numbered map of all
+six pages built from the same `PAGES` array the nav uses, so the two can never drift. The
+short version: two of the six are the product and the rest explain it. Workspace is what a
+customer would use day to day; Console is the same system with its working shown. Same
+data, same API, same decisions.
+
+**Also:** the challenge panel sits at the bottom of a long page, so the console now has a
+"Try to break it →" link at the top pointing straight at it. `PROJECT-DOCUMENTATION.md`
+said six checks when there are eleven, omitted the hold branch entirely, and described the
+Monad anchor as unwritten. All three now match the build.
+
+
 ## 2026-08-08 · Beat the checks — hand the judge the attack
 
 From the Monad workshop's Split or Steal demo. Building a side game would have cost hours

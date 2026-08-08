@@ -306,20 +306,31 @@ export default function Page() {
 
       <main className="mx-auto max-w-[1600px] px-6 py-8 md:px-10">
         <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            1 · How it works
-          </p>
-          {/* The one failure that works perfectly on a laptop and breaks on the deployed
-          URL. Loud, because a quiet version of this warning is how it gets missed. */}
-      {state.ephemeralInProduction && (
-        <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-2.5 text-[13px] text-danger-700">
-          <strong>No database is configured on this deployment.</strong> The decision log
-          is in memory and will empty on the next cold start, which silently breaks replay.
-          Set <code className="font-mono">DATABASE_URL</code> and redeploy.
-        </div>
-      )}
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+              1 · How it works
+            </p>
+            {/* The challenge is the most convincing thing here and it sits at the bottom
+                of a long page, so it needs a pointer from where people actually look. */}
+            <a
+              href="#break-it"
+              className="rounded-full border border-rain-200 bg-rain-50 px-3 py-1.5 text-[12.5px] font-medium text-rain-700 transition hover:bg-rain-100"
+            >
+              Try to break it →
+            </a>
+          </div>
 
-      <PipelineDiagram stages={stages} racing={racing} />
+          {/* The one failure that works perfectly on a laptop and breaks on the deployed
+              URL. Loud, because a quiet version of this warning is how it gets missed. */}
+          {state.ephemeralInProduction && (
+            <div className="mb-4 rounded-xl border border-danger-200 bg-danger-50 px-4 py-2.5 text-[13px] text-danger-700">
+              <strong>No database is configured on this deployment.</strong> The decision
+              log is in memory and will empty on the next cold start, which silently breaks
+              replay. Set <code className="font-mono">DATABASE_URL</code> and redeploy.
+            </div>
+          )}
+
+          <PipelineDiagram stages={stages} racing={racing} />
         </section>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
@@ -420,7 +431,7 @@ export default function Page() {
           </section>
         </div>
 
-        <section className="mt-14">
+        <section id="break-it" className="mt-14 scroll-mt-6">
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
             4 · Try to break it
           </p>

@@ -19,37 +19,76 @@ the same moment, one step earlier.
 ## 2. The architecture
 
 ```
-  1 TASK        agent is given a job
+  1 TASK        an agent is given a job
        |
-  1b QUOTE      buyer gets a vendor quote (competing quotes if time allows)
+  1b NEGOTIATE  competing sellers bid, one counter-offer round, a winner
+       |          the winning quote is written to the record as an accepted order line
        v
-  2 PROPOSE     agent declares the accepted PO
-       |          { poNumber, vendor, sku, unitPrice, quantity, quoteExpiry }
+  2 PROPOSE     the agent declares that quote as a purchase order
+       |          { poNumber, vendor, sku, unitPrice, quantity, quoteExpiry, costCentre }
        v
-  3 VERIFY      deterministic checks against the record        <-- no model here
+  3 VERIFY      eleven deterministic checks against a record snapshot   <-- no model here
        |          rules are versioned CONFIG, not code
        |
-    pass|fail
-       |    \
-       |     \--> REFUSE   no card. plain-English reason. logged.
-       v
-  4 ISSUE       Rain issues a scoped virtual card, bound to exactly this PO
-       v
-  5 SETTLE      the purchase happens on that card
-       v
-  6 RECORD      PO + checks + rule version + card + outcome, append-only
+       |-- fails ------> REFUSE  no card, ever. A plain-English reason. Logged.
        |
-  7 REVOKE      card deactivated once the job is done (if the endpoint supports it)
+       |-- too big ----> HOLD    every check passed, but it is above the delegated
+       |                         limit. Still no card. A named person releases it,
+       |                         and every check runs again on fresh records.
+       v
+  4 ISSUE       Rain issues a virtual card scoped to exactly this PO
+       v
+  5 SETTLE      the cost centre is charged, the record is written back
+       v
+  6 REVOKE      the card is retired — it existed for exactly this obligation
+       v
+  7 RECORD      PO + snapshot + rule version + every check + outcome, append-only
 ```
+
+**There is no code path where a card is created and then judged**, and none where a card
+outlives the obligation that justified it. The refusal and hold branches never reach Rain
+at all — that is enforced by the shape of `lib/pipeline.ts`, not by a flag.
+
+**The eleven checks** that decide stage 3, in order: the PO exists and was accepted; it is
+still open and the quote has not expired; the amount matches the quote; the vendor **and
+SKU** match; it is within the cost centre's budget; no card has already been issued for
+this line; it is inside the company's delegated limit; it is not a large purchase split in
+two to duck that limit; it is inside this particular agent's own limit; the vendor is one
+we have paid before; and the agent is not spending faster than it should.
+
+The last four read **patterns rather than moves**. Splitting a purchase to avoid an
+approval is not a lie — every individual line is true — so only a rule looking at the
+running total can see it.
 
 **Monad:** each **rule version** is hashed and anchored on testnet. This is what proves the
 rules were not edited after the fact to fit a history someone already had, closing the one
 real hole in an otherwise-airtight audit story.
 
-Six deterministic checks decide stage 3: the PO exists and is accepted, it's still open,
-the amount matches the quote, the merchant matches the quote, it's within budget, and no
-card has already been issued for this exact PO (idempotency, the check that carries the
-demo).
+---
+
+## 2b. The six pages, and what each one is for
+
+The site grew a page at a time, so this is the map. It is the same list the navigation is
+built from, in `components/SiteNav.tsx`.
+
+| | Page | Route | What it is for |
+|---|---|---|---|
+| 1 | **Workspace** | `/workspace` | What a customer sees — plain language, approvals, budgets |
+| 2 | **Console** | `/` | Run it and watch the checks. Every panel, every control |
+| 3 | **Catalogue** | `/catalog` | What an agent can buy |
+| 4 | **Agents** | `/agents` | Who is allowed to spend, and how much each may spend alone |
+| 5 | **System design** | `/architecture` | How it works, and this same page map |
+| 6 | **Deck** | `/presentation` | The pitch |
+
+**Two of these are the product; the rest explain it.** Workspace is what someone who bought
+this would use day to day. Console is the same system with its working shown — every check,
+every record it read, and the controls to change policy and re-judge history. Same data,
+same API, same decisions; only the amount of machinery on screen differs.
+
+One navigation bar appears on all six, in that order, plus a second "on this page" row
+inside the workspace for its own sections. Earlier each page carried its own bespoke
+header, so where you could go next depended on where you happened to be — the console had
+no way out at all, and the workspace had a second nav that led nowhere else in the site.
 
 ---
 
@@ -177,26 +216,49 @@ lib/
   rules/             versioned rule data + the sha256 anchored on Monad (B)
   replay/            re-judging stored decisions against another rule version (B)
   store/             append-only log; Postgres when DATABASE_URL is set, memory otherwise (B)
-  pipeline.ts        the seven stages in order (B)
+  pipeline.ts        every stage in order — this file IS the architecture diagram (B)
+  monad/anchor.ts    publishing a rule version's hash to Monad testnet (B)
   rain/issuer.ts     the issue seam: verify passes -> rain-client is called
   seed/              54 committed historical decisions, deterministically generated (B)
 app/
+  page.tsx           the console        /
+  workspace/         the customer view  /workspace
+  catalog/           what can be bought /catalog
+  agents/            who may spend      /agents
+  architecture/      how it works       /architecture
+  presentation/      the pitch          /presentation
+  api/state/         everything the console and workspace render
+  api/run/           run a task, or a hand-written PO, through the same pipeline
+  api/purchase/      the full journey: negotiate -> propose -> verify -> issue
+  api/approve/       release a held purchase; a named person, checks re-run
+  api/rules/         list rule versions, propose an edit as the next version
+  api/rules/activate/ the second pair of eyes — the author may not approve their own
+  api/replay/        re-judge history against an edited rule version
+  api/anchor/        publish a rule version's hash to Monad
+  api/reset/         restore the seeded state between demos
   api/rain/ping/     the first-authenticated-call milestone
-  api/purchase/      the full join: negotiate -> propose -> verify -> issue
-  api/run/           run a task or a hand-written PO through the same pipeline
-  api/replay/        re-run history against an edited rule version
-  api/rules/         list rule versions, save an edit as the next version
-  api/state/         everything the console renders
-docs/                this file, SUBMISSION.md, and the full planning trail
+components/
+  SiteNav.tsx        PAGES — the single source of truth for navigation and the page map
+docs/                this file, SUBMISSION.md, CHANGELOG.md, and the full planning trail
 ```
 
-**Status, stated plainly so nothing is overclaimed in front of judges:** the checks, rule
-versioning, replay, the append-only log, the negotiation and the run-it-twice refusal are
-all built and tested. Card issuance currently returns a **simulated** card, labelled as
-such in the UI, because the Rain endpoint paths still need confirming on site — the client
-is written and wired, so it is one function swap. The Monad anchor is **not yet written**;
-the hash and the storage for its transaction reference exist. See `SUBMISSION.md` §5 for
-the honest per-track breakdown.
+**Status, stated plainly so nothing is overclaimed in front of judges.** Built and tested:
+the eleven checks, rule versioning with dual control, replay, the append-only log, the
+negotiation, human escalation and release, card retirement, idempotency under concurrency,
+and the run-it-twice refusal.
+
+Card issuance returns a **simulated** card, labelled as such in the UI. The auth header and
+the issuance path are both **confirmed against Rain's live sandbox**, and our KYC is
+approved — but no collateral contract is linked to the user, so a card issued today would
+have no spending power. That is the one thing standing between this and money genuinely
+moving, and it is a question for a Rain engineer rather than a piece of code.
+
+The Monad anchor is **written and wired** but inert: it needs a testnet RPC URL and a
+funded key, and the anchor control simply does not appear without them. Nothing in the
+decision path depends on the chain being reachable.
+
+See `SUBMISSION.md` §5 for the honest per-track breakdown, `RAIN-API-CONFIRMED.md` for what
+the sandbox actually told us, and `CHANGELOG.md` for how each piece arrived.
 
 Repo: `github.com/theomthakur/raingentic-team10`, public per the event's rules,
 `.env.local` never committed, only `.env.local.example`.

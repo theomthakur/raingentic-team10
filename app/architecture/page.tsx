@@ -5,7 +5,7 @@ import { FlowDiagram } from "@/components/FlowDiagram";
 import { TechStack } from "@/components/TechStack";
 import { ControlCoverage } from "@/components/ControlCoverage";
 import { Footer } from "@/components/Footer";
-import { SubPageHeader } from "@/components/SiteNav";
+import { PAGES, SubPageHeader } from "@/components/SiteNav";
 
 export const metadata = {
   title: "Mandate — system design",
@@ -60,6 +60,44 @@ export default function ArchitecturePage() {
             negotiated. Deterministic code checks the declared order against the real record
             before the card is ever created. Any mismatch means no card, not a decline —
             an instrument that never comes into existence in the first place.
+          </p>
+        </section>
+
+        {/* The site grew a page at a time and it was no longer obvious what any of them
+            were for, or which one you were meant to start on. Driven off the same PAGES
+            array the nav uses, so the two can never drift apart. */}
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            The six pages, and what each one is for
+          </p>
+          <Panel>
+            <ol className="divide-y divide-edge">
+              {PAGES.map((page, i) => (
+                <li key={page.href} className="flex items-baseline gap-4 px-5 py-3">
+                  <span className="w-4 shrink-0 font-mono text-[11px] text-ink-400">
+                    {i + 1}
+                  </span>
+                  <Link
+                    href={page.href}
+                    className="w-32 shrink-0 text-[14px] font-medium text-rain-600 hover:text-rain-700"
+                  >
+                    {page.label}
+                  </Link>
+                  <span className="flex-1 text-[13.5px] text-muted">{page.blurb}</span>
+                  <code className="hidden shrink-0 font-mono text-[11px] text-ink-300 sm:block">
+                    {page.href}
+                  </code>
+                </li>
+              ))}
+            </ol>
+          </Panel>
+          <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-muted">
+            Two of these are the product and the rest explain it.{" "}
+            <strong className="font-medium text-ink-900">Workspace</strong> is what someone
+            who buys this would use day to day — plain language, approvals, budgets.{" "}
+            <strong className="font-medium text-ink-900">Console</strong> is the same system
+            with its working shown: every check, every record it read, and the controls to
+            change policy and re-judge history. Same data, same API, same decisions.
           </p>
         </section>
 

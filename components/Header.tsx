@@ -73,6 +73,13 @@ export function Header({
           </div>
         </div>
       </div>
+
+      {/* The console is where a judge lands, and it used to be the one page with no way
+          out — SiteNav was imported here and never rendered, so every other page was
+          unreachable from the front door. */}
+      <div className="mx-auto max-w-[1600px] px-6 pb-3 md:px-10">
+        <SiteNav current="/" />
+      </div>
     </header>
   );
 }

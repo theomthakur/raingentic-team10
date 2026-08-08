@@ -7,6 +7,7 @@ import { money, shortDate, shortTime } from "@/lib/format";
 import { departmentName, outcomeSummary, productName } from "@/lib/plain";
 import { getAgent } from "@/lib/agents";
 import { Avatar } from "@/components/Avatar";
+import { SubPageHeader } from "@/components/SiteNav";
 import { Badge, Button, Empty, Panel } from "@/components/ui";
 import { LoadingRain } from "@/components/LoadingRain";
 
@@ -102,24 +103,22 @@ export function CustomerWorkspace() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-ink-900">
-      <header className="border-b border-edge bg-white">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-6 py-4 md:px-10">
-          <Link href="/workspace" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rain-500 text-lg font-bold text-white">M</span>
-            <span>
-              <strong className="font-display text-[20px] font-medium tracking-[-0.02em]">Mandate</strong>
-              <span className="ml-2 hidden text-[12.5px] text-muted sm:inline">Spending workspace</span>
-            </span>
-          </Link>
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] font-medium text-muted">
-            <a className="text-ink-900" href="#overview">Overview</a>
-            <a href="#approvals">Approvals{pending.length ? ` (${pending.length})` : ""}</a>
-            <a href="#activity">Activity</a>
-            <a href="#budgets">Budgets</a>
-            <Link className="hover:text-ink-900" href="/">Operations view</Link>
-          </nav>
-        </div>
-      </header>
+      {/* The same bar as every other page. This used to be a second, bespoke nav whose
+          links went nowhere else in the site, so the workspace was effectively a separate
+          little app that happened to share a domain. */}
+      <SubPageHeader current="/workspace" />
+
+      {/* Sections within this page, kept as their own row so they read as a level below
+          the site nav rather than competing with it. */}
+      <div className="border-b border-edge bg-ink-50">
+        <nav className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-5 gap-y-2 px-6 py-2.5 text-[13px] font-medium text-muted md:px-10">
+          <span className="text-[11px] uppercase tracking-wider text-ink-400">On this page</span>
+          <a className="text-ink-900" href="#overview">Overview</a>
+          <a href="#approvals">Approvals{pending.length ? ` (${pending.length})` : ""}</a>
+          <a href="#activity">Activity</a>
+          <a href="#budgets">Budgets</a>
+        </nav>
+      </div>
 
       <main className="mx-auto max-w-[1440px] px-6 py-8 md:px-10">
         {state.ephemeralInProduction && (

@@ -4,21 +4,23 @@ import Link from "next/link";
  * One nav, every page, always in the same order.
  *
  * Each page used to carry its own bespoke header, so where you could go next depended on
- * where you happened to be — the catalogue offered no way to reach the agents, and only
- * the architecture page knew the deck existed. In a five-minute demo that is a real cost:
- * every dead end is a fumble in front of a judge.
+ * where you happened to be — the console offered no way out at all, and the workspace had
+ * a second, different nav of its own. In a five-minute demo that is a real cost: every
+ * dead end is a fumble in front of a judge.
  *
- * The order is the order you would present in, left to right: pitch it, buy something,
- * see what the checks did, then how it is built and who is spending.
+ * The order is the order you would present in, left to right: what a customer sees, then
+ * the machinery behind it, then what is for sale, who spends, how it is built, and the
+ * pitch. `blurb` exists because a bare noun does not tell a judge what a page is for —
+ * "Catalogue" could be anything until you read "what an agent can buy".
  */
 
-const PAGES = [
-  { href: "/workspace", label: "Workspace" },
-  { href: "/", label: "Console" },
-  { href: "/catalog", label: "Catalogue" },
-  { href: "/architecture", label: "System design" },
-  { href: "/agents", label: "Agents" },
-  { href: "/presentation", label: "Deck" },
+export const PAGES = [
+  { href: "/workspace", label: "Workspace", blurb: "what a customer sees" },
+  { href: "/", label: "Console", blurb: "run it and watch the checks" },
+  { href: "/catalog", label: "Catalogue", blurb: "what an agent can buy" },
+  { href: "/agents", label: "Agents", blurb: "who is allowed to spend" },
+  { href: "/architecture", label: "System design", blurb: "how it works" },
+  { href: "/presentation", label: "Deck", blurb: "the pitch" },
 ] as const;
 
 export function SiteNav({ current }: { current: string }) {
@@ -31,6 +33,7 @@ export function SiteNav({ current }: { current: string }) {
             key={p.href}
             href={p.href}
             aria-current={active ? "page" : undefined}
+            title={p.blurb}
             className={`rounded-full px-3 py-1.5 text-[12.5px] font-medium transition ${
               active
                 ? "bg-rain-50 text-rain-700"
@@ -45,7 +48,11 @@ export function SiteNav({ current }: { current: string }) {
   );
 }
 
-/** The mark plus wordmark, used as the "home" affordance on every sub-page. */
+/**
+ * The mark plus wordmark. Always points at the console, from every page including the
+ * workspace — a brand that goes somewhere different depending on where you are is how
+ * people get lost.
+ */
 export function NavBrand() {
   return (
     <Link href="/" className="flex shrink-0 items-center gap-2.5">

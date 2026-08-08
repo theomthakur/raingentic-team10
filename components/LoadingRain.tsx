@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { SiteNav } from "./SiteNav";
+
 /**
  * The loading screen.
  *
@@ -69,7 +72,28 @@ export function LoadingRain({ error }: { error?: string | null }) {
         </div>
 
         {error ? (
-          <p className="mt-5 max-w-xs text-center text-[13px] text-fail">{error}</p>
+          // A failed load used to be a total dead end: the message, and no way anywhere.
+          // Every other page is static and would have loaded fine, so stranding someone
+          // here is the one avoidable failure in the whole app.
+          <div className="mt-5 flex max-w-sm flex-col items-center gap-3">
+            <p className="text-center text-[13px] text-fail">{error}</p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="rounded-full bg-rain-500 px-3.5 py-1.5 text-[12.5px] font-medium text-white transition hover:bg-rain-600"
+              >
+                Try again
+              </button>
+              <Link
+                href="/architecture"
+                className="rounded-full border border-edge px-3.5 py-1.5 text-[12.5px] font-medium text-ink-700 transition hover:bg-ink-50"
+              >
+                System design
+              </Link>
+            </div>
+            <SiteNav current="" />
+          </div>
         ) : (
           <>
             <p className="mt-5 font-display text-[22px] font-medium tracking-[-0.01em] text-ink-900">
