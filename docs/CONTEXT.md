@@ -34,6 +34,14 @@ type it straight into your own local `.env.local`.
 **Join at 17:00.** A real check result decides whether a real card is issued. If not joined
 by 18:00, cut scope rather than push the join later.
 
+## 🔴🔴 DECIDE THIS NOW, before more checker code is written
+
+**Storage.** In-memory or on-disk state does not survive Vercel's serverless cold starts.
+The append-only decision log needs somewhere real to live or replay breaks silently on the
+deployed URL, the one thing you cannot cut. **Pick Neon Postgres (free tier, fits the
+append-only model directly) or Vercel KV/Upstash (faster to wire).** B owns this call, make
+it before writing more checks against an assumption that won't survive deploy.
+
 ## 🔴 Open right now, ask a Rain engineer
 
 1. **Can we simulate an authorization** against a card we issue? Shapes whether the demo
@@ -44,12 +52,29 @@ by 18:00, cut scope rather than push the join later.
 3. Base URL and auth header to use this weekend.
 4. Is the collateral already funded, or do we need to send RUSD first.
 
-## The demo's lead failure case
+## The demo's lead failure case: run it twice, don't script a bad agent
 
-**Not vendor mismatch.** Lead with a duplicate spend on an already-fulfilled order line, or
-a SKU mismatch (right vendor, right price, wrong item). Neither exists in any card
-network's controls at any granularity, a card issuer does not know your order system
-exists, so this claim holds regardless of what question 2 above comes back with.
+**The vendor-mismatch refusal is fakeable and a judge who's won hackathons himself will
+clock it in ten seconds**, you wrote the fixture, the bad agent, and the check that catches
+it. Replace it:
+
+1. Run the task. Card issued, money moves, the record gets written.
+2. **Press the same button again.** No new fixture, no second agent.
+3. Refused, by rule 6 (idempotency), reading the record the *first run itself wrote.*
+
+This is unfalsifiable in the best way, the refusal is a consequence of the demo's own first
+half, not a script. It also costs nothing new to build, rule 6 is already in the plan.
+
+**Stretch, if there's time: let a judge edit the PO on screen and press issue themselves.**
+Turns the whole claim from "trust us" into "try it." Ten lines of UI.
+
+## The pitch line for the first hard question
+
+If a judge reduces the six checks to *"so it's a foreign key and a uniqueness constraint
+before the API call"*, the answer is ready: **this is a pre-issuance three-way match**, the
+same PO/receipt/invoice reconciliation every ERP does, just moved from after the invoice
+arrives (where the remedy is a dispute or a clawback) to before the card exists at all.
+Zero build cost, just the vocabulary a finance person in the room already trusts.
 
 ## The six checks (rule 4 is now secondary, see above)
 
@@ -68,8 +93,29 @@ Delegated budget trees (too close to Rain's own controls), replay as the headlin
 capability plus a Monad contract from scratch), Four-Eyes consensus voting (puts a model
 back in the verify path, undoes design decision 2). All reasoning in `THE-IDEA.md`.
 
-**Two small additions if time allows, same cut priority as the Monad anchor:** a tiny real
-Monad fee per recorded decision, and a live budget meter in the UI. Neither is required.
+**Two small additions if time allows, lowest priority, cut first:** a tiny real Monad fee
+per recorded decision, and a live budget meter in the UI.
+
+## 🔴 Reprioritized: negotiation is now cut line #1, not #2
+
+Two seller agents you wrote, haggling to a number you chose, is the most fakeable thing on
+screen, in front of the judge whose actual job is agent orchestration. If it survives the
+cut, describe it honestly as a **quote-selection stage**, not a negotiation.
+
+## Monad, reprioritized: anchor the rule version, not just decisions
+
+Replay proves the rules are data. It does not prove the rules weren't edited after the fact
+to fit history you already had. **Anchoring a hash of each rule version on Monad closes
+that hole and is structural**, not decorative, unlike the per-decision fee. Do the
+rule-version anchor first; it's also cheaper, one transaction per version, not per decision.
+
+## Two cheap adds worth more than what they'd displace
+
+- **Revoke the card after settlement.** Rain's own line is cards are "retired automatically
+  once the job is done." Confirm the endpoint, then show it. Nobody else will.
+- **Seed 40-50 historical decisions before demoing replay.** Six live rows reads as a test
+  file. "Across 47 decisions, six approvals would now be refused" reads as a real system.
+  Half an hour of fixture writing.
 
 ## Schedule
 
