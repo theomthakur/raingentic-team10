@@ -46,9 +46,11 @@ it before writing more checks against an assumption that won't survive deploy.
 
 1. **Can we simulate an authorization** against a card we issue? Shapes whether the demo
    can show a decline, or only issuance.
-2. **Does card issuance lock to one exact merchant, or only a category?** Decides whether
-   the vendor-mismatch point is "Rain would have allowed this" or the weaker "we stop it
-   before Rain is asked."
+2. ✅ **RESOLVED, do not ask this — Rain supports exact-merchant allowlists.** Confirmed
+   from public sources, citations in [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). The
+   strong "Rain would allow this" claim is **false**; lead with the duplicate-spend refusal.
+   ~~Original question: decides whether the vendor-mismatch point is "Rain would have
+   allowed this" or the weaker "we stop it before Rain is asked."~~
 3. Base URL and auth header to use this weekend.
 4. Is the collateral already funded, or do we need to send RUSD first.
 

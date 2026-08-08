@@ -203,7 +203,7 @@ script.
 | 1 | **Order exists** | An agent inventing a justification outright |
 | 2 | **Order still open** | Paying twice for something already fulfilled |
 | 3 | **Amount matches the quote**, within tolerance | Right vendor, wrong price |
-| 4 | **Merchant matches the quote** | ⭐ Right price, wrong vendor. **Every Rain control passes this one.** |
+| 4 | **Merchant matches the quote** | Right price, wrong vendor. 🔴 ~~Every Rain control passes this one.~~ **False — Rain supports exact-merchant allowlists.** See [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). The SKU half of this check is the uncovered part. |
 | 5 | **Within the remaining budget** for the cost centre | Death by a thousand small correct purchases |
 | 6 | **No card already issued for this line** | ⭐ Duplicate spend on retry. This is idempotency, and one judge builds high-throughput transactional systems for a living. |
 
@@ -271,9 +271,12 @@ Do not narrate the architecture. Show the thing, then explain it.
 
 1. **Four procurement agents running.** Real tasks, real purchases. Money visibly moving.
 2. **Three go through.** Cards issued, limits scoped to each purchase, collateral drawn.
-3. **The fourth is stopped.** The agent proposed the right price, under budget, at an
-   allowed merchant category. **A different vendor than the quote.** Every Rain control
-   passes. Mandate refuses, and no card is created.
+3. **The fourth is stopped.** 🔴 **Superseded — do not run the demo this way.** This step
+   claimed a vendor mismatch means "every Rain control passes." **That is false:** Rain
+   supports exact-merchant allowlists, confirmed from public sources in
+   [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). Lead instead with the run-it-twice
+   duplicate refusal, which no card control can express at any granularity. The current
+   demo order lives in [SUBMISSION.md §4](SUBMISSION.md).
 4. **Show the reason**, in the plain sentence the checker produced.
 5. **Show the provenance.** Click the refusal. The failed rule, the expected value, the
    actual value, the record it read. Four fields.

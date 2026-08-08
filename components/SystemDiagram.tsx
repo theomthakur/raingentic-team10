@@ -3,8 +3,8 @@ import { Badge } from "./ui";
 /**
  * The one diagram. Not the live per-run trace (that's PipelineDiagram, on the home page) —
  * this is the whole system, always fully drawn, color-coded by who owns each step, so it
- * can be understood without a run ever happening. This is the thing the ABI hackathon loss
- * said to build: one numbered, color-coded architecture diagram, not eight pages of prose.
+ * can be understood without a run ever happening. One numbered, color-coded diagram beats
+ * eight pages of prose: at a system-design-judged event, the diagram is the pitch.
  */
 
 type Owner = "agent" | "check" | "refuse" | "rain" | "record";

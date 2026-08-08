@@ -56,8 +56,16 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
     limitCents: req.limitCents,
     expiresAt: req.po.quoteExpiry,
     reference: req.po.poNumber,
-    // ⚠️ Only set once a Rain engineer confirms exact-merchant locking is supported.
-    // Category-level locking would be a weaker claim, so we do not assert it yet.
+    // Exact-merchant locking IS supported — Rain's press release lists "approved
+    // merchants or payment recipients" separately from merchant category codes, and
+    // their Agent Control Layer post lists "merchant and category allowlists". See
+    // docs/RAIN-API-CONFIRMED.md for the citations.
+    //
+    // ⚠️ Still commented out, but for a narrower reason than before: the capability is
+    // confirmed, the `configuration` schema to express it is not. Sending a guessed shape
+    // is worse than sending none, because the endpoint accepts a one-field body without
+    // validating the rest — so a wrong key would silently produce an unscoped card while
+    // we believed it was locked. Uncomment once an engineer confirms the field name.
     // merchantLock: req.po.vendor,
   });
 

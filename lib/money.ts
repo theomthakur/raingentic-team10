@@ -1,5 +1,5 @@
-/** Integer cents throughout. See crossval-pricing/lib/money.ts for the fuller version;
- * this is the trimmed subset Mandate actually needs. */
+/** Integer cents throughout, never floats — a price compared with a tolerance is the one
+ * place a rounding error becomes a wrong decision. */
 
 export function toCents(input: string | number): number {
   const raw = String(input).trim();

@@ -25,13 +25,19 @@ import { privateKeyToAccount } from "viem/accounts";
  * the point, and it is a real transaction either way.
  */
 
-// Monad testnet. Chain id confirmed against the public testnet; the RPC URL comes from
-// the environment so it can be pointed at whichever endpoint is handed out on the day.
+/**
+ * Monad testnet, chain id 10143, per Monad's own network information page. Mainnet is
+ * live and is chain id 143 — deliberately not used here, since the bounty asks for
+ * testnet and a real testnet transaction is still a real transaction.
+ * https://docs.monad.xyz/developer-essentials/testnet
+ */
+const DEFAULT_TESTNET_RPC = "https://testnet-rpc.monad.xyz";
+
 export const monadTestnet = defineChain({
   id: 10143,
   name: "Monad Testnet",
   nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
-  rpcUrls: { default: { http: [process.env.MONAD_RPC_URL ?? "https://testnet-rpc.monad.xyz"] } },
+  rpcUrls: { default: { http: [process.env.MONAD_RPC_URL ?? DEFAULT_TESTNET_RPC] } },
   blockExplorers: {
     default: { name: "Monad Explorer", url: "https://testnet.monadexplorer.com" },
   },
@@ -43,9 +49,21 @@ export interface AnchorResult {
   explorerUrl: string;
 }
 
-/** Configured only when both an RPC and a key are present. Never guessed at. */
+/**
+ * Enabled as soon as a key exists. The RPC falls back to Monad's public testnet endpoint,
+ * which is rate-limited but ample for a handful of rule-version writes — so requiring it
+ * explicitly would only mean silently disabling anchoring for someone who supplied the
+ * one credential that cannot be defaulted.
+ *
+ * The key is the real dependency: an RPC is a public address, a funded key is not.
+ */
 export function anchoringEnabled(): boolean {
-  return Boolean(process.env.MONAD_RPC_URL && process.env.MONAD_PRIVATE_KEY);
+  return Boolean(process.env.MONAD_PRIVATE_KEY);
+}
+
+/** Whichever endpoint is in play, so the UI can say where an anchor was sent. */
+export function anchorRpcUrl(): string {
+  return process.env.MONAD_RPC_URL ?? DEFAULT_TESTNET_RPC;
 }
 
 function normalisePrivateKey(raw: string): Hex {
@@ -66,7 +84,8 @@ export async function anchorRuleVersion(
 ): Promise<AnchorResult> {
   if (!anchoringEnabled()) {
     throw new Error(
-      "Monad anchoring is not configured. Set MONAD_RPC_URL and MONAD_PRIVATE_KEY in .env.local."
+      "Monad anchoring is not configured. Set MONAD_PRIVATE_KEY in .env.local (fund it from " +
+        "faucet.monad.xyz). MONAD_RPC_URL is optional and defaults to Monad's public testnet RPC."
     );
   }
 
@@ -74,7 +93,7 @@ export async function anchorRuleVersion(
   const client = createWalletClient({
     account,
     chain: monadTestnet,
-    transport: http(process.env.MONAD_RPC_URL),
+    transport: http(anchorRpcUrl()),
   });
 
   const clean = ruleHash.startsWith("0x") ? ruleHash.slice(2) : ruleHash;

@@ -24,9 +24,12 @@ exists at all.
    replay silently breaks on the exact URL you submit. B decides, five minutes, move on.
 2. **Ask a Rain engineer, together, before 14:00:**
    - Can we simulate an authorization against a card we issue?
-   - Does card issuance lock to one exact merchant, or only a category?
-   - Base URL and auth header for this weekend.
-   - Is the collateral already funded, or do we send RUSD first?
+   - What is the `configuration` schema for a spending limit, a merchant allowlist and a
+     short expiry? *(The capability is confirmed publicly — only the field shape is open.
+     See [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md).)*
+   - What status value deactivates a card? `{"status":"inactive"}` returns 400.
+   - Is the collateral already funded, or do we send RUSD first? The contract on our sheet
+     is not linked to our user, and collateral *is* the spending power in Rain's model.
 
 ---
 
@@ -87,9 +90,16 @@ by 18:00, cut scope, do not push the join later.
 
 Each check returns pass/fail plus a plain-English reason, never "validation failed."
 
-⚠️ On check 4: only claim "Rain would have let this through" if the engineer confirms
-category-level locking. If Rain locks to the exact merchant, say instead "we check the same
-thing Rain does, plus the parts of the deal Rain never sees."
+✅ **On check 4, settled — Rain supports exact-merchant allowlists.** Confirmed from Rain's
+own press release and Agent Control Layer post; citations in
+[RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). So **never** claim "Rain would have let this
+through." Say: *we set every control Rain gives us, and we add the checks a card control
+cannot express* — which obligation this belongs to, whether it's still open, which SKU,
+whether we already issued for it, and who must approve.
+
+Checks 3, 4 and partly 5 overlap what Rain already enforces. That is fine as defence in
+depth — Rain decides whether to *allow*, we decide whether to *ask* — but do not present
+them as gaps. Checks 1, 2, the SKU half of 4, 6 and 7 are the genuinely uncovered ones.
 
 ---
 

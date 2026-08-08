@@ -51,31 +51,38 @@ mid-build:**
   makes replay meaningful. This idea trades the strongest line in the pitch for the
   weakest architecture.
 
-## 🔴 Correction, validate this within the hour: what "Rain misses" actually means
+## ✅ Settled: what "Rain misses" actually means
 
 The original pitch claimed rule 4, vendor mismatch, is something "every Rain control
-passes." **That is only true if Rain's merchant lock is category-level** (e.g. any
-office-supply merchant). Rain's own docs say "merchant AND category allowlists," which
-means exact single-merchant locking may be supported. If so, a fresh card Mandate scopes to
-the exact confirmed vendor never has the chance to let a different vendor through, because
-Mandate is the one telling Rain which merchant to lock to. In that world, "Rain misses this"
-is false. What is still true is "we stop it before Rain is even asked," which is a
-real claim, just a different and slightly weaker one.
+passes." **That claim is false and must not be said.**
 
-**Ask a Rain engineer this in the next hour: does the card issue endpoint support locking
-to one exact merchant, or only a category?** It decides which claim the pitch can honestly
-make.
+Rain supports **exact-merchant allowlists**, not only categories. Their press release
+enumerates "approved merchants or payment recipients" as a dimension distinct from merchant
+category codes, and their Agent Control Layer post lists agent-level controls as amounts,
+merchant and category allowlists, spend intervals and card expiry. Citations in
+[RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md).
 
-**Regardless of the answer, lead the demo with a different rule, one no card network's
-controls can express at any granularity:** duplicate spend on an already-fulfilled order
-line, or a SKU mismatch, right vendor, right total, wrong specific item. Neither concept
-exists in a card's amount, merchant, category or frequency limits, because a card issuer
-does not know about your order system at all. That is a claim that holds no matter what
-Rain's merchant lock supports, and it does not need validating on the day.
+Which means a card Mandate scopes to the confirmed vendor never had the chance to let a
+different vendor through — because Mandate is the thing telling Rain which merchant to lock
+to. Claiming Rain misses it would be claiming credit for using their own feature.
 
-**Vendor mismatch becomes the secondary point, framed correctly either way:** if category
-locking, "Rain approves this, we do not." If exact locking, "we check the same thing Rain
-does, plus the parts of the deal Rain never sees."
+**What is still completely true, and is the better claim anyway:** all six of Rain's
+enumerated dimensions describe the *instrument* — amount, merchant, category, frequency,
+active-card count, expiry. **None describe the obligation behind it.** So five things remain
+genuinely uncovered, and this is the list to say out loud:
+
+1. which internal purchase order a spend belongs to
+2. whether that order is still open
+3. which specific **item** is being bought
+4. whether a card was already issued for that order line
+5. who must approve above a delegated threshold
+
+**Lead the demo with #4** — a duplicate spend on an already-fulfilled line. No card
+control expresses it at any granularity, because a card issuer does not know your order
+system exists. It needed no validating on the day and it still doesn't.
+
+**Vendor mismatch is now a supporting point, framed the only honest way:** *we set every
+control Rain gives us, and we add the five a card control cannot express.*
 
 ## Agent Underwriting, noted as a future direction, not built this weekend
 

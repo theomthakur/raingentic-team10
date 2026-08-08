@@ -43,9 +43,10 @@ mutated. This is what makes replay possible at all.
 **Write `verify(po, record, rules) -> { ok, failures[] }` as a pure function with zero I/O.**
 Test it against fixtures before touching a database or a UI.
 
-⚠️ On check 4, don't claim "every Rain control passes this" until A confirms with the
-engineer whether Rain locks to category or exact merchant. If exact, reframe: "we check the
-same thing Rain does, plus the parts of the deal Rain never sees."
+✅ **On check 4, settled — never claim "every Rain control passes this."** Rain supports
+exact-merchant allowlists; citations in [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). The
+honest framing: *we set every control Rain gives us, and we add the checks a card control
+cannot express.* The uncovered part of check 4 is the **SKU**, not the vendor.
 
 ### 15:00-17:00: storage wired, decision log, UI shell, seed data
 

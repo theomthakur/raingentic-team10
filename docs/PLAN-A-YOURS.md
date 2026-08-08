@@ -9,9 +9,10 @@ do, in order.
 
 1. **Can we simulate an authorization** against a card we issue? This decides whether the
    demo can show a decline, or only issuance.
-2. **Does card issuance lock to one exact merchant, or only a category?** Decides whether
-   the vendor-check point is "Rain would have allowed this" or the weaker "we stop it
-   before Rain is asked."
+2. ✅ **RESOLVED — Rain supports exact-merchant allowlists, don't ask this.** Citations in
+   [RAIN-API-CONFIRMED.md](RAIN-API-CONFIRMED.md). "Rain would have allowed this" is
+   **false**. Ask instead: **what is the `configuration` schema** to express a limit, a
+   merchant allowlist and a short expiry? The capability is confirmed, the field shape is not.
 3. Base URL and auth header to use.
 4. Is the collateral already funded, or do we send RUSD first.
 

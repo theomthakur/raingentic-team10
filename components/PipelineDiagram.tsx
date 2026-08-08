@@ -5,9 +5,9 @@ import type { Stage } from "@/lib/pipeline";
 /**
  * The architecture, always on screen, lighting up as a real run passes through it.
  *
- * This is the thing the WoundScope loss said to build and the docs said "not today." It
- * is not today anymore: a judge should be able to point at this and understand the whole
- * system before anyone says a word, and then watch it actually happen when a task runs.
+ * The diagram is the pitch: someone should be able to point at this and understand the
+ * whole system before anyone says a word, and then watch it actually happen when a task
+ * runs. A static architecture slide claims the stages exist; this one demonstrates them.
  */
 
 interface Node {

@@ -86,6 +86,42 @@ limit, a merchant or category allowlist, and a short expiry. The field exists an
 back as `{ "currency": "usd" }`, but the accepted schema is not discoverable from errors,
 because the endpoint accepts a one-field body rather than validating the rest.
 
+## ✅ Resolved from public sources: exact-merchant locking IS supported
+
+Several docs in this folder flag *"does issuance lock to one exact merchant, or only a
+category?"* as an urgent question for an engineer. **It is answered publicly and does not
+need asking.**
+
+Rain's press release enumerates the control dimensions as merchant category codes,
+**approved merchants or payment recipients**, transaction amounts, transaction frequency,
+the number of active agent cards, and card expiry
+([PR Newswire, June 2026](https://www.prnewswire.com/news-releases/rain-releases-agent-control-layer-bringing-programmatic-spending-guardrails-to-agentic-payments-302794541.html)).
+Their own post lists agent-level controls as amounts, **merchant and category allowlists**,
+spend intervals and card expiry
+([Introducing the Agent Control Layer](https://www.rain.xyz/resources/introducing-the-agent-control-layer)).
+
+Approved *merchants* is listed separately from merchant *category codes*, so exact-merchant
+allowlisting exists.
+
+🔴 **Consequence for the pitch: the strong version of the vendor-mismatch claim is false.**
+Do not say "Rain would let a different vendor through." Say instead: *we set every control
+Rain gives us, and we add the checks a card control cannot express.*
+
+**What Rain's enumerated dimensions genuinely do not cover** — all six describe the
+*instrument*, none describe the obligation behind it:
+
+1. which internal purchase order a spend belongs to
+2. whether that order is still open
+3. which specific **item** (SKU) is being bought
+4. whether a card was already issued for that order line
+5. who must approve above a delegated threshold
+
+That is the honest list, it is five items rather than a vague "why", and every one of them
+is defensible in front of a Rain engineer.
+
+📝 The remaining open question is narrower than it looked: not *can* we lock to a merchant,
+but **what is the `configuration` schema to express it.** That still needs an engineer.
+
 ## Deactivation — unresolved
 
 `PATCH /issuing/cards/{cardId}` exists and accepts an empty body, but
