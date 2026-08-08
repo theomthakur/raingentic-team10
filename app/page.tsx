@@ -20,6 +20,7 @@ import { ReplayDiff } from "@/components/ReplayDiff";
 import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui";
 import { diffRules } from "@/lib/rules/diff";
 
@@ -304,6 +305,8 @@ export default function Page() {
           </section>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

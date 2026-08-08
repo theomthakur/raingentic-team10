@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Badge, Panel } from "@/components/ui";
 import { SystemDiagram } from "@/components/SystemDiagram";
+import { FlowDiagram } from "@/components/FlowDiagram";
+import { Footer } from "@/components/Footer";
 
 export const metadata = {
   title: "Mandate — system design",
@@ -69,6 +71,13 @@ export default function ArchitecturePage() {
         <section className="mb-10">
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
             The whole system, one diagram
+          </p>
+          <FlowDiagram />
+        </section>
+
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            Step by step
           </p>
           <SystemDiagram />
         </section>
@@ -182,6 +191,8 @@ export default function ArchitecturePage() {
           </Panel>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 }
