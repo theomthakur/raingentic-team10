@@ -10,6 +10,7 @@ import { verify } from "@/lib/checks";
 import { defaultRuleSet, nextRuleSet } from "@/lib/rules/defaults";
 import { hashRules } from "@/lib/rules/hash";
 import { replay } from "@/lib/replay";
+import { diffRules } from "@/lib/rules/diff";
 import seeded from "@/lib/seed/decisions.json";
 import type { Decision } from "@/lib/types";
 
@@ -300,7 +301,11 @@ test("tightening the amount tolerance flips approvals to refusals", () => {
   assert.ok(r.approvedNowRefused.length >= 5, `only ${r.approvedNowRefused.length} flipped`);
   assert.equal(r.refusedNowApproved.length, 0);
   for (const change of r.approvedNowRefused) {
-    assert.ok(change.nowFailing.some((c) => c.ruleId === "amount-matches"));
+    const flip = change.nowFailing.find((f) => f.now.ruleId === "amount-matches");
+    assert.ok(flip, "amount-matches should be the rule that flipped");
+    // Both sides of the comparison must be present, or the UI cannot explain the flip.
+    assert.equal(flip.previously?.passed, true, "it should have passed under v1");
+    assert.equal(flip.now.passed, false);
   }
 });
 
@@ -322,6 +327,35 @@ test("every decision in the log accounts for itself in a replay", () => {
     r.unchanged + r.approvedNowRefused.length + r.refusedNowApproved.length,
     r.total
   );
+});
+
+// --- the rule diff, which is what explains a replay --------------------------
+
+test("the rule diff names the exact parameter that moved", () => {
+  const tightened = RULES.rules.map((rule) =>
+    rule.id === "amount-matches" ? { ...rule, params: { toleranceBps: 0 } } : rule
+  );
+  const changes = diffRules(RULES.rules, tightened);
+  assert.equal(changes.length, 1);
+  assert.equal(changes[0].ruleId, "amount-matches");
+  assert.equal(changes[0].field, "toleranceBps");
+  assert.equal(changes[0].before, "200");
+  assert.equal(changes[0].after, "0");
+});
+
+test("the rule diff reports a rule being switched off", () => {
+  const relaxed = RULES.rules.map((rule) =>
+    rule.id === "line-matches" ? { ...rule, enabled: false } : rule
+  );
+  const changes = diffRules(RULES.rules, relaxed);
+  assert.deepEqual(
+    changes.map((c) => [c.field, c.before, c.after]),
+    [["enabled", "on", "off"]]
+  );
+});
+
+test("an unchanged policy produces an empty diff", () => {
+  assert.deepEqual(diffRules(RULES.rules, RULES.rules), []);
 });
 
 // --- report ----------------------------------------------------------------

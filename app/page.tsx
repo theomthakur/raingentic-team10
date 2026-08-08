@@ -21,6 +21,7 @@ import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
 import { Header } from "@/components/Header";
 import { Badge } from "@/components/ui";
+import { diffRules } from "@/lib/rules/diff";
 
 interface State {
   storage: "memory" | "postgres";
@@ -290,7 +291,14 @@ export default function Page() {
                     if (rs) setDraftRules(rs.rules);
                   }}
                 />
-                <ReplayDiff result={replayResult} />
+                <ReplayDiff
+                  result={replayResult}
+                  ruleChanges={diffRules(currentRuleSet.rules, draftRules)}
+                  onSelectDecision={(id) => {
+                    setSelectedId(id);
+                    setTab("provenance");
+                  }}
+                />
               </>
             )}
           </section>
