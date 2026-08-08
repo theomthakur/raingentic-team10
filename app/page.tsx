@@ -349,12 +349,6 @@ export default function Page() {
               }}
             />
             <BudgetMeter budgets={state.budgets} />
-            <ChallengePanel
-              blankPO={state.blankPO}
-              rules={currentRuleSet.rules}
-              busy={busy}
-              onAttempt={attempt}
-            />
           </section>
 
           {/* right: audit one decision, or change the policy and re-judge all of them */}
@@ -425,6 +419,18 @@ export default function Page() {
             )}
           </section>
         </div>
+
+        <section className="mt-14">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            4 · Try to break it
+          </p>
+          <ChallengePanel
+            blankPO={state.blankPO}
+            rules={currentRuleSet.rules}
+            busy={busy}
+            onAttempt={attempt}
+          />
+        </section>
       </main>
 
       <Footer />
