@@ -30,6 +30,18 @@ export const RULE_BASIS: Record<RuleId, string> = {
     "Idempotency key — in payments a retry is not hypothetical, and the order line is the key",
   "requires-approval":
     "Delegation of authority — bounded autonomy with an escalation path, exactly as a DoA matrix grants it to a person",
+
+  // The history-aware four. Each of these reads the decision log rather than a single
+  // declaration, which is why they could only exist once the log did — and each is a
+  // named control, not an invention.
+  "no-structuring":
+    "Structuring detection — banks have flagged deliberately-split transactions since the Bank Secrecy Act; the same logic applies to an agent splitting a purchase order",
+  "agent-authority":
+    "Role-based delegation of authority — a junior buyer and a capital buyer do not share a signing limit",
+  "known-vendor":
+    "New-payee verification — the control every AP team runs, because invoice fraud almost always arrives as a payee nobody has paid before",
+  "velocity":
+    "Velocity limiting — standard card-fraud control, applied to the agent rather than the card",
 };
 
 /**

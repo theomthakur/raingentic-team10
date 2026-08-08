@@ -49,6 +49,10 @@ const RULE_QUESTIONS: Record<RuleId, string> = {
   "within-budget": "Is there budget left to cover it?",
   "no-existing-card": "Has a card already been issued for it?",
   "requires-approval": "Is it inside this agent's spending authority?",
+  "no-structuring": "Is this a big purchase split up to duck approval?",
+  "agent-authority": "Is it inside this particular agent's own limit?",
+  "known-vendor": "Have we ever paid this supplier before?",
+  velocity: "Is this agent buying faster than it should?",
 };
 
 export function productName(sku: string): string {

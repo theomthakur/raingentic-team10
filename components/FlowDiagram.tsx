@@ -38,7 +38,7 @@ const NODES: Node[] = [
   { id: "task", n: "1", title: "Task", caption: "agent is given a job", x: 10, y: 92, owner: "agent" },
   { id: "quote", n: "1b", title: "Quote", caption: "sellers bid, one wins", x: 210, y: 92, owner: "agent" },
   { id: "propose", n: "2", title: "Propose", caption: "agent declares the PO", x: 410, y: 92, owner: "agent" },
-  { id: "verify", n: "3", title: "Verify", caption: "6 deterministic checks", x: 640, y: 92, owner: "check" },
+  { id: "verify", n: "3", title: "Verify", caption: "11 deterministic checks", x: 640, y: 92, owner: "check" },
   { id: "refuse", n: "4a", title: "Refuse", caption: "no card, ever", x: 860, y: 92, owner: "refuse" },
   { id: "issue", n: "4b", title: "Issue", caption: "Rain issues scoped card", x: 10, y: 234, owner: "rain" },
   { id: "settle", n: "5", title: "Settle", caption: "purchase happens", x: 210, y: 234, owner: "rain" },
@@ -127,7 +127,7 @@ export function FlowDiagram() {
           markerEnd="url(#arrow-mint)"
         />
         <text x={cx(byId.verify) + 8} y={188} fontSize={10.5} fontWeight={600} fill="#117932">
-          all 6 pass
+          all 11 pass
         </text>
 
         {/* bottom row chain */}

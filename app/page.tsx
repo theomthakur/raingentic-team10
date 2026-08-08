@@ -20,8 +20,10 @@ import { RuleEditor } from "@/components/RuleEditor";
 import { ReplayDiff } from "@/components/ReplayDiff";
 import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
+import { RainFlow } from "@/components/RainFlow";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { LoadingRain } from "@/components/LoadingRain";
 import { Badge } from "@/components/ui";
 import { diffRules } from "@/lib/rules/diff";
 
@@ -41,6 +43,16 @@ interface State {
 type Tab = "provenance" | "policy";
 
 const STEP_DELAY_MS = 380;
+
+/**
+ * Minimum time the Raining… screen stays up.
+ *
+ * State usually returns in well under 100ms warm, and a loader that appears for 70ms
+ * reads as a flicker rather than a loader — worse than not having one. This is a floor,
+ * not a delay: if the data takes longer, the screen simply stays until it arrives.
+ * Nothing waits on this timer except the animation being visible long enough to be seen.
+ */
+const MIN_LOADING_MS = 900;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Page() {
@@ -53,6 +65,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("provenance");
 
+  const [minLoadingDone, setMinLoadingDone] = useState(false);
   const [draftRules, setDraftRules] = useState<Rule[] | null>(null);
   const [replayResult, setReplayResult] = useState<ReplayResult | null>(null);
 
@@ -62,6 +75,11 @@ export default function Page() {
     setState(data);
     setDraftRules((prev) => prev ?? latest(data.ruleSets).rules);
     return data;
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMinLoadingDone(true), MIN_LOADING_MS);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
@@ -258,12 +276,9 @@ export default function Page() {
     }
   }
 
-  if (!state || !currentRuleSet || !draftRules) {
-    return (
-      <main className="flex h-screen items-center justify-center text-[13px] text-muted">
-        {error ?? "Loading…"}
-      </main>
-    );
+  // An error should show immediately rather than sitting behind the animation.
+  if (!state || !currentRuleSet || !draftRules || (!minLoadingDone && !error)) {
+    return <LoadingRain error={error} />;
   }
 
   return (

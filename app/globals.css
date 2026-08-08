@@ -19,6 +19,46 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* The loading screen. A drop falls, stretches slightly as it accelerates, and fades before
+   it lands — a full splash would draw the eye to the bottom of an empty screen, which is
+   the one place there is nothing to look at. */
+@keyframes raindrop-fall {
+  0% {
+    transform: translateY(-12vh) scaleY(0.6);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(88vh) scaleY(1.25);
+    opacity: 0;
+  }
+}
+
+/* The ripple under the wordmark, so the rain reads as landing on something. */
+@keyframes ripple-out {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raindrop,
+  .ripple {
+    animation: none !important;
+    opacity: 0.25;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

@@ -6,6 +6,7 @@ import type {
   QuoteRecord,
   RecordSnapshot,
   RuleSet,
+  SpendHistory,
 } from "@/lib/types";
 
 /**
@@ -37,6 +38,20 @@ export interface Store {
   getQuote(poNumber: string): Promise<QuoteRecord | null>;
   getBudget(costCentre: string): Promise<BudgetRecord | null>;
   getCardForPO(poNumber: string): Promise<IssuedCardRecord | null>;
+
+  /**
+   * Aggregates over recent decisions, for the rules that judge a purchase in the context
+   * of the ones around it rather than on its own.
+   *
+   * Derived from the decision log itself rather than a separate counter, so it cannot
+   * drift out of step with what was actually decided.
+   */
+  getSpendHistory(params: {
+    agent: string;
+    vendor: string;
+    costCentre: string;
+    windowHours: number;
+  }): Promise<SpendHistory>;
 
   /**
    * A negotiation concluded, so the winning quote becomes an accepted order line on the
@@ -80,11 +95,25 @@ export interface Store {
  * Take the snapshot the checker is allowed to see. Design decision 4: what gets stored on
  * the decision is this object, not the ids inside it.
  */
-export async function snapshot(store: Store, po: PurchaseOrder): Promise<RecordSnapshot> {
-  const [quote, budget, existingCard] = await Promise.all([
+export async function snapshot(
+  store: Store,
+  po: PurchaseOrder,
+  agent: string,
+  /** Trailing window the history rules judge against. One business day by default. */
+  windowHours = 24
+): Promise<RecordSnapshot> {
+  const [quote, budget, existingCard, history] = await Promise.all([
     store.getQuote(po.poNumber),
     store.getBudget(po.costCentre),
     store.getCardForPO(po.poNumber),
+    store.getSpendHistory({ agent, vendor: po.vendor, costCentre: po.costCentre, windowHours }),
   ]);
-  return { quote, budget, existingCard, observedAt: new Date().toISOString() };
+  return {
+    quote,
+    budget,
+    existingCard,
+    agent,
+    history,
+    observedAt: new Date().toISOString(),
+  };
 }

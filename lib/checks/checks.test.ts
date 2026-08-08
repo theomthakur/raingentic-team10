@@ -5,7 +5,7 @@
  * determinism, and that every threshold comes from rule data rather than from code.
  */
 import assert from "node:assert/strict";
-import type { PurchaseOrder, RecordSnapshot, Rule, RuleSet } from "@/lib/types";
+import type { PurchaseOrder, RecordSnapshot, Rule, RuleSet, SpendHistory } from "@/lib/types";
 import { verify } from "@/lib/checks";
 import {
   DEFAULT_RULES,
@@ -64,6 +64,23 @@ function record(overrides: Partial<RecordSnapshot> = {}): RecordSnapshot {
     budget: { costCentre: "CC-OPS", limitCents: 1_000_000, spentCents: 0 },
     existingCard: null,
     observedAt: OBSERVED,
+    // The agent with the largest own-limit, so the older tests keep isolating the rule
+    // they were written for rather than also tripping per-agent authority.
+    agent: "procurement-02",
+    history: spend(),
+    ...overrides,
+  };
+}
+
+/** A quiet history: nothing recent, supplier already known. The happy path. */
+function spend(overrides: Partial<SpendHistory> = {}): SpendHistory {
+  return {
+    windowHours: 24,
+    agentCount: 0,
+    agentTotalCents: 0,
+    sameVendorCostCentreCents: 0,
+    sameVendorCostCentreCount: 0,
+    vendorEverPaid: true,
     ...overrides,
   };
 }
@@ -76,7 +93,7 @@ const failed = (r: ReturnType<typeof verify>) => r.failures.map((f) => f.ruleId)
 test("a PO that matches the record in every way is approved", () => {
   const r = verify(po(), record(), RULES);
   assert.equal(r.ok, true, `expected approval, got failures: ${failed(r)}`);
-  assert.equal(r.checks.length, 7);
+  assert.equal(r.checks.length, 11);
 });
 
 // --- rule 1 ----------------------------------------------------------------
@@ -554,3 +571,102 @@ async function run() {
 }
 
 run();
+
+// --- rules 8-11: the history-aware guardrails -------------------------------
+
+test("rule 8 escalates a purchase split to stay under the approval limit", () => {
+  // $20,000 alone is under the $25,000 ceiling. Another $20,000 already went to the same
+  // supplier and cost centre today, so together they are over it.
+  const r = verify(
+    po({ unitPrice: 2_000_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 2_000_000, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+      agent: "procurement-02",
+      history: spend({ sameVendorCostCentreCents: 2_000_000, sameVendorCostCentreCount: 1 }),
+    }),
+    RULES
+  );
+  const structuring = r.checks.find((c) => c.ruleId === "no-structuring")!;
+  assert.equal(structuring.passed, false);
+  assert.equal(structuring.escalates, true);
+  // Escalated, not refused: the purchase is suspicious, not wrong.
+  assert.ok(!failed(r).includes("no-structuring"));
+});
+
+test("rule 8 leaves a single large purchase to rule 7 rather than double-flagging it", () => {
+  const r = verify(
+    po({ unitPrice: 3_000_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 3_000_000, quantity: 1 },
+      budget: { costCentre: "CC-OPS", limitCents: 100_000_000, spentCents: 0 },
+      history: spend(),
+    }),
+    RULES
+  );
+  assert.equal(r.checks.find((c) => c.ruleId === "no-structuring")!.passed, true);
+  assert.equal(r.checks.find((c) => c.ruleId === "requires-approval")!.passed, false);
+});
+
+test("rule 9 holds a purchase over the individual agent's own limit", () => {
+  // office-supplies is trusted to $2,000; this is $3,000.
+  const r = verify(
+    po({ unitPrice: 300_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 300_000, quantity: 1 },
+      agent: "office-supplies",
+      history: spend(),
+    }),
+    RULES
+  );
+  const authority = r.checks.find((c) => c.ruleId === "agent-authority")!;
+  assert.equal(authority.passed, false);
+  assert.equal(authority.escalates, true);
+});
+
+test("rule 9 lets the same amount through for an agent with a bigger limit", () => {
+  const r = verify(
+    po({ unitPrice: 300_000, quantity: 1 }),
+    record({
+      quote: { ...record().quote!, unitPrice: 300_000, quantity: 1 },
+      agent: "procurement-02",
+      history: spend(),
+    }),
+    RULES
+  );
+  assert.equal(r.checks.find((c) => c.ruleId === "agent-authority")!.passed, true);
+});
+
+test("rule 10 escalates the first ever payment to a supplier", () => {
+  const r = verify(po(), record({ history: spend({ vendorEverPaid: false }) }), RULES);
+  const known = r.checks.find((c) => c.ruleId === "known-vendor")!;
+  assert.equal(known.passed, false);
+  assert.equal(known.escalates, true);
+});
+
+test("rule 11 refuses an agent that has exceeded its purchase count", () => {
+  const r = verify(po(), record({ history: spend({ agentCount: 12 }) }), RULES);
+  assert.equal(r.ok, false);
+  assert.ok(failed(r).includes("velocity"));
+});
+
+test("rule 11 refuses on cumulative value even when the count is fine", () => {
+  const r = verify(
+    po(),
+    record({ history: spend({ agentCount: 2, agentTotalCents: 9_999_000 }) }),
+    RULES
+  );
+  assert.ok(failed(r).includes("velocity"));
+});
+
+test("the history rules skip cleanly on a decision recorded before they existed", () => {
+  // The 47 seeded decisions have no history block. Replay must judge them on what was
+  // actually captured rather than inventing a past.
+  const r = verify(po(), record({ history: undefined, agent: undefined }), RULES);
+  const historyRules = ["no-structuring", "agent-authority", "known-vendor", "velocity"];
+  for (const id of historyRules) {
+    const c = r.checks.find((x) => x.ruleId === id)!;
+    assert.equal(c.skipped, true, `${id} should skip without history`);
+  }
+  assert.equal(r.ok, true);
+});

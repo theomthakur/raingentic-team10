@@ -20,7 +20,7 @@ const STEPS: Step[] = [
   { n: "1", name: "Task", owner: "agent", detail: "An agent is given a job — restock supplies, provision compute, book freight." },
   { n: "1b", name: "Quote", owner: "agent", detail: "Sellers bid. A deterministic negotiation engine runs one counter-offer round per seller and picks a winner — the buyer never sees a fabricated price." },
   { n: "2", name: "Propose", owner: "agent", detail: "The agent declares the purchase order it wants: vendor, SKU, unit price, quantity, quote expiry." },
-  { n: "3", name: "Verify", owner: "check", detail: "Six pure functions check the declared PO against the record — no model, no I/O, no wall clock. Rules are versioned data, not code." },
+  { n: "3", name: "Verify", owner: "check", detail: "Eleven pure functions check the declared PO against the record — no model, no I/O, no wall clock. Rules are versioned data, not code." },
   { n: "4a", name: "Refuse", owner: "refuse", detail: "Any check fails → no card is ever created. A plain-English reason is logged, not a decline on an instrument that already exists." },
   { n: "4b", name: "Issue", owner: "rain", detail: "All checks pass → Rain issues a scoped virtual card bound to exactly this PO: this vendor, this amount, this expiry." },
   { n: "5", name: "Settle", owner: "rain", detail: "The purchase happens on that card. The cost centre's budget is charged and the PO is marked fulfilled." },

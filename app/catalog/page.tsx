@@ -10,6 +10,7 @@ import { ProductGlyph } from "@/components/ProductGlyph";
 import { Avatar } from "@/components/Avatar";
 import { Badge, Button, Panel } from "@/components/ui";
 import { Footer } from "@/components/Footer";
+import { SubPageHeader } from "@/components/SiteNav";
 
 /**
  * The buying side, as a person would actually meet it.
@@ -288,20 +289,7 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-edge bg-white">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-5 md:px-10">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 text-[13px] font-medium text-muted transition hover:text-ink-900"
-          >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rain-500 text-[12px] font-bold text-white">
-              M
-            </span>
-            ← Back to Mandate
-          </Link>
-          <Badge tone="neutral">catalogue</Badge>
-        </div>
-      </header>
+      <SubPageHeader current="/catalog" />
 
       <main className="mx-auto max-w-[1400px] px-6 py-10 md:px-10">
         <section className="mb-8">
@@ -309,7 +297,7 @@ export default function CatalogPage() {
             What the agents are buying
           </p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Real products, real quantities, the same seven checks
+            Real products, real quantities, the same eleven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Buying from this page posts to the same endpoints the console does — there is no

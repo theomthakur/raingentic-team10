@@ -43,7 +43,7 @@ const ROWS: Row[] = [
   {
     layer: "Verification",
     tech: "Plain TypeScript, no dependencies",
-    why: "Six pure functions: no I/O, no model, no wall clock. That is precisely what makes replaying history meaningful instead of decorative.",
+    why: "Eleven pure functions: no I/O, no model, no wall clock. That is precisely what makes replaying history meaningful instead of decorative.",
   },
   {
     layer: "Money",

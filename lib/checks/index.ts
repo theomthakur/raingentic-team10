@@ -11,7 +11,7 @@ import { poTotal } from "@/lib/types";
 import { money } from "@/lib/format";
 
 /**
- * The six checks.
+ * The eleven checks.
  *
  * Three properties hold for every function in this file, and all three are load-bearing:
  *
@@ -331,6 +331,192 @@ const requiresApproval: CheckFn = (po, _record, rule) => {
   };
 };
 
+
+// ---------------------------------------------------------------------------
+// 8. Not a large purchase chopped into small ones to duck the approval limit
+// ---------------------------------------------------------------------------
+
+/**
+ * The counter to rule 7's obvious weakness.
+ *
+ * A $30,000 purchase gets held. Two $15,000 purchases do not — each is individually
+ * within authority, and every other check passes on both. The only thing that sees it is
+ * a rule that looks at the running total on the same vendor and cost centre rather than
+ * at one line in isolation.
+ *
+ * It escalates rather than refuses. Buying twice from one supplier in a day is completely
+ * ordinary; buying twice in a way that happens to stay just under the ceiling is worth a
+ * person's attention, not an accusation.
+ */
+const noStructuring: CheckFn = (po, record, rule) => {
+  const base = { ruleId: rule.id, label: rule.label, readFrom: "record.history.sameVendorCostCentreCents" };
+  const h = record.history;
+  if (!h) {
+    return skipped(rule, "No spend history was captured with this decision.", base.readFrom);
+  }
+
+  const windowHours = num(rule.params, "windowHours", 24);
+  const threshold = num(rule.params, "thresholdCents", 2_500_000);
+  const asked = poTotal(po);
+  const combined = asked + h.sameVendorCostCentreCents;
+
+  // Only interesting when this line on its own would have sailed through.
+  if (asked < threshold && combined >= threshold && h.sameVendorCostCentreCount > 0) {
+    return {
+      ...base,
+      passed: false,
+      escalates: true,
+      reason: `On its own this is ${money(asked)}, under the ${money(threshold)} limit — but ${money(h.sameVendorCostCentreCents)} has already gone to ${po.vendor} on ${po.costCentre} in the last ${windowHours} hours, making ${money(combined)} together. Split purchases are how an approval limit gets sidestepped, so a person confirms this one.`,
+      expected: `under ${money(threshold)} combined over ${windowHours}h`,
+      actual: `${money(combined)} across ${h.sameVendorCostCentreCount + 1} purchases`,
+    };
+  }
+
+  return {
+    ...base,
+    passed: true,
+    reason:
+      h.sameVendorCostCentreCount === 0
+        ? `Nothing else has gone to ${po.vendor} on ${po.costCentre} in the last ${windowHours} hours.`
+        : `${money(combined)} to ${po.vendor} on ${po.costCentre} over ${windowHours} hours, under the ${money(threshold)} limit.`,
+    expected: `under ${money(threshold)} combined over ${windowHours}h`,
+    actual: money(combined),
+  };
+};
+
+// ---------------------------------------------------------------------------
+// 9. Inside this particular agent's own signing limit
+// ---------------------------------------------------------------------------
+
+/**
+ * One global ceiling treats every agent as equally trusted. A real delegation matrix does
+ * not: the person ordering stationery and the person ordering capital equipment have very
+ * different limits, and so should their agents.
+ */
+const agentAuthority: CheckFn = (po, record, rule) => {
+  const base = { ruleId: rule.id, label: rule.label, readFrom: "record.agent" };
+  const agent = record.agent;
+  if (!agent) {
+    return skipped(rule, "No agent was recorded on this decision.", base.readFrom);
+  }
+
+  const limit = num(rule.params, agent, num(rule.params, "defaultCents", 500_000));
+  const asked = poTotal(po);
+
+  if (asked > limit) {
+    return {
+      ...base,
+      passed: false,
+      escalates: true,
+      reason: `${agent} is trusted up to ${money(limit)} unattended, and this is ${money(asked)}. Not refused — it needs whoever holds a bigger limit to release it.`,
+      expected: `at most ${money(limit)} for ${agent}`,
+      actual: money(asked),
+    };
+  }
+
+  return {
+    ...base,
+    passed: true,
+    reason: `${money(asked)} is inside ${agent}'s own ${money(limit)} limit.`,
+    expected: `at most ${money(limit)} for ${agent}`,
+    actual: money(asked),
+  };
+};
+
+// ---------------------------------------------------------------------------
+// 10. A vendor somebody has paid before
+// ---------------------------------------------------------------------------
+
+/**
+ * Invoice fraud almost always arrives as a payee nobody has ever paid. A first payment to
+ * a new supplier is still perfectly normal business, so this holds rather than refuses —
+ * it is the pairing of "new payee" and "nobody looked" that loses the money.
+ */
+const knownVendor: CheckFn = (po, record, rule) => {
+  const base = { ruleId: rule.id, label: rule.label, readFrom: "record.history.vendorEverPaid" };
+  const h = record.history;
+  if (!h) {
+    return skipped(rule, "No vendor history was captured with this decision.", base.readFrom);
+  }
+  if (!bool(rule.params, "escalateOnFirstPayment", true)) {
+    return skipped(rule, "First-payment escalation is switched off in this policy.", base.readFrom);
+  }
+
+  if (!h.vendorEverPaid) {
+    return {
+      ...base,
+      passed: false,
+      escalates: true,
+      reason: `${po.vendor} has never been paid before. A first payment to a new supplier is normal, and it is also what invoice fraud looks like, so a person confirms it once.`,
+      expected: "a supplier with payment history",
+      actual: `first ever payment to ${po.vendor}`,
+    };
+  }
+
+  return {
+    ...base,
+    passed: true,
+    reason: `${po.vendor} has been paid before.`,
+    expected: "a supplier with payment history",
+    actual: "known supplier",
+  };
+};
+
+// ---------------------------------------------------------------------------
+// 11. Not spending faster than this agent should be able to
+// ---------------------------------------------------------------------------
+
+/**
+ * The failure every other check is blind to. An agent stuck in a loop, or one that has
+ * been taken over, makes purchases that are each individually perfect. Nothing is wrong
+ * with any single one of them. Only the rate is wrong.
+ *
+ * This refuses rather than escalates: a runaway agent should stop now, and a person can
+ * always raise the limit afterwards.
+ */
+const velocity: CheckFn = (po, record, rule) => {
+  const base = { ruleId: rule.id, label: rule.label, readFrom: "record.history.agentCount" };
+  const h = record.history;
+  if (!h) {
+    return skipped(rule, "No spend history was captured with this decision.", base.readFrom);
+  }
+
+  const windowHours = num(rule.params, "windowHours", 24);
+  const maxCount = num(rule.params, "maxCount", 12);
+  const maxTotal = num(rule.params, "maxTotalCents", 10_000_000);
+  const agent = record.agent ?? "this agent";
+  const nextCount = h.agentCount + 1;
+  const nextTotal = h.agentTotalCents + poTotal(po);
+
+  if (nextCount > maxCount) {
+    return {
+      ...base,
+      passed: false,
+      reason: `${agent} has already made ${h.agentCount} purchases in the last ${windowHours} hours, and the ceiling is ${maxCount}. Each one may be fine on its own; the rate is not.`,
+      expected: `at most ${maxCount} purchases per ${windowHours}h`,
+      actual: `${nextCount} purchases`,
+    };
+  }
+
+  if (nextTotal > maxTotal) {
+    return {
+      ...base,
+      passed: false,
+      reason: `${agent} would reach ${money(nextTotal)} in ${windowHours} hours, over the ${money(maxTotal)} ceiling for that period.`,
+      expected: `at most ${money(maxTotal)} per ${windowHours}h`,
+      actual: money(nextTotal),
+    };
+  }
+
+  return {
+    ...base,
+    passed: true,
+    reason: `${nextCount} of ${maxCount} purchases and ${money(nextTotal)} of ${money(maxTotal)} used in the last ${windowHours} hours.`,
+    expected: `at most ${maxCount} purchases and ${money(maxTotal)} per ${windowHours}h`,
+    actual: `${nextCount} purchases, ${money(nextTotal)}`,
+  };
+};
+
 const CHECKS: Record<RuleId, CheckFn> = {
   "po-exists": poExists,
   "po-open": poOpen,
@@ -338,6 +524,10 @@ const CHECKS: Record<RuleId, CheckFn> = {
   "line-matches": lineMatches,
   "within-budget": withinBudget,
   "no-existing-card": noExistingCard,
+  "no-structuring": noStructuring,
+  "agent-authority": agentAuthority,
+  "known-vendor": knownVendor,
+  velocity,
   "requires-approval": requiresApproval,
 };
 

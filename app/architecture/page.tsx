@@ -5,6 +5,7 @@ import { FlowDiagram } from "@/components/FlowDiagram";
 import { TechStack } from "@/components/TechStack";
 import { ControlCoverage } from "@/components/ControlCoverage";
 import { Footer } from "@/components/Footer";
+import { SubPageHeader } from "@/components/SiteNav";
 
 export const metadata = {
   title: "Mandate — system design",
@@ -17,7 +18,11 @@ const CHECKS = [
   { id: "line-matches", label: "Vendor and SKU match the accepted quote", detail: "Right price, wrong item, is still wrong. Catches an agent that quietly substitutes what it's buying." },
   { id: "within-budget", label: "Within the cost centre's remaining budget", detail: "Checked against the real remaining balance at the moment of the request, not a cached figure." },
   { id: "no-existing-card", label: "No card already issued for this PO", detail: "Idempotency. Submit the same PO twice and the second run is refused by the record the first run itself wrote." },
-  { id: "requires-approval", label: "Above the delegated limit, a person must release it", detail: "Bounded autonomy. Above the configured threshold the purchase is held rather than refused — every check passed, it is simply large. No card exists while it waits, so approving is what creates the instrument." },
+  { id: "requires-approval", label: "Above the delegated limit, a person must release it", detail: "Over $25,000 the purchase is held rather than refused. Nothing is wrong with it — it is simply larger than any agent's unattended authority." },
+  { id: "no-structuring", label: "Not a large purchase split to duck approval", detail: "The obvious way to beat the limit above is to buy twice, just under it each time. So the ceiling applies to the running total on one supplier and cost centre, not to a single line in isolation." },
+  { id: "agent-authority", label: "Inside this particular agent's own limit", detail: "A single global ceiling would give the agent buying stationery the same authority as the one buying capital equipment. Limits are per-agent, exactly as a delegation matrix is per-role." },
+  { id: "known-vendor", label: "A supplier we have paid before", detail: "A first payment to a new supplier is ordinary business, and it is also what invoice fraud looks like. Held once, not refused." },
+  { id: "velocity", label: "Not spending faster than this agent should", detail: "An agent stuck in a loop makes purchases that are each individually perfect. Nothing is wrong with any one of them; only the rate is wrong, so only a rate limit sees it." },
 ];
 
 const CATEGORIES = [
@@ -37,20 +42,7 @@ const NOT_BUILT = [
 export default function ArchitecturePage() {
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-edge bg-white">
-        <div className="mx-auto flex max-w-[1100px] items-center justify-between gap-4 px-6 py-5 md:px-10">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 text-[13px] font-medium text-muted transition hover:text-ink-900"
-          >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rain-500 text-[12px] font-bold text-white">
-              M
-            </span>
-            ← Back to Mandate
-          </Link>
-          <Badge tone="neutral">system design</Badge>
-        </div>
-      </header>
+      <SubPageHeader current="/architecture" />
 
       <main className="mx-auto max-w-[1100px] px-6 py-10 md:px-10">
         <section className="mb-10">
@@ -94,7 +86,7 @@ export default function ArchitecturePage() {
 
         <section className="mb-10">
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            The seven checks that decide step 3
+            The eleven checks that decide step 3
           </p>
           <Panel>
             <ul className="divide-y divide-edge">
