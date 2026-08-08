@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { proposePurchase, type Task } from "@/lib/agent";
+import { enrichWithLLMFlavor } from "@/lib/llm";
 import { runPipeline } from "@/lib/pipeline";
 import { getStore } from "@/lib/store";
 import { poTotal, type QuoteRecord } from "@/lib/types";
@@ -42,7 +43,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 422 });
   }
 
-  const { po, negotiation } = proposed;
+  const { po } = proposed;
+
+  // Optional, additive, never blocks or changes the outcome: swaps in an LLM-written
+  // seller remark if GROQ_API_KEY is set and responds in time. Falls back silently to the
+  // deterministic note otherwise — the price and the winner were already decided above,
+  // and this runs upstream of PROPOSE, so no model is anywhere near the verify path.
+  const negotiation = await enrichWithLLMFlavor(proposed.negotiation);
 
   // The concluded negotiation becomes an accepted order line. Without this the checker
   // would have nothing independent to compare the agent's declaration against.
