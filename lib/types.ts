@@ -94,6 +94,40 @@ export interface RecordSnapshot {
   existingCard: IssuedCardRecord | null;
   /** When the snapshot was taken. */
   observedAt: string;
+  /** Who declared it. Needed by the rules that vary authority by agent. */
+  agent?: string;
+  /**
+   * What has already been spent around this purchase.
+   *
+   * Optional because the 47 seeded decisions were written before these rules existed, and
+   * a replay must never invent history it did not capture — the rules that read this skip
+   * cleanly when it is absent rather than guessing.
+   */
+  history?: SpendHistory;
+}
+
+/**
+ * Aggregates over the recent decision log, computed at snapshot time and frozen with the
+ * decision.
+ *
+ * Deliberately aggregates rather than a list of rows: a check must stay a pure function
+ * over a small, stable input, and storing every prior decision inside every decision
+ * would make the log grow quadratically.
+ */
+export interface SpendHistory {
+  /** How far back the counts below reach. */
+  windowHours: number;
+  /** Everything this agent had approved or held in the window, before this purchase. */
+  agentCount: number;
+  agentTotalCents: Cents;
+  /**
+   * Spend already committed to this same vendor and cost centre in the window. This is
+   * what makes a split purchase visible: each half is small, the pair is not.
+   */
+  sameVendorCostCentreCents: Cents;
+  sameVendorCostCentreCount: number;
+  /** False when nobody has ever successfully paid this vendor before. */
+  vendorEverPaid: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -107,7 +141,11 @@ export type RuleId =
   | "line-matches"
   | "within-budget"
   | "no-existing-card"
-  | "requires-approval";
+  | "requires-approval"
+  | "no-structuring"
+  | "agent-authority"
+  | "known-vendor"
+  | "velocity";
 
 /** A rule is a row, not an `if`. Params are what a finance team edits without a deploy. */
 export interface Rule {

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { SiteNav } from "./SiteNav";
 import { Badge } from "./ui";
 
 /**
@@ -56,36 +56,6 @@ export function Header({
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/workspace"
-              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
-            >
-              Customer workspace →
-            </Link>
-            <Link
-              href="/presentation"
-              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
-            >
-              Presentation →
-            </Link>
-            <Link
-              href="/catalog"
-              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
-            >
-              Catalogue →
-            </Link>
-            <Link
-              href="/agents"
-              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
-            >
-              Agents →
-            </Link>
-            <Link
-              href="/architecture"
-              className="text-[12.5px] font-medium text-muted underline-offset-4 transition hover:text-ink-900 hover:underline"
-            >
-              System design →
-            </Link>
             <div className="flex items-center gap-2.5 rounded-full border border-edge bg-ink-50 py-1.5 pl-3 pr-3.5">
               <span className="text-[11px] font-medium uppercase tracking-wider text-ink-400">
                 Built for

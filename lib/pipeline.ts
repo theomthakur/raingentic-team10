@@ -81,7 +81,7 @@ export async function runPipeline(
   });
 
   // 3 VERIFY — deterministic, against a snapshot taken now and kept forever.
-  const record = await snapshot(store, po);
+  const record = await snapshot(store, po, agent);
   const ruleSet = await store.latestRuleSet();
 
   // On a release, the delegated-limit rule has already been satisfied — by a person.

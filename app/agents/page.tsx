@@ -9,6 +9,7 @@ import { AGENTS } from "@/lib/agents";
 import { AgentAvatar } from "@/components/AgentAvatar";
 import { Badge, Panel } from "@/components/ui";
 import { Footer } from "@/components/Footer";
+import { SubPageHeader } from "@/components/SiteNav";
 
 /**
  * The roster. Every stat here is counted off the live decision log, not written by hand —
@@ -94,26 +95,13 @@ export default function AgentsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-edge bg-white">
-        <div className="mx-auto flex max-w-[1100px] items-center justify-between gap-4 px-6 py-5 md:px-10">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 text-[13px] font-medium text-muted transition hover:text-ink-900"
-          >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rain-500 text-[12px] font-bold text-white">
-              M
-            </span>
-            ← Back to Mandate
-          </Link>
-          <Badge tone="neutral">agents</Badge>
-        </div>
-      </header>
+      <SubPageHeader current="/agents" />
 
       <main className="mx-auto max-w-[1100px] px-6 py-10 md:px-10">
         <section className="mb-8">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">Who's spending</p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Five agents, five roles — the same six checks
+            Five agents, five roles — the same eleven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Every purchase order in the log was declared by one of these. The id is what

@@ -68,6 +68,51 @@ export const DEFAULT_RULES: Rule[] = [
     params: { thresholdCents: 2_500_000, approverRole: "finance-controller" },
     basis: "Delegation of authority — bounded autonomy with an escalation path, exactly as a DoA matrix grants it to a person",
   },
+  {
+    id: "no-structuring",
+    label: "Not a large purchase split to duck approval",
+    enabled: true,
+    // The obvious way to defeat rule 7 is to buy the same thing twice, just under the
+    // limit each time. So the limit is applied to the running total on the same vendor
+    // and cost centre inside a window, not to a single line in isolation.
+    params: { windowHours: 24, thresholdCents: 2_500_000 },
+    basis: "Structuring detection — banks have flagged deliberately-split transactions since the Bank Secrecy Act; the same logic applies to an agent splitting a purchase order",
+  },
+  {
+    id: "agent-authority",
+    label: "Inside this particular agent's own limit",
+    enabled: true,
+    // One global ceiling would give the agent buying chairs the same authority as the one
+    // buying capital equipment. A real DoA matrix is per-role, so this is too. Anything
+    // not named here falls back to `defaultCents`.
+    params: {
+      defaultCents: 500_000,
+      "facilities-01": 500_000,
+      "procurement-01": 1_000_000,
+      "procurement-02": 5_000_000,
+      "office-supplies": 200_000,
+      "cloud-compute": 1_500_000,
+    },
+    basis: "Role-based delegation of authority — a junior buyer and a capital buyer do not share a signing limit",
+  },
+  {
+    id: "known-vendor",
+    label: "A vendor we have paid before",
+    enabled: true,
+    // Not a refusal: a first purchase from a new supplier is ordinary business. It is the
+    // combination of "new payee" and "nobody looked" that loses money.
+    params: { escalateOnFirstPayment: true },
+    basis: "New-payee verification — the control every AP team runs, because invoice fraud almost always arrives as a payee nobody has paid before",
+  },
+  {
+    id: "velocity",
+    label: "Not spending faster than this agent should",
+    enabled: true,
+    // A correct-but-looping agent passes every other check every time. Only the rate is
+    // wrong, so only a rate limit sees it.
+    params: { windowHours: 24, maxCount: 12, maxTotalCents: 10_000_000 },
+    basis: "Velocity limiting — standard card-fraud control, applied to the agent rather than the card",
+  },
 ];
 
 export function defaultRuleSet(): RuleSet {

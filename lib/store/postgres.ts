@@ -211,6 +211,35 @@ export function createPostgresStore(): Store {
       return rows[0] ? (rows[0].data as IssuedCardRecord) : null;
     },
 
+    /**
+     * Read straight off the decision log. Only approved and held rows count as committed
+     * spend — a refusal never moved money, so counting it would punish an agent for the
+     * system correctly stopping it.
+     */
+    async getSpendHistory({ agent, vendor, costCentre, windowHours }) {
+      const cutoff = Date.now() - windowHours * 3_600_000;
+      const all = await this.listDecisions();
+      const committed = all.filter((d) => d.outcome === "approved" || d.outcome === "held");
+      const inWindow = committed.filter((d) => Date.parse(d.createdAt) >= cutoff);
+
+      const mine = inWindow.filter((d) => d.agent === agent);
+      const sameLine = inWindow.filter(
+        (d) => d.po.vendor === vendor && d.po.costCentre === costCentre
+      );
+      const total = (rows: typeof inWindow) =>
+        rows.reduce((sum, d) => sum + d.po.unitPrice * d.po.quantity, 0);
+
+      return {
+        windowHours,
+        agentCount: mine.length,
+        agentTotalCents: total(mine),
+        sameVendorCostCentreCents: total(sameLine),
+        sameVendorCostCentreCount: sameLine.length,
+        // Across all time, not just the window: a vendor paid two years ago is not new.
+        vendorEverPaid: committed.some((d) => d.po.vendor === vendor),
+      };
+    },
+
     async recordAcceptedQuote(quote) {
       const sql = await getSql();
       // do nothing on conflict: first terms win, see the interface note.

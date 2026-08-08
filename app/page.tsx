@@ -20,6 +20,7 @@ import { RuleEditor } from "@/components/RuleEditor";
 import { ReplayDiff } from "@/components/ReplayDiff";
 import { BudgetMeter } from "@/components/BudgetMeter";
 import { PipelineDiagram } from "@/components/PipelineDiagram";
+import { RainFlow } from "@/components/RainFlow";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { LoadingRain } from "@/components/LoadingRain";
