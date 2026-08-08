@@ -24,7 +24,7 @@ function Head({ children }: { children: React.ReactNode }) {
 
 type FaceProps = SVGProps<SVGSVGElement> & { hair: string };
 
-export function NoraFace({ hair, ...props }: FaceProps) {
+export function RaeFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -36,7 +36,7 @@ export function NoraFace({ hair, ...props }: FaceProps) {
   );
 }
 
-export function KaiFace({ hair, ...props }: FaceProps) {
+export function MonaFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -49,7 +49,7 @@ export function KaiFace({ hair, ...props }: FaceProps) {
   );
 }
 
-export function ReidFace({ hair, ...props }: FaceProps) {
+export function PrueFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -62,7 +62,7 @@ export function ReidFace({ hair, ...props }: FaceProps) {
   );
 }
 
-export function MiloFace({ hair, ...props }: FaceProps) {
+export function LucaFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -76,7 +76,7 @@ export function MiloFace({ hair, ...props }: FaceProps) {
   );
 }
 
-export function VeraFace({ hair, ...props }: FaceProps) {
+export function AdaFace({ hair, ...props }: FaceProps) {
   return (
     <svg viewBox="0 0 24 24" {...props}>
       <Head>
@@ -98,11 +98,11 @@ export function GenericFace({ hair, ...props }: FaceProps) {
 }
 
 export const AGENT_FACES = {
-  nora: NoraFace,
-  kai: KaiFace,
-  reid: ReidFace,
-  milo: MiloFace,
-  vera: VeraFace,
+  rae: RaeFace,
+  mona: MonaFace,
+  prue: PrueFace,
+  luca: LucaFace,
+  ada: AdaFace,
   generic: GenericFace,
 } as const;
 

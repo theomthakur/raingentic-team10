@@ -40,6 +40,13 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
           </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-700">{agent.description}</p>
 
+          <p
+            className="mt-2.5 border-l-2 pl-3 text-[12.5px] italic leading-relaxed text-muted"
+            style={{ borderColor: `${agent.color}55` }}
+          >
+            Named for — {agent.why}
+          </p>
+
           <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
             <Badge tone="neutral">{mine.length} decisions</Badge>
             {approved > 0 && <Badge tone="pass">{approved} approved</Badge>}
@@ -95,8 +102,10 @@ export default function AgentsPage() {
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Every purchase order in the log was declared by one of these. The id is what
             the system actually keys on; the name is just so the feed reads like a team
-            doing work rather than a service account making requests. Stats below are
-            counted live off the decision log, not written by hand.
+            doing work rather than a service account making requests. Two are named for
+            our hosts, three for the history of financial control — the same argument the
+            rules make, that none of this was invented here. Stats are counted live off
+            the decision log, not written by hand.
           </p>
         </section>
 
