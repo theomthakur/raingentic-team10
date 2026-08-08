@@ -5,6 +5,7 @@ import { poTotal } from "@/lib/types";
 import { money, shortDate } from "@/lib/format";
 import { departmentName, outcomeSummary, productName, ruleQuestion } from "@/lib/plain";
 import { generateReceipt } from "@/lib/receipt";
+import { basisFor } from "@/lib/rules/basis";
 import { Avatar } from "./Avatar";
 import { AgentTag } from "./AgentTag";
 import { Badge, Button, Empty, Panel } from "./ui";
@@ -21,6 +22,10 @@ import { Badge, Button, Empty, Panel } from "./ui";
 function CheckRow({ check }: { check: CheckResult }) {
   const failed = !check.passed && !check.skipped;
   const escalated = check.escalates && !check.passed;
+  // Where a rule that just stopped a purchase comes from. Shown on the row that decided
+  // something, because "we refused this" is an assertion and "we refused this, and here is
+  // the established control that says so" is an argument.
+  const basis = basisFor(check.ruleId);
 
   const mark = check.skipped
     ? { glyph: "–", cls: "bg-ink-100 text-ink-400", word: "Not checked" }
@@ -78,6 +83,14 @@ function CheckRow({ check }: { check: CheckResult }) {
                   <th className="py-0.5 pr-3 font-normal text-ink-400">Read from</th>
                   <td className="py-0.5 text-ink-500">{check.readFrom}</td>
                 </tr>
+                {basis && (
+                  <tr>
+                    <th className="py-0.5 pr-3 align-top font-normal text-ink-400">Basis</th>
+                    <td className="py-0.5 font-sans text-[11.5px] leading-snug text-ink-500">
+                      {basis}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}

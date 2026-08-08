@@ -134,6 +134,15 @@ export function RuleEditor({
                   </p>
                   <code className="shrink-0 font-mono text-[10px] text-ink-400">{rule.id}</code>
                 </div>
+                {/* The control this descends from. None of these rules were invented here,
+                    and saying which established control each one implements is most of the
+                    answer to "why should I trust software to spend my money?" — these are
+                    the controls a finance team already runs, moved to before the money is
+                    committed. Invisible until now: it was in the data and in the docs but
+                    never on screen. */}
+                {rule.basis && (
+                  <p className="mt-0.5 text-[11.5px] leading-snug text-ink-400">{rule.basis}</p>
+                )}
                 {Object.keys(rule.params).length > 0 && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                     {Object.entries(rule.params).map(([k, v]) => (

@@ -1,5 +1,6 @@
 import type { Rule, RuleSet } from "@/lib/types";
 import { hashRules } from "./hash";
+import { RULE_BASIS } from "./basis";
 
 /**
  * Rule version 1. Seven rules, all data.
@@ -19,14 +20,14 @@ export const DEFAULT_RULES: Rule[] = [
     label: "PO exists and is accepted",
     enabled: true,
     params: { requireAccepted: true },
-    basis: "Three-way match, PO leg — accounts payable will not pay against an order that was never raised",
+    basis: RULE_BASIS["po-exists"],
   },
   {
     id: "po-open",
     label: "PO still open and the quote has not expired",
     enabled: true,
     params: { allowExpiredQuote: false, expiryGraceHours: 0 },
-    basis: "Three-way match, receipt leg — a fulfilled line must not be paid twice",
+    basis: RULE_BASIS["po-open"],
   },
   {
     id: "amount-matches",
@@ -34,21 +35,21 @@ export const DEFAULT_RULES: Rule[] = [
     enabled: true,
     // 200 bps = 2%. Tightening this to 0 is the rule edit the replay demo uses.
     params: { toleranceBps: 200 },
-    basis: "Three-way match, invoice leg — price variance tolerance, as ERPs apply on invoice matching",
+    basis: RULE_BASIS["amount-matches"],
   },
   {
     id: "line-matches",
     label: "Vendor and SKU match the accepted quote",
     enabled: true,
     params: { checkVendor: true, checkSku: true, caseSensitive: false },
-    basis: "Line-level match — no card network can express 'right supplier, wrong item', because an issuer cannot see your order system",
+    basis: RULE_BASIS["line-matches"],
   },
   {
     id: "within-budget",
     label: "Within the cost centre's remaining budget",
     enabled: true,
     params: { blockOnMissingBudget: true },
-    basis: "Budgetary control — commitment accounting against a cost centre",
+    basis: RULE_BASIS["within-budget"],
   },
   {
     id: "no-existing-card",
@@ -56,7 +57,7 @@ export const DEFAULT_RULES: Rule[] = [
     enabled: true,
     // A revoked card still counts: the obligation was already met once.
     params: { countRevoked: true },
-    basis: "Idempotency key — in payments a retry is not hypothetical, and the order line is the key",
+    basis: RULE_BASIS["no-existing-card"],
   },
   {
     id: "requires-approval",
@@ -66,7 +67,7 @@ export const DEFAULT_RULES: Rule[] = [
     // named human. Set it too low and nobody reads the queue, which is worse than no
     // control at all.
     params: { thresholdCents: 2_500_000, approverRole: "finance-controller" },
-    basis: "Delegation of authority — bounded autonomy with an escalation path, exactly as a DoA matrix grants it to a person",
+    basis: RULE_BASIS["requires-approval"],
   },
 ];
 
