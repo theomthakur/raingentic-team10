@@ -88,7 +88,6 @@ The app works without credentials using clearly labeled local simulations. For a
 | `lib/rain/` | Rain sandbox cards, lifecycle, routes, and conditional treasury payout |
 | `lib/store/` | Append-only decision log backed by Postgres when configured |
 | `app/api/` | The API surface used by Home, Suppliers, Orders, and Proof |
-| `docs/` | Design notes, deployment notes, and hackathon context |
 
 ## Team
 

@@ -17,3 +17,6 @@ CLAUDE.md
 .kiro/
 tsconfig.tsbuildinfo
 .env*
+
+# Personal hackathon notes and reference material stay local-only.
+docs/

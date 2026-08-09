@@ -14,7 +14,8 @@ import type { RuleId } from "@/lib/types";
  * answer to "why should I trust software to spend my money?" — the answer is not "our rules
  * are clever", it is "these are your controls, moved to before the money is committed."
  *
- * Sources for each: docs/CONTROLS.md.
+ * The basis text is intentionally kept with the code so the public repository remains
+ * self-contained.
  */
 export const RULE_BASIS: Record<RuleId, string> = {
   "po-exists":

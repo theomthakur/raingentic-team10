@@ -157,7 +157,7 @@ export interface Rule {
   /**
    * The real-world control this implements. None of these rules were invented here — they
    * are controls finance departments already run, moved to before the money is committed.
-   * Saying so is most of the answer to "why should I trust this?". See docs/CONTROLS.md.
+   * Saying so is most of the answer to "why should I trust this?".
    */
   basis: string;
 }

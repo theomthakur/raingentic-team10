@@ -58,8 +58,7 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
     reference: req.po.poNumber,
     // Exact-merchant locking IS supported — Rain's press release lists "approved
     // merchants or payment recipients" separately from merchant category codes, and
-    // their Agent Control Layer post lists "merchant and category allowlists". See
-    // docs/RAIN-API-CONFIRMED.md for the citations.
+    // their Agent Control Layer post lists "merchant and category allowlists".
     //
     // ⚠️ Still commented out, but for a narrower reason than before: the capability is
     // confirmed, the `configuration` schema to express it is not. Sending a guessed shape

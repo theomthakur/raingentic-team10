@@ -1,7 +1,7 @@
 /**
  * Rain API client.
  *
- * Confirmed against the live sandbox (see docs/RAIN-API-CONFIRMED.md):
+ * Confirmed against the live sandbox during the hackathon:
  *   ✅ Base URL `https://api-dev.raincards.xyz/v1`
  *   ✅ Auth is an `api-key` header, NOT an Authorization bearer — the API says so itself
  *      in its 401: "headers is missing required property 'api-key'".

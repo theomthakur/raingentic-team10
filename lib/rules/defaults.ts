@@ -12,7 +12,7 @@ import { RULE_BASIS } from "./basis";
  * Every rule carries a `basis`: the real-world control it implements. None of these were
  * invented here. That is deliberate, and it is most of the answer to "why should I trust
  * software to spend my money?" — because these are the controls your finance team already
- * runs, moved to before the money is committed. See docs/CONTROLS.md.
+ * runs, moved to before the money is committed.
  */
 export const DEFAULT_RULES: Rule[] = [
   {

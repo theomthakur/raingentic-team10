@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Markdown -> styled HTML -> PDF, via pandoc and headless Chrome.
-# Matches how the other PDFs in docs/ were produced (Chrome's Skia/PDF renderer).
+# Uses Chrome's Skia/PDF renderer.
 #
-#   ./scripts/md-to-pdf.sh docs/SUBMISSION.md
+#   ./scripts/md-to-pdf.sh path/to/file.md
 set -euo pipefail
 
 SRC="${1:?usage: md-to-pdf.sh <file.md>}"
