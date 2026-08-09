@@ -15,6 +15,22 @@ mostly **not code**.
 
 ---
 
+## 0. Sunday morning, before anything else: make the repo public
+
+Deliberately private overnight so the idea is not lifted before judging. That is a fine
+call, but it is also a **submission blocker with a 30-second fix**, and Sunday morning
+before a noon deadline is exactly when a 30-second task gets forgotten.
+
+GitHub → the repo → **Settings** → **Danger Zone** → **Change visibility** → **Public**.
+
+Then check it from a logged-out browser, because the failure mode is silent: it looks fine
+to you and 404s for everyone else. The deployed footer and the submission both link there.
+
+- [ ] Repo public
+- [ ] `github.com/theomthakur/raingentic-team10` loads in a private window
+
+---
+
 ## 1. Walk over and ask a Rain engineer three questions
 
 Ranked first because it is the only item that **depends on other people and expires.** The
