@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx lib/checks/checks.test.ts && tsx lib/rain/payment-routes.test.ts",
+    "test": "tsx lib/checks/checks.test.ts && tsx lib/rain/payment-routes.test.ts && tsx lib/rain/lifecycle.test.ts",
     "test:rain": "tsx scripts/check-rain-connection.ts",
     "seed": "tsx lib/seed/generate.ts",
     "mcp": "tsx mcp/server.ts"
