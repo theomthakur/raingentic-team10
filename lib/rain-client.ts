@@ -18,6 +18,7 @@
  * of a request in exactly one place: here.
  */
 
+import { constants, publicEncrypt, randomUUID } from "node:crypto";
 import type { ScopedCard } from "./types";
 
 function env(name: string): string {
@@ -128,48 +129,81 @@ export interface IssueCardParams {
 }
 
 /**
- * Create a card.
+ * Sandbox RSA public key for session encryption, published in Rain's own docs at
+ * /docs/resource-sessionid-keys. Sandbox only — a production key never lives in a repo.
+ */
+const SESSION_PEM = `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAP192809jZyaw62g/eTzJ3P9H
++RmT88sXUYjQ0K8Bx+rJ83f22+9isKx+lo5UuV8tvOlKwvdDS/pVbzpG7D7NO45c
+0zkLOXwDHZkou8fuj8xhDO5Tq3GzcrabNLRLVz3dkx0znfzGOhnY4lkOMIdKxlQb
+LuVM/dGDC9UpulF+UwIDAQAB
+-----END PUBLIC KEY-----`;
+
+/**
+ * The scoped-card endpoint requires a `sessionid` header, and it is not an opaque id —
+ * it is a 32-character hex secret, base64'd, then RSA-OAEP encrypted with Rain's public
+ * key. A random UUID gets "Failed to Decrypt Session ID, RSA Public key Not Matching".
  *
- * Path and response shape are the ones confirmed against the live sandbox and written up
- * in docs/RAIN-API-CONFIRMED.md — `POST /issuing/users/{userId}/cards`, not `/cards`,
- * which 404s. The response uses `last4` and `expirationMonth`/`expirationYear`, not
- * `lastFour` and `expiresAt`.
+ * The same secret would decrypt the returned PAN and CVC. We never ask for those and never
+ * keep them: the card id and last four are all this system needs, and holding card numbers
+ * we have no use for would be indefensible in a product about spending control.
+ */
+function generateSessionId(): string {
+  const secretKey = randomUUID().replace(/-/g, "");
+  const secretKeyBase64 = Buffer.from(secretKey, "hex").toString("base64");
+  return publicEncrypt(
+    { key: SESSION_PEM, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha1" },
+    Buffer.from(secretKeyBase64, "utf-8")
+  ).toString("base64");
+}
+
+/**
+ * Issue a card scoped to one purchase.
  *
- * 🔴 The `configuration` object is the remaining unknown. The minimum accepted body is
- * `{ type: "virtual" }`, and it returns an ACTIVE card with NO spend limit and a 2032
- * expiry. We send our intended scope anyway so that the moment a Rain engineer confirms
- * the schema this starts working — but the caller must treat an unscoped response as a
- * failure to scope, because "a card bound to exactly this purchase" is the entire claim.
+ * 🔴 The endpoint that matters is `/issuing/users/{id}/cards/**scoped**`, not `/cards`.
+ * The plain endpoint accepts a one-field body and returns an ACTIVE card with no limit and
+ * a 2031 expiry — which is why every attempt to scope a card silently produced an unscoped
+ * one. The scoped endpoint takes `amountInUSDCents` and Rain enforces it at authorization.
+ *
+ * Rain grants the requested amount **plus a ~20% authorization buffer** — ask for 4299 and
+ * the card comes back limited to 5159, frequency `allTime`. That is normal card behaviour,
+ * not a failure to scope: an authorization can legitimately land slightly above the quoted
+ * total. So the check below is that the granted limit covers the purchase and stays within
+ * a sane margin of it, not that the two numbers match exactly.
  */
 export async function issueScopedCard(params: IssueCardParams): Promise<ScopedCard> {
   const userId = env("RAIN_USER_ID");
-  const body = {
-    type: "virtual",
-    configuration: {
-      currency: "usd",
-      spendLimit: params.limitCents,
-      spendLimitFrequency: "single_use",
-      expiresAt: params.expiresAt,
-      ...(params.merchantLock ? { merchantAllowlist: [params.merchantLock] } : {}),
-      reference: params.reference,
-    },
-  };
 
   const card = await rainFetch<{
     id: string;
-    last4: string;
     status: string;
-    expirationMonth?: number;
-    expirationYear?: number;
-    configuration?: { spendLimit?: number };
-  }>(`/issuing/users/${userId}/cards`, { method: "POST", body: JSON.stringify(body) });
+    last4: string;
+    expirationMonth?: string | number;
+    expirationYear?: string | number;
+    limit?: { amount?: number; frequency?: string };
+  }>(`/issuing/users/${userId}/cards/scoped`, {
+    method: "POST",
+    headers: { sessionid: generateSessionId() },
+    body: JSON.stringify({ amountInUSDCents: params.limitCents }),
+  });
 
-  // Rain echoed a card back, but did it honour the scope we asked for? If the limit did
-  // not stick, saying "scoped card issued" would be false, so refuse to claim it.
-  const grantedLimit = card.configuration?.spendLimit;
-  if (grantedLimit !== params.limitCents) {
+  // The create response omits the limit; the card resource carries it. Read it back rather
+  // than assume, because "we issued a scoped card" is the whole claim and it should rest on
+  // what Rain says the card is, not on what we asked for.
+  const stored = await rainFetch<{ limit?: { amount?: number; frequency?: string } }>(
+    `/issuing/cards/${card.id}`
+  );
+  const granted = stored.limit?.amount ?? card.limit?.amount;
+
+  if (typeof granted !== "number" || granted < params.limitCents) {
     throw new Error(
-      `Card ${card.id} was created but NOT scoped: asked for a ${params.limitCents}c limit, got ${grantedLimit ?? "none"}. Refusing to present this as a scoped card.`
+      `Card ${card.id} came back without a usable limit: asked for ${params.limitCents}c, got ${granted ?? "none"}. Refusing to present it as scoped.`
+    );
+  }
+  // A buffer is expected. A limit many times the purchase is not a scoped card.
+  if (granted > params.limitCents * 1.5) {
+    throw new Error(
+      `Card ${card.id} is not meaningfully scoped: asked for ${params.limitCents}c, granted ${granted}c.`
     );
   }
 
@@ -177,10 +211,10 @@ export async function issueScopedCard(params: IssueCardParams): Promise<ScopedCa
     cardId: card.id,
     lastFour: card.last4,
     status: card.status === "active" ? "active" : "inactive",
-    limitCents: grantedLimit,
+    limitCents: granted,
     expiresAt:
       card.expirationYear && card.expirationMonth
-        ? new Date(Date.UTC(card.expirationYear, card.expirationMonth, 0)).toISOString()
+        ? new Date(Date.UTC(Number(card.expirationYear), Number(card.expirationMonth), 0)).toISOString()
         : params.expiresAt,
   };
 }
