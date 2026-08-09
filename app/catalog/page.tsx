@@ -10,6 +10,7 @@ import { money } from "@/lib/format";
 import { Avatar } from "@/components/identity/Avatar";
 import { getAgent } from "@/lib/agents";
 import { Badge, Button, Panel } from "@/components/ui";
+import { TaskLoop, type LoopState } from "@/components/console/TaskLoop";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
@@ -20,6 +21,9 @@ import { SubPageHeader } from "@/components/layout/SiteNav";
  * catalogue-only code path and no shortcut past the checks — a purchase made from this
  * page is indistinguishable, downstream, from one an agent made on its own.
  */
+
+/** A beat between steps. A loop that finishes in 40ms communicates nothing. */
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 interface RunResult {
   decision: Decision;
@@ -254,13 +258,14 @@ function ResultPanel({ result, error }: { result: RunResult | null; error: strin
 function RequestChat({
   catalog,
   busy,
-  onMatch,
-  onRun,
+  loop,
+  onDelegate,
 }: {
   catalog: CatalogProduct[];
   busy: boolean;
-  onMatch: (product: CatalogProduct, quantity: number) => void;
-  onRun: (product: CatalogProduct) => void;
+  loop: LoopState | null;
+  /** Runs the whole thing. There is no confirm step — delegating is the product. */
+  onDelegate: (product: CatalogProduct, quantity: number, understood: string) => void;
 }) {
   const [request, setRequest] = useState("");
   const [match, setMatch] = useState<{ product: CatalogProduct; quantity: number } | null>(null);
@@ -308,14 +313,14 @@ function RequestChat({
         return;
       }
 
-      const next = { product, quantity: data.quantity as number };
+      const quantity = data.quantity as number;
       const agent = getAgent(product.agent);
-      onMatch(product, next.quantity);
-      setMatch(next);
+      setMatch({ product, quantity });
       setVia(data.via === "model" ? "model" : "keywords");
-      setReply(
-        `Got it — ${data.understood}. Routed to ${agent.name}. ${agent.assurance}`
-      );
+      setReply(`On it — ${data.understood}. ${agent.name} is handling this. ${agent.assurance}`);
+      // No confirm step. Being asked to press "start with Rae" would make the person do
+      // the routing the product exists to do for them.
+      onDelegate(product, quantity, data.understood as string);
     } catch {
       setReply("I could not reach the intake service. Try one of the cards below.");
     } finally {
@@ -352,14 +357,14 @@ function RequestChat({
               : "Model unavailable — read by keyword matching, then handed to the same checks."}
           </p>
         )}
-        {match && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rain-200 bg-white px-3.5 py-3">
-            <p className="text-[12.5px] text-ink-700">
-              Ready to delegate <strong>{match.quantity} × {match.product.name}</strong>
-            </p>
-            <Button variant="primary" disabled={busy} onClick={() => onRun(match.product)}>
-              {busy ? "Agent is working…" : `Start with ${getAgent(match.product.agent).name}`}
-            </Button>
+        {loop && (
+          <div className="rounded-xl border border-rain-200 bg-white px-4 py-4">
+            {match && (
+              <p className="mb-3 text-[12.5px] text-ink-700">
+                <strong>{match.quantity} × {match.product.name}</strong>
+              </p>
+            )}
+            <TaskLoop state={loop} />
           </div>
         )}
       </div>
@@ -376,12 +381,86 @@ export default function CatalogPage() {
   const [result, setResult] = useState<RunResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [loop, setLoop] = useState<LoopState | null>(null);
 
-  async function buy(product: CatalogProduct) {
+  /**
+   * Read → route → run, with the loop reflecting real progress.
+   *
+   * The steps are not on a timer. `understand` and `assign` are already true by the time
+   * this is called; the rest are marked from the stages the pipeline returns, so the
+   * animation is a readout of work that happened rather than a performance of it. The one
+   * concession to pacing is a short beat between steps, because a loop that completes in
+   * 40ms communicates nothing.
+   */
+  async function delegate(product: CatalogProduct, quantity: number, understood: string) {
+    setQty((current) => ({ ...current, [product.id]: quantity }));
+    setSelectedProductId(product.id);
+    setResult(null);
+    setError(null);
+
+    const detail: LoopState["detail"] = { understand: understood };
+    setLoop({ done: ["understand"], active: "assign", agentId: product.agent, detail });
+    await sleep(420);
+
+    setLoop({
+      done: ["understand", "assign"],
+      active: product.kind === "negotiated" ? "negotiate" : "verify",
+      agentId: product.agent,
+      detail,
+    });
+
+    const decision = await buy(product, quantity);
+    if (!decision) {
+      setLoop(null);
+      return;
+    }
+
+    const stageNames = new Set(decision.stages.map((s) => s.name));
+    const negotiated = decision.stages.find((s) => s.name === "NEGOTIATE");
+    if (negotiated) detail.negotiate = negotiated.detail;
+
+    if (product.kind === "negotiated") {
+      setLoop({ done: ["understand", "assign", "negotiate"], active: "verify", agentId: product.agent, detail });
+      await sleep(420);
+    }
+
+    const verify = decision.stages.find((s) => s.name === "VERIFY");
+    if (verify) detail.verify = verify.detail;
+    const outcome = decision.decision.outcome;
+
+    setLoop({
+      done: ["understand", "assign", ...(product.kind === "negotiated" ? (["negotiate"] as const) : []), "verify"],
+      active: "settle",
+      agentId: product.agent,
+      detail,
+    });
+    await sleep(420);
+
+    const closing =
+      decision.stages.find((s) => s.name === "REVOKE") ??
+      decision.stages.find((s) => s.name === "REFUSE") ??
+      decision.stages.find((s) => s.name === "HOLD");
+    if (closing) detail.settle = closing.detail;
+    else if (stageNames.has("SETTLE")) detail.settle = "Settled and recorded.";
+
+    setLoop({
+      done: ["understand", "assign", ...(product.kind === "negotiated" ? (["negotiate"] as const) : []), "verify", "settle"],
+      active: null,
+      outcome,
+      agentId: product.agent,
+      detail,
+    });
+  }
+
+  async function buy(
+    product: CatalogProduct,
+    quantityOverride?: number
+  ): Promise<RunResult | null> {
     setBusyId(product.id);
     setError(null);
     setResult(null);
-    const quantity = qty[product.id];
+    // setQty in the same tick has not flushed yet, so delegate passes the value directly.
+    const quantity = quantityOverride ?? qty[product.id];
 
     try {
       const url = product.kind === "negotiated" ? "/api/purchase" : "/api/run";
@@ -416,9 +495,12 @@ export default function CatalogPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Request failed.");
-      setResult({ decision: data.decision, stages: data.stages });
+      const run: RunResult = { decision: data.decision, stages: data.stages };
+      setResult(run);
+      return run;
     } catch (err) {
       setError((err as Error).message);
+      return null;
     } finally {
       setBusyId(null);
     }
@@ -448,11 +530,8 @@ export default function CatalogPage() {
             <RequestChat
               catalog={catalog}
               busy={busyId !== null}
-              onMatch={(product, quantity) => {
-                setQty((current) => ({ ...current, [product.id]: quantity }));
-                setSelectedProductId(product.id);
-              }}
-              onRun={(product) => buy(product)}
+              loop={loop}
+              onDelegate={delegate}
             />
           </section>
 
