@@ -175,13 +175,16 @@ export function AgentJourney({
   return (
     <section aria-label="Mandate agent journey" className="mx-auto max-w-5xl">
       <div className="text-center">
-        <Badge tone="rain">Mandate · safe spending for AI agents</Badge>
+        <Badge tone="rain">Mandate · infrastructure for safe AI spending</Badge>
         <h2 className="mt-4 font-display text-[38px] font-medium leading-[1.05] tracking-[-0.03em] text-ink-900 sm:text-[50px]">
           Tell us what you need.<br />Mandate handles the rest.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
           Your purchasing agent finds suppliers, checks what is safe to spend, makes the
           payment, and sends you the receipt. You set the goal; Mandate does the chasing.
+        </p>
+        <p className="mx-auto mt-3 max-w-2xl text-[12.5px] leading-relaxed text-ink-600">
+          <strong>What Mandate is:</strong> the infrastructure layer between an AI agent and your company money.
         </p>
         <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-2 text-left sm:grid-cols-4">
           {["Tell Mandate", "Compare suppliers", "Pay safely", "Get your receipt"].map((step, index) => (

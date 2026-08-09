@@ -23,11 +23,11 @@ export function Header({
         <div className="flex min-w-0 items-start gap-4">
           <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              The safe spending layer for AI agents
+              Infrastructure for safe AI spending
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
-              Mandate lets an agent source and pay for what it needs—without handing it
-              an unlimited company card.
+              Mandate sits between an AI agent and company money. It turns a goal into a
+              limited, traceable payment—not an unlimited company card.
             </p>
           </div>
         </div>
