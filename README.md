@@ -3,6 +3,8 @@
 **Rain bounds how much an agent spends and where. Mandate checks why — and if the reason
 does not hold, no card is ever issued.**
 
+**Live demo → https://raingentic-team10.vercel.app**
+
 Built for the Raingentic Commerce Hackathon NYC, Team 10.
 
 ---
@@ -71,6 +73,11 @@ in a table; nothing in `lib/checks` hardcodes a number.
 | 4 | Vendor **and SKU** match the quote | Right vendor, right total, **wrong item** — no card control can express this at any granularity |
 | 5 | Within the cost centre's remaining budget | Death by a thousand small correct purchases |
 | 6 | No card already issued for this PO | Duplicate spend on a retry. The order line is the idempotency key |
+| 7 | Above the delegated limit, a person must release it | A purchase that is correct but larger than any agent's unattended authority. Held, not refused |
+| 8 | Not a large purchase split to duck approval | The obvious way to beat rule 7: buy twice, just under the limit each time. Structuring |
+| 9 | Inside this particular agent's own limit | One global ceiling would trust the stationery buyer exactly as far as the capital buyer |
+| 10 | A supplier we have paid before | Invoice fraud almost always arrives as a payee nobody has ever paid. Held, not refused |
+| 11 | Not spending faster than this agent should | A looping agent makes purchases that are each individually perfect. Only the rate is wrong |
 
 Every check returns pass/fail **plus a sentence a person can act on**, never
 "validation failed".

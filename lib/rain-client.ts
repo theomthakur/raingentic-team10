@@ -69,8 +69,39 @@ async function rainFetch<T>(path: string, init?: RequestInit): Promise<T> {
  */
 export async function getContractDetails(): Promise<unknown> {
   const contractId = env("RAIN_COLLATERAL_CONTRACT_ID");
-  // UNCONFIRMED path, likely something like /contracts/:id or /users/contracts/:id.
+  // Confirmed 403 against the sandbox. Kept because the answer to "does the contract need
+  // attaching or funding" is a question for a Rain engineer, not a bug to code around —
+  // but it must NOT be the connectivity probe. A 403 here says nothing about whether the
+  // credentials work, and reading it as "not connected" wasted hours. See checkConnection.
   return rainFetch(`/contracts/${contractId}`);
+}
+
+/**
+ * Are the credentials actually working?
+ *
+ * `GET /issuing/users/{id}` is the right probe: it is the cheapest endpoint that requires
+ * auth and that this account genuinely has access to. The collateral contract endpoint
+ * 403s for a reason unrelated to the key, so using it as a health check reports a red
+ * failure on a perfectly good connection — which is exactly what it did.
+ */
+export async function checkConnection(): Promise<{
+  applicationStatus?: string;
+  isActive?: boolean;
+  contractCount: number;
+  cardCount: number;
+}> {
+  const userId = env("RAIN_USER_ID");
+  const user = await rainFetch<{ applicationStatus?: string; isActive?: boolean }>(
+    `/issuing/users/${userId}`
+  );
+  const contracts = await rainFetch<unknown[]>(`/issuing/users/${userId}/contracts`);
+  const cards = await listCards();
+  return {
+    applicationStatus: user.applicationStatus,
+    isActive: user.isActive,
+    contractCount: Array.isArray(contracts) ? contracts.length : 0,
+    cardCount: cards.length,
+  };
 }
 
 export async function getCreditBalance(): Promise<{
@@ -170,16 +201,35 @@ export async function setCardStatus(cardId: string, status: string): Promise<voi
   });
 }
 
+/**
+ * List the cards on this account.
+ *
+ * The response is a bare array, and the fields are `last4` and `configuration` — not the
+ * `{ cards: [...] }` envelope with `lastFour` and `limit.amount` this used to assume. That
+ * shape was never exercised, so it would have thrown the first time anything called it.
+ */
 export async function listCards(): Promise<ScopedCard[]> {
-  const res = await rainFetch<{ cards: Array<{
-    id: string; lastFour: string; status: string; limit: { amount: number }; expiresAt: string;
-  }> }>(`/issuing/cards`);
-  return res.cards.map((c) => ({
+  const res = await rainFetch<
+    Array<{
+      id: string;
+      last4: string;
+      status: string;
+      expirationMonth?: number;
+      expirationYear?: number;
+      configuration?: { spendLimit?: number };
+    }>
+  >(`/issuing/cards`);
+  const rows = Array.isArray(res) ? res : [];
+  return rows.map((c) => ({
     cardId: c.id,
-    lastFour: c.lastFour,
+    lastFour: c.last4,
     status: c.status === "active" ? "active" : "inactive",
-    limitCents: c.limit.amount,
-    expiresAt: c.expiresAt,
+    // No limit echoed back is the finding, not a parse failure: the sandbox drops it.
+    limitCents: c.configuration?.spendLimit ?? 0,
+    expiresAt:
+      c.expirationYear && c.expirationMonth
+        ? new Date(Date.UTC(c.expirationYear, c.expirationMonth, 0)).toISOString()
+        : "",
   }));
 }
 

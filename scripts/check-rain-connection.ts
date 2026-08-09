@@ -23,11 +23,20 @@ async function main() {
     process.exit(1);
   }
 
-  const { getContractDetails } = await import("../lib/rain-client");
+  const { checkConnection } = await import("../lib/rain-client");
 
   try {
-    await getContractDetails();
+    const s = await checkConnection();
     console.log("\n  ✓ Authenticated call succeeded.");
+    console.log(`    account   : ${s.applicationStatus}, ${s.isActive ? "active" : "inactive"}`);
+    console.log(`    cards     : ${s.cardCount}`);
+    console.log(`    collateral: ${s.contractCount} contracts linked`);
+    if (s.contractCount === 0) {
+      console.log(
+        "\n  ⚠ Connected, but no collateral contract is linked, so an issued card has\n" +
+        "    no spending power. That is a question for a Rain engineer, not a broken key."
+      );
+    }
     process.exit(0);
   } catch (err) {
     console.error(`\n  ✗ Failed: ${(err as Error).message.split("\n")[0]}`);
