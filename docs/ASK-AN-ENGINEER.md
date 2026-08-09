@@ -43,11 +43,26 @@ We confirmed against the live sandbox that auth is an `api-key` header (not a be
 that card creation is `POST /issuing/users/{userId}/cards`. Three things we can't resolve
 ourselves:
 
-**1. Our collateral contract isn't linked.**
-`GET /issuing/users/{userId}/contracts` returns `[]`, and `GET /contracts/{id}` on the ID
-from our credentials sheet returns 403. Does it need attaching to the user, or funding with
-RUSD first? *Without this an issued card has no spending power — it's the one thing between
-us and money genuinely moving.*
+**1. Our tenant can't create a collateral contract — please grant it, or attach ours.**
+
+This is now precise rather than a guess. We traced it:
+
+```
+GET  /issuing/users/{userId}/contracts   → 200  []
+GET  /issuing/users/{userId}/balances    → 200  creditLimit 0, spendingPower 0
+POST /issuing/users/{userId}/contracts   → 400  "body must have required property 'chainId'"
+POST …/contracts  { chainId: 84532 }     → 403  "Tenant does not have permission to
+                                                  create user contracts"
+GET  /contracts/{id-from-our-sheet}      → 403
+```
+
+So the endpoint exists and our key reaches it, but our tenant lacks the permission. **Either
+grant our tenant that permission, or attach the contract from our credentials sheet
+(`b96c5a77-8fca-4c6b-8966-de7385cae27a`) to our user (`f0dc00d4-bb50-4730-8d59-625296e5b1b8`).**
+
+*This is the one thing between us and money genuinely moving.* Our cards are real and
+Rain-scoped already — they just have no spending power behind them. If funding the contract
+with RUSD is also needed, tell us and we'll do that part.
 
 **2. What status value deactivates a card?**
 `PATCH /issuing/cards/{id}` exists and accepts a body, but `{"status":"inactive"}` returns

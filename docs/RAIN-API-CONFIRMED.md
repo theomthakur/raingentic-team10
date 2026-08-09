@@ -161,3 +161,26 @@ Read-only, and prints no key and no personal data.
 `.env.local` is gitignored and untracked; the key is in no tracked file. Note that
 `scripts/check-rain-connection.ts` loads `dotenv/config`, which reads `.env` and **not**
 `.env.local` — hence the `DOTENV_CONFIG_PATH=.env.local` prefix on every command above.
+
+
+---
+
+## Collateral: traced to a tenant permission, not a missing step
+
+Chased to a definitive answer rather than left as "ask someone".
+
+| Call | Result |
+|---|---|
+| `GET /issuing/users/{id}/contracts` | 200 `[]` |
+| `GET /issuing/users/{id}/balances` | 200 — `creditLimit 0`, `spendingPower 0` |
+| `POST /issuing/users/{id}/contracts` `{}` | 400 `body must have required property 'chainId'` |
+| `POST …/contracts` `{chainId: 84532}` | **403 `Tenant does not have permission to create user contracts`** |
+| `GET /contracts/{sheet-id}` | 403 |
+
+The route exists and our key reaches it. **The tenant simply is not permitted to create user
+contracts**, so this cannot be solved in code — only Rain can grant the permission or attach
+the existing contract to our user.
+
+Nothing was created while establishing this: every probe before the final one used
+deliberately invalid values (`chainId: 0` → "Chain not supported"), and the single valid
+attempt was refused. Contracts remained 0 and balances remained 0 throughout.
