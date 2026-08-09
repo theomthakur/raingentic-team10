@@ -1,4 +1,4 @@
-/** Integer cents throughout, never floats — a price compared with a tolerance is the one
+/** Integer cents throughout, never floats. A price compared with a tolerance is the one
  * place a rounding error becomes a wrong decision. */
 
 export function toCents(input: string | number): number {

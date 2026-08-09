@@ -9,7 +9,7 @@ import { GithubIcon, LinkedinIcon } from "../icons";
  * The deck. Seven slides, keyboard-driven, in the same type and palette as the console.
  *
  * A hackathon is judged in five minutes standing up, and the thing that loses those five
- * minutes is switching windows — a PDF in one app, the running product in another, the
+ * minutes is switching windows, a PDF in one app, the running product in another, the
  * repo in a third. So the deck lives at a route inside the product it is describing: the
  * judge is already looking at the real thing, and every claim on a slide is one click from
  * the screen that backs it.
@@ -48,7 +48,7 @@ const CHECKS: { id: string; label: string; basis: string; star?: boolean }[] = [
   {
     id: "line-matches",
     label: "The vendor and the SKU match the accepted quote",
-    basis: "Line-level match — no card network can express this",
+    basis: "Line-level match: no card network can express this",
     star: true,
   },
   {
@@ -100,7 +100,7 @@ const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
     n: "2",
     what: "Press the same button again.",
     detail:
-      "No second scenario, no bad agent written to fail. Refused — by the record the first run itself wrote. Rain is never contacted.",
+      "No second scenario, no bad agent written to fail. Refused. By the record the first run itself wrote. Rain is never contacted.",
     key: true,
   },
   {
@@ -113,7 +113,7 @@ const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
     n: "4",
     what: "Run the $43,500 conveyor line.",
     detail:
-      "Everything checks out, and it is held — not refused. No card exists while it waits. Typing a name is what creates it.",
+      "Everything checks out, and it is held. Not refused. No card exists while it waits. Typing a name is what creates it.",
     key: true,
   },
   {
@@ -130,7 +130,7 @@ const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
   },
   {
     // The last thing they see should be their own hands on it, not ours. A judge who
-    // attacks something and fails believes it in a way no slide achieves — so this beat
+    // attacks something and fails believes it in a way no slide achieves, so this beat
     // ends with the room typing and the presenter quiet.
     n: "7",
     what: "Scan the QR. Stop talking.",
@@ -142,8 +142,8 @@ const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
 
 const STACK: { layer: string; tech: string }[] = [
   { layer: "Framework", tech: "Next.js 14 App Router, React 18, TypeScript 5.5" },
-  { layer: "Payments", tech: "Rain issuing API — scoped virtual cards" },
-  { layer: "Chain", tech: "Monad testnet via viem — rule-version hashes" },
+  { layer: "Payments", tech: "Rain issuing API, scoped virtual cards" },
+  { layer: "Chain", tech: "Monad testnet via viem, rule-version hashes" },
   { layer: "Storage", tech: "Postgres on Neon, append-only decision log" },
   { layer: "Verify path", tech: "Plain TypeScript, no dependencies, no model" },
   { layer: "Money", tech: "Integer cents end to end, never a float" },
@@ -153,13 +153,13 @@ const STACK: { layer: string; tech: string }[] = [
 
 // Led with "no human is involved" until the reframe, which put the human topic back at the
 // top of the slide the reframe existed to demote. The trust question about the model is the
-// one that actually decides whether any of this is believable, so it goes first — and the
+// one that actually decides whether any of this is believable, so it goes first, and the
 // human row now answers with the proportion rather than conceding the premise.
 const OBJECTIONS: { worry: string; answer: string }[] = [
   { worry: "The AI decides what's allowed", answer: "It decides nothing. It proposes; plain code rules." },
   { worry: "Your rules could be wrong", answer: "They're the three-way match your finance team already runs." },
   { worry: "You could just change the rules", answer: "Takes two people, and every version is kept and hashed." },
-  { worry: "Are humans approving these?", answer: "35 of 41 had none. Above $25,000 one signs off — a boundary, not the model." },
+  { worry: "Are humans approving these?", answer: "35 of 41 had none. Above $25,000 one signs off: a boundary, not the model." },
 ];
 
 const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[] }[] = [
@@ -178,7 +178,7 @@ const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[
     tone: "warn",
     state: "simulated, and labelled as such",
     items: [
-      "Card issuance. The Rain client is written and wired, auth and endpoints confirmed against the sandbox — the outstanding piece is a linked collateral contract. Every simulated card says so on screen.",
+      "Card issuance. The Rain client is written and wired, auth and endpoints confirmed against the sandbox. The outstanding piece is a linked collateral contract. Every simulated card says so on screen.",
     ],
   },
   {
@@ -214,7 +214,7 @@ const HOSTS: { name: string; role: string }[] = [
 ];
 
 const TRACKS: { track: string; how: string }[] = [
-  { track: "Best use of Rain", how: "Issuance is the enforcement point — Rain's own principle, one layer up." },
+  { track: "Best use of Rain", how: "Issuance is the enforcement point: Rain's own principle, one layer up." },
   { track: "Agents that move money", how: "One task, end to end: negotiate, propose, verify, issue, settle, file." },
   { track: "Agent negotiation", how: "The accepted quote becomes the PO the card is bound to. Negotiation causes what gets verified." },
   { track: "Monad", how: "Every rule version hashed and anchored, so policy cannot be backdated." },
@@ -259,12 +259,12 @@ const SLIDES: Slide[] = [
         </div>
         <h2 className="mt-7 max-w-3xl font-display text-[28px] font-medium leading-[1.3] tracking-[-0.01em] text-ink-900 md:text-[36px]">
           Rain bounds <Accent>how much</Accent> an agent spends and <Accent>where</Accent>.
-          Mandate checks <Accent>why</Accent> — one step earlier, before the card exists.
+          Mandate checks <Accent>why</Accent>: one step earlier, before the card exists.
         </h2>
         <p className="mt-6 max-w-2xl text-[14.5px] leading-relaxed text-muted">
           An agent gets a scoped virtual card bound to the exact purchase order it
           negotiated. If the declared order does not match the record, no card is created at
-          all — not a decline, an instrument that never comes into existence.
+          all: not a decline, an instrument that never comes into existence.
         </p>
 
         {/* State the boundary plainly: Rain is real infrastructure exercised in its sandbox,
@@ -349,7 +349,7 @@ const SLIDES: Slide[] = [
         </Title>
         <Lede>
           Before any card exists, the agent hands over the purchase order it negotiated.
-          Ordinary TypeScript — no model — compares that declaration against the company&apos;s
+          Ordinary TypeScript (no model) compares that declaration against the company&apos;s
           real records.
         </Lede>
         <div className="mt-6 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -368,7 +368,7 @@ const SLIDES: Slide[] = [
           <Panel title="What a mismatch produces">
             <div className="space-y-3 px-5 py-4 text-[13.5px] leading-relaxed text-ink-700">
               <p>
-                <b className="text-ink-900">No card.</b> Not a declined payment — there is
+                <b className="text-ink-900">No card.</b> Not a declined payment, there is
                 nothing to decline, because the instrument was never created.
               </p>
               <p>
@@ -393,7 +393,7 @@ const SLIDES: Slide[] = [
     body: (
       <div>
         <Title>
-          Money moves only if step 3 passes — and for large purchases, only once a person
+          Money moves only if step 3 passes. And for large purchases, only once a person
           has also said so.
         </Title>
         <div className="mt-6">
@@ -437,7 +437,7 @@ const SLIDES: Slide[] = [
           </ul>
         </Panel>
         <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-muted">
-          Rule 4 is the one no card network can express at any granularity — an issuer has no
+          Rule 4 is the one no card network can express at any granularity, an issuer has no
           idea your order system exists, so it cannot tell you that you bought the wrong item
           from the right shop at the right price.
         </p>
@@ -464,7 +464,7 @@ const SLIDES: Slide[] = [
             <p className="text-[13.5px] font-semibold text-ink-900">Why it works</p>
             <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
               Rules are versioned data, checks are pure functions, and every decision saved a
-              photograph of the records as they looked at that moment — not a link to records
+              photograph of the records as they looked at that moment, not a link to records
               that have since changed.
             </p>
           </div>
@@ -487,7 +487,7 @@ const SLIDES: Slide[] = [
   {
     id: "demo",
     label: "The demo",
-    eyebrow: "Seven steps — the first four live, the rest on standby",
+    eyebrow: "Seven steps: the first four live, the rest on standby",
     body: (
       <div>
         <Title>
@@ -517,7 +517,7 @@ const SLIDES: Slide[] = [
           </ol>
         </Panel>
         <p className="mt-3 text-[13px] leading-relaxed text-muted">
-          Steps 2 and 7 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
+          Steps 2 and 7 are the ones that answer &ldquo;why would I trust this?&rdquo;, and
           they answer it by being refused and held on stage, not by being asserted.
         </p>
       </div>
@@ -530,7 +530,7 @@ const SLIDES: Slide[] = [
     body: (
       <div>
         <Title>
-          There is a human — <Accent>above a limit you set</Accent>.
+          There is a human, <Accent>above a limit you set</Accent>.
         </Title>
         <Lede>
           No company gives an employee unlimited authority either. It gives bounded autonomy
@@ -560,7 +560,7 @@ const SLIDES: Slide[] = [
         </div>
         <Panel className="mt-4">
           <p className="px-5 py-4 text-[13.5px] leading-relaxed text-ink-700">
-            If two approvers both hit release, the second is refused — by rule 6, reading the
+            If two approvers both hit release, the second is refused, by rule 6, reading the
             record the first release wrote. Idempotency protecting a{" "}
             <b className="text-ink-900">human</b> race, not just a machine retry.
           </p>
@@ -591,7 +591,7 @@ const SLIDES: Slide[] = [
               },
               {
                 h: "The author cannot be the approver",
-                p: "Segregation of duties — the same control that stops whoever raises an invoice from also paying it.",
+                p: "Segregation of duties: the same control that stops whoever raises an invoice from also paying it.",
               },
               {
                 h: "Every version is kept and hashed",
@@ -619,7 +619,7 @@ const SLIDES: Slide[] = [
     body: (
       <div>
         <Title>
-          Four worries, four <Accent>controls</Accent> — not four reassurances.
+          Four worries, four <Accent>controls</Accent>, not four reassurances.
         </Title>
         <Panel className="mt-6">
           <ul className="divide-y divide-edge">
@@ -662,7 +662,7 @@ const SLIDES: Slide[] = [
         </Panel>
         <p className="mt-3 text-[13px] leading-relaxed text-muted">
           The palette is sampled from Rain&apos;s and Monad&apos;s own stylesheets rather than
-          guessed — #ff2fb6 and #6e54ff are their real brand values.
+          guessed: #ff2fb6 and #6e54ff are their real brand values.
         </p>
       </div>
     ),
@@ -707,7 +707,7 @@ const SLIDES: Slide[] = [
       <div className="flex h-full flex-col justify-center">
         <h2 className="max-w-3xl font-display text-[26px] font-medium leading-[1.3] tracking-[-0.01em] text-ink-900 md:text-[32px]">
           Rain bounds how much an agent spends and where. Mandate checks{" "}
-          <Accent>why</Accent> — and if the reason doesn&apos;t hold, the card is never
+          <Accent>why</Accent>: and if the reason doesn&apos;t hold, the card is never
           issued.
         </h2>
         <Panel className="mt-7">
@@ -782,7 +782,7 @@ const SLIDES: Slide[] = [
             <GithubIcon className="h-4 w-4" />
             theomthakur/raingentic-team10
           </a>
-          <span className="text-muted">Questions welcome — including the hard ones.</span>
+          <span className="text-muted">Questions welcome, including the hard ones.</span>
         </div>
       </div>
     ),

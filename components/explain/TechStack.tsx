@@ -4,8 +4,8 @@ import { Panel } from "../ui";
  * The stack, with the reason each piece is there.
  *
  * A list of package names tells a judge nothing they couldn't get from package.json. What
- * they actually want to know is which choices were forced by the problem — integer cents,
- * a driver that survives serverless, no model in the check path — so each row says why.
+ * they actually want to know is which choices were forced by the problem, integer cents,
+ * a driver that survives serverless, no model in the check path, so each row says why.
  */
 
 interface Row {
@@ -23,7 +23,7 @@ const ROWS: Row[] = [
   {
     layer: "Styling",
     tech: "Tailwind CSS 3.4",
-    why: "Palette sampled from Rain's and Monad's own stylesheets rather than guessed — #ff2fb6 and #6e54ff are their real brand values.",
+    why: "Palette sampled from Rain's and Monad's own stylesheets rather than guessed, #ff2fb6 and #6e54ff are their real brand values.",
   },
   {
     layer: "Payments",

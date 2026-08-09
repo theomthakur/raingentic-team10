@@ -128,7 +128,7 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
         </div>
       }
     >
-      {/* 1 — what was bought */}
+      {/* 1, what was bought */}
       <div className="border-b border-edge px-5 py-4">
         <div className="flex items-start gap-3">
           <Avatar name={po.vendor} size={34} />
@@ -152,7 +152,7 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
         </div>
       </div>
 
-      {/* 2 — what happened, in one sentence */}
+      {/* 2, what happened, in one sentence */}
       <div
         className={`border-b border-edge px-5 py-3.5 ${
           outcome === "approved" ? "bg-mint-50/50" : outcome === "held" ? "bg-amber-50/50" : "bg-red-50/50"
@@ -171,7 +171,7 @@ export function ProvenancePanel({ decision }: { decision: Decision | null }) {
         )}
       </div>
 
-      {/* 3 — the evidence */}
+      {/* 3, the evidence */}
       <div className="flex items-baseline justify-between gap-3 border-b border-edge bg-ink-50/60 px-5 py-2">
         <p className="text-[11.5px] font-semibold uppercase tracking-wider text-muted">
           The checks it had to pass

@@ -8,14 +8,14 @@ import { Badge, Button, Panel } from "../ui";
 
 /**
  * The transcript below is a replay, not a live chat. Every number and every note in it was
- * already decided by `negotiate()` before this component ever rendered — no model runs
+ * already decided by `negotiate()` before this component ever rendered, no model runs
  * here, nothing is generated on click. It exists because reading five price bars doesn't
  * feel like watching a negotiation happen, and a chat-shaped read of the exact same,
  * already-final numbers does. Presentation, not a new decision surface.
  */
 function Transcript({ negotiation }: { negotiation: NegotiationSummary }) {
   const { offers, buyerTargetCents } = negotiation;
-  // Conversation order: whoever the buyer's target implicitly challenged first — read left
+  // Conversation order: whoever the buyer's target implicitly challenged first, read left
   // to right the same way the bars above do, opening price ascending.
   const ordered = [...offers].sort((a, b) => a.opening - b.opening);
 
@@ -25,7 +25,7 @@ function Transcript({ negotiation }: { negotiation: NegotiationSummary }) {
         <div className="flex max-w-[85%] items-start gap-2">
           <Avatar name="Buyer" color="#121212" size={24} />
           <div className="rounded-2xl rounded-tl-sm bg-ink-900 px-3 py-2 text-[12.5px] text-white">
-            Opening at {money(buyerTargetCents)}/unit — who can meet that?
+            Opening at {money(buyerTargetCents)}/unit: who can meet that?
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@ function Transcript({ negotiation }: { negotiation: NegotiationSummary }) {
               <p className="font-semibold">{o.vendor}</p>
               <p className="mt-0.5">{o.note}</p>
               <p className="tabular mt-1 font-mono text-[11px] opacity-70">
-                final {money(o.final)}/unit{o.won ? " — won" : ""}
+                final {money(o.final)}/unit{o.won ? ", won" : ""}
               </p>
             </div>
           </div>
@@ -62,7 +62,7 @@ function Transcript({ negotiation }: { negotiation: NegotiationSummary }) {
  *
  * And the line at the bottom is the one that matters: the winning number becomes the
  * purchase order everything downstream is checked against. Negotiation is not running
- * beside the verification — it produces the thing being verified.
+ * beside the verification: it produces the thing being verified.
  */
 export function NegotiationPanel({
   negotiation,
@@ -178,7 +178,7 @@ export function NegotiationPanel({
           )}
           .{" "}
           <span className="text-muted">
-            That number is what the checks below verify — not what the seller said about it.
+            That number is what the checks below verify, not what the seller said about it.
           </span>
         </p>
       )}

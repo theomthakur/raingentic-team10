@@ -6,17 +6,17 @@ import type { Cents } from "./types";
  * The storefront.
  *
  * Nothing here invents a price. Every number is derived from the same fixtures the
- * pipeline already runs on — `SELLERS_BY_TASK` for the lines that get negotiated, and
+ * pipeline already runs on: `SELLERS_BY_TASK` for the lines that get negotiated, and
  * `SEED_QUOTES` for the lines that already have an accepted quote on the record. This
  * file only adds the things a catalogue needs and a purchase order doesn't: a human name,
  * a description, a unit, and a picture.
  *
  * The two kinds are not a cosmetic split. They are the two real paths through the system:
  *
- *  - `negotiated` — no quote exists yet. Sellers compete, one wins, and the winning price
+ *  - `negotiated`: no quote exists yet. Sellers compete, one wins, and the winning price
  *    becomes the purchase order that then gets verified. Buying a different quantity is a
  *    genuinely different order line, so it gets its own PO number and negotiates again.
- *  - `contract`   — a quote is already accepted on the record. Buying it declares against
+ *  - `contract`  : a quote is already accepted on the record. Buying it declares against
  *    that quote, so the declared total has to match what was quoted. Change the quantity
  *    and the amount check refuses it, which is the point.
  */
@@ -43,7 +43,7 @@ export interface CatalogProduct {
   /**
    * The most any single supplier can actually ship. Negotiation drops sellers who cannot
    * meet the quantity, so asking for more than this throws rather than producing a
-   * decision — an error is a far worse demo than a refusal.
+   * decision: an error is a far worse demo than a refusal.
    */
   maxAvailable?: number;
   /** contract only */
@@ -51,7 +51,7 @@ export interface CatalogProduct {
   vendor?: string;
   sku?: string;
   quotedQuantity?: number;
-  /** A quote already marked fulfilled — buying it again is a duplicate, by design. */
+  /** A quote already marked fulfilled: buying it again is a duplicate, by design. */
   alreadyFulfilled?: boolean;
 }
 
@@ -108,7 +108,7 @@ const CONTRACT_META: Record<string, { name: string; blurb: string; unit: string;
   },
   "PO-4419": {
     name: "Alloy stock, grade 7",
-    blurb: "Already delivered and paid. Buying it again is a duplicate — the record says so.",
+    blurb: "Already delivered and paid. Buying it again is a duplicate, the record says so.",
     unit: "billet",
     glyph: "alloy",
     image: "/catalog/alloy.png",

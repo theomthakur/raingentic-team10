@@ -22,13 +22,13 @@ export async function GET() {
 
   return NextResponse.json({
     storage: store.kind,
-    // Not "is a key configured" — "can this actually issue a card". A key in the
+    // Not "is a key configured", "can this actually issue a card". A key in the
     // environment says nothing about whether Rain accepts the call.
-    // Counted from the log, not from this instance's memory — a cold serverless
+    // Counted from the log, not from this instance's memory, a cold serverless
     // start knows nothing, and reported 'simulated' on a system that had issued fifty.
     rain: rainIssuanceStatus(realCardsIssued(decisions)),
     anchoringEnabled: anchoringEnabled(),
-    // Whether the negotiation dialogue is model-written. A boolean, never the key — this
+    // Whether the negotiation dialogue is model-written. A boolean, never the key, this
     // exists because "is Groq actually configured on this deployment" was otherwise only
     // answerable by reading the seller notes and guessing.
     llmEnabled: Boolean(process.env.GROQ_API_KEY ?? process.env.GROQ_KEY),
@@ -37,7 +37,7 @@ export async function GET() {
     challenge: challengeStats(decisions),
     // Deployed with no database: the log lives in serverless memory and empties on the
     // next cold start, so replay silently breaks on the exact URL we submit. It works
-    // perfectly on a laptop either way, which is what makes it dangerous — so say it
+    // perfectly on a laptop either way, which is what makes it dangerous, so say it
     // loudly on screen rather than discovering it in front of a judge.
     ephemeralInProduction:
       store.kind === "memory" && process.env.NODE_ENV === "production",

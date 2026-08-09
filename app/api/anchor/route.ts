@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       {
         error:
           "Monad anchoring is not configured. Set MONAD_PRIVATE_KEY in .env.local and fund " +
-          "it from faucet.monad.xyz. MONAD_RPC_URL is optional — it defaults to Monad's " +
+          "it from faucet.monad.xyz. MONAD_RPC_URL is optional and defaults to Monad's " +
           "public testnet RPC.",
       },
       { status: 501 }
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   }
   if (ruleSet.status !== "active") {
     return NextResponse.json(
-      { error: `Policy v${body.version} is still pending approval — nothing to anchor yet.` },
+      { error: `Policy v${body.version} is still pending approval, nothing to anchor yet.` },
       { status: 409 }
     );
   }

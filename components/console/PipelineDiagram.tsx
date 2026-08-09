@@ -31,7 +31,7 @@ type NodeState = "idle" | "pass" | "fail" | "held" | "skipped";
 function stateFor(stages: Stage[], key: Stage["name"]): NodeState {
   const s = stages.find((x) => x.name === key);
   if (!s) return stages.length > 0 ? "skipped" : "idle";
-  // A hold is not a failure — it is the escalation path, and colouring it red would say
+  // A hold is not a failure. It is the escalation path, and colouring it red would say
   // the purchase was wrong when it was only large.
   if (key === "HOLD") return "held";
   return s.ok ? "pass" : "fail";
@@ -115,7 +115,7 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
             {refused
               ? "Refused before a card could exist"
               : held
-                ? "Held for a person — no card exists yet"
+                ? "Held for a person, no card exists yet"
                 : "Approved, issued, settled and retired"}
           </p>
         )}
@@ -159,7 +159,7 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
       <p className="mt-4 border-t border-edge pt-3 text-[12px] leading-relaxed text-muted">
         Rain bounds <b className="text-ink-700">how much</b> an agent spends and{" "}
         <b className="text-ink-700">where</b>. Mandate checks <b className="text-ink-700">why</b>{" "}
-        — and if the reason does not hold, step 3 never creates a card at all.
+       . And if the reason does not hold, step 3 never creates a card at all.
       </p>
     </div>
   );

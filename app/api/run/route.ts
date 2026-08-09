@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * Run one task through the pipeline.
  *
  * Accepts either a `taskId` (the canned demo tasks) or a full `po` object, which is what
- * the judge-editable form posts. Both take exactly the same path — there is no "demo
+ * the judge-editable form posts. Both take exactly the same path, there is no "demo
  * mode" branch, so what a judge tests by hand is the same code the demo runs.
  */
 export async function POST(request: Request) {

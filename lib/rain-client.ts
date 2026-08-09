@@ -3,14 +3,14 @@
  *
  * Confirmed against the live sandbox (see docs/RAIN-API-CONFIRMED.md):
  *   ✅ Base URL `https://api-dev.raincards.xyz/v1`
- *   ✅ Auth is an `api-key` header, NOT an Authorization bearer — the API says so itself
+ *   ✅ Auth is an `api-key` header, NOT an Authorization bearer, the API says so itself
  *      in its 401: "headers is missing required property 'api-key'".
  *   ✅ Cards live under `/issuing`. Creation is POST /issuing/users/{userId}/cards.
  *
  * 🔴 Still unconfirmed, and each one is a question for a Rain engineer:
  *   1. The `configuration` schema for a spend limit and a short expiry. The minimum body
  *      returns an unscoped card with a 2032 expiry, which we refuse to call "scoped".
- *   2. The status enum that deactivates a card — "inactive" returns 400.
+ *   2. The status enum that deactivates a card: "inactive" returns 400.
  *   3. Whether the collateral contract needs attaching or funding; it 403s today.
  *   4. Whether exact-merchant locking is supported, or only category level.
  *
@@ -71,7 +71,7 @@ async function rainFetch<T>(path: string, init?: RequestInit): Promise<T> {
 export async function getContractDetails(): Promise<unknown> {
   const contractId = env("RAIN_COLLATERAL_CONTRACT_ID");
   // Confirmed 403 against the sandbox. Kept because the answer to "does the contract need
-  // attaching or funding" is a question for a Rain engineer, not a bug to code around —
+  // attaching or funding" is a question for a Rain engineer, not a bug to code around,
   // but it must NOT be the connectivity probe. A 403 here says nothing about whether the
   // credentials work, and reading it as "not connected" wasted hours. See checkConnection.
   return rainFetch(`/contracts/${contractId}`);
@@ -83,7 +83,7 @@ export async function getContractDetails(): Promise<unknown> {
  * `GET /issuing/users/{id}` is the right probe: it is the cheapest endpoint that requires
  * auth and that this account genuinely has access to. The collateral contract endpoint
  * 403s for a reason unrelated to the key, so using it as a health check reports a red
- * failure on a perfectly good connection — which is exactly what it did.
+ * failure on a perfectly good connection: which is exactly what it did.
  */
 export async function checkConnection(): Promise<{
   applicationStatus?: string;
@@ -130,7 +130,7 @@ export interface IssueCardParams {
 
 /**
  * Sandbox RSA public key for session encryption, published in Rain's own docs at
- * /docs/resource-sessionid-keys. Sandbox only — a production key never lives in a repo.
+ * /docs/resource-sessionid-keys. Sandbox only. A production key never lives in a repo.
  */
 const SESSION_PEM = `-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAP192809jZyaw62g/eTzJ3P9H
@@ -140,7 +140,7 @@ LuVM/dGDC9UpulF+UwIDAQAB
 -----END PUBLIC KEY-----`;
 
 /**
- * The scoped-card endpoint requires a `sessionid` header, and it is not an opaque id —
+ * The scoped-card endpoint requires a `sessionid` header, and it is not an opaque id,
  * it is a 32-character hex secret, base64'd, then RSA-OAEP encrypted with Rain's public
  * key. A random UUID gets "Failed to Decrypt Session ID, RSA Public key Not Matching".
  *
@@ -162,10 +162,10 @@ function generateSessionId(): string {
  *
  * 🔴 The endpoint that matters is `/issuing/users/{id}/cards/**scoped**`, not `/cards`.
  * The plain endpoint accepts a one-field body and returns an ACTIVE card with no limit and
- * a 2031 expiry — which is why every attempt to scope a card silently produced an unscoped
+ * a 2031 expiry: which is why every attempt to scope a card silently produced an unscoped
  * one. The scoped endpoint takes `amountInUSDCents` and Rain enforces it at authorization.
  *
- * Rain grants the requested amount **plus a ~20% authorization buffer** — ask for 4299 and
+ * Rain grants the requested amount **plus a ~20% authorization buffer**, ask for 4299 and
  * the card comes back limited to 5159, frequency `allTime`. That is normal card behaviour,
  * not a failure to scope: an authorization can legitimately land slightly above the quoted
  * total. So the check below is that the granted limit covers the purchase and stays within
@@ -305,7 +305,7 @@ export async function authorizeAndSettleSandboxCard({
  * exists before relying on it in the demo; if it doesn't, this stage is simply skipped. */
 /**
  * Set a card's status. `PATCH /issuing/cards/{id}` is confirmed to exist against the live
- * sandbox — `DELETE /cards/{id}`, which this used to call, returns 404.
+ * sandbox: `DELETE /cards/{id}`, which this used to call, returns 404.
  *
  * 🔴 The accepted status value is NOT yet confirmed: `"inactive"` returns 400. Ask a Rain
  * engineer for the enum and set `RAIN_CARD_INACTIVE_STATUS` in `.env.local`.
@@ -320,7 +320,7 @@ export async function setCardStatus(cardId: string, status: string): Promise<voi
 /**
  * List the cards on this account.
  *
- * The response is a bare array, and the fields are `last4` and `configuration` — not the
+ * The response is a bare array, and the fields are `last4` and `configuration`, not the
  * `{ cards: [...] }` envelope with `lastFour` and `limit.amount` this used to assume. That
  * shape was never exercised, so it would have thrown the first time anything called it.
  */

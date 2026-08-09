@@ -24,7 +24,7 @@ export interface ChallengeStats {
  * Did this purchase order differ from what was actually quoted?
  *
  * Deliberately compares against the snapshot the decision itself stored, not today's
- * records — the same discipline replay uses. A missing quote counts as deviation: an
+ * records: the same discipline replay uses. A missing quote counts as deviation: an
  * invented purchase order is the most obvious attack there is.
  */
 export function deviatesFromRecord(decision: Decision): boolean {
@@ -53,7 +53,7 @@ export function challengeStats(decisions: Decision[]): ChallengeStats {
   return {
     attempts: attempts.length,
     // A refusal is the check working. A defeat is a card that exists for an order the
-    // record does not support — a deliberately hard bar, and the only one worth counting.
+    // record does not support. A deliberately hard bar, and the only one worth counting.
     defeats: attempts.filter((d) => d.outcome === "approved" && deviatesFromRecord(d)).length,
     rulesTriggered: [...triggered],
   };
@@ -66,7 +66,7 @@ export function challengeStats(decisions: Decision[]): ChallengeStats {
  * The live badge used to read off an in-process flag, which meant a serverless instance
  * that had just woken up reported "simulated" while fifty real Rain cards sat in the
  * database. On a project whose whole argument is that it does not overstate, understating
- * on the first screen is its own kind of dishonesty — and this is the one number worth
+ * on the first screen is its own kind of dishonesty. And this is the one number worth
  * being loud about.
  *
  * Counted from the log for the same reason the challenge scoreboard is: a number derived

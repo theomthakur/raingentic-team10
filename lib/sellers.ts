@@ -11,13 +11,13 @@ import type { SellerProfile } from "./negotiation";
  *
  * These used to be literal dates, and they quietly became a time bomb: `negotiate()` drops
  * any seller whose quote has expired, and the GPU quotes said 2026-08-09. Vercel runs in
- * UTC, so the deployed site crossed that boundary hours before a laptop in New York did —
+ * UTC, so the deployed site crossed that boundary hours before a laptop in New York did,
  * every compute seller was filtered out and the task failed with "no seller has N units
  * available" on the live URL while still working locally.
  *
  * A demo fixture must not depend on what day it is read. The relative spread below keeps
- * the shape that matters — some quotes run out sooner than others, which is what makes the
- * urgency strategy mean anything — without any of them ever going stale.
+ * the shape that matters: some quotes run out sooner than others, which is what makes the
+ * urgency strategy mean anything: without any of them ever going stale.
  */
 function inDays(days: number): string {
   const d = new Date();

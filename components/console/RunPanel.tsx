@@ -80,7 +80,7 @@ function EditablePO({
   return (
     <div className="space-y-3 border-t border-edge px-4 py-3">
       <p className="text-[12px] text-muted">
-        Change anything — vendor, SKU, quantity, a cent over the quote — then issue. This
+        Change anything (vendor, SKU, quantity, a cent over the quote) then issue. This
         posts to the same endpoint the tasks above use.
       </p>
       <div className="grid grid-cols-2 gap-2.5">
@@ -182,7 +182,7 @@ export function RunPanel({
       }
     >
       <ul className="divide-y divide-edge">
-        <GroupLabel>negotiated — sellers compete, the winner becomes the PO</GroupLabel>
+        <GroupLabel>negotiated: sellers compete, the winner becomes the PO</GroupLabel>
         {negotiatedTasks.map((t) => (
           <TaskRow
             key={t.id}
@@ -195,7 +195,7 @@ export function RunPanel({
           />
         ))}
 
-        <GroupLabel>direct — an agent declares against an existing quote</GroupLabel>
+        <GroupLabel>direct: an agent declares against an existing quote</GroupLabel>
         {tasks.map((t) => (
           <TaskRow
             key={t.id}

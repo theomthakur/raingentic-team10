@@ -14,7 +14,7 @@ import { Badge, Button, Panel } from "@/components/ui";
  *
  * Every other surface here starts with a person asking for something. This one does not.
  * You give it a standing objective and press go, and it decides what to buy, buys it,
- * gets refused, and decides again — unattended, inside the limits already set.
+ * gets refused, and decides again, unattended, inside the limits already set.
  *
  * That is the claim worth making: **autonomy is safe not because the agent is good, but
  * because being wrong is bounded.** The agent picks freely and is allowed to pick badly.
@@ -172,7 +172,7 @@ export function Autopilot({
       <div className="border-b border-edge px-5 py-4">
         <p className="text-[12.5px] leading-relaxed text-muted">
           No one types a request here. Give the agent a standing objective and it decides
-          what to buy, buys it, gets refused, and decides again — inside the limits you
+          what to buy, buys it, gets refused, and decides again, inside the limits you
           already set.
         </p>
         <label className="mt-3 block">
@@ -250,7 +250,7 @@ export function Autopilot({
           </p>
           <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
             Nobody approved any of that. The agent chose freely and the checks decided
-            — which is the only reason it is safe to let it choose freely.
+           . Which is the only reason it is safe to let it choose freely.
           </p>
           {finished && <p className="mt-1 text-[12.5px] text-ink-500">{finished}</p>}
         </div>

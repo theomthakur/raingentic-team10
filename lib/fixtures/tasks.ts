@@ -19,7 +19,7 @@ export const NEGOTIATED_TASKS: NegotiatedTask[] = [
   {
     id: "restock-office",
     label: "Restock office supplies",
-    note: "Four sellers bid, one counter-offer round. Run it once — then run it again.",
+    note: "Four sellers bid, one counter-offer round. Run it once, then run it again.",
     task: {
       taskKey: "office-supplies",
       quantity: 10,
@@ -46,7 +46,7 @@ export const NEGOTIATED_TASKS: NegotiatedTask[] = [
  * Runnable demo tasks.
  *
  * In the joined build these POs come from A's agent. Until then these stand in, and they
- * are deliberately not a gallery of scripted failures — the first one is an ordinary,
+ * are deliberately not a gallery of scripted failures. The first one is an ordinary,
  * correct purchase. The headline refusal in the demo comes from running that same task a
  * second time, not from a task written to fail.
  */
@@ -74,7 +74,7 @@ function fromQuote(poNumber: string, overrides: Partial<PurchaseOrder> = {}): Pu
 }
 
 /**
- * Direct purchase orders against a pre-existing quote — no negotiation.
+ * Direct purchase orders against a pre-existing quote, no negotiation.
  *
  * These are the deviation scenarios. They exist to show a specific rule catching a
  * specific thing, so each one is built to fail on exactly one rule and no others.
@@ -98,7 +98,7 @@ export const TASKS: Task[] = [
     id: "conveyor-capital",
     label: "Order conveyor line for the new bay",
     agent: "procurement-02",
-    note: "Nothing wrong with it — just $43,500. Held for a person, not refused.",
+    note: "Nothing wrong with it: just $43,500. Held for a person, not refused.",
     po: fromQuote("PO-4423"),
   },
 ];

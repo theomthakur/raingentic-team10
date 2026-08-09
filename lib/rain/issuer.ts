@@ -8,7 +8,7 @@ import { issueScopedCard } from "@/lib/rain-client";
  *
  * The contract between the two halves is exactly this file: the pipeline calls
  * `issueCard()` only after `verify()` has already returned ok, and a refusal means this
- * function is never called at all. That is the whole thesis — a failed check does not
+ * function is never called at all. That is the whole thesis, a failed check does not
  * produce a declined transaction, it produces no instrument, because nothing downstream
  * of the check ever ran.
  */
@@ -47,8 +47,8 @@ function simulate(req: IssueRequest): IssuedCard {
 /**
  * The real call, through A's client in `lib/rain-client.ts`.
  *
- * The card is scoped to exactly the approved total — not rounded up, not a standing limit
- * — and expires with the quote it is bound to, so the instrument cannot outlive the
+ * The card is scoped to exactly the approved total, not rounded up, not a standing limit
+ *. And expires with the quote it is bound to, so the instrument cannot outlive the
  * obligation that justified it.
  */
 async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
@@ -56,7 +56,7 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
     limitCents: req.limitCents,
     expiresAt: req.po.quoteExpiry,
     reference: req.po.poNumber,
-    // Exact-merchant locking IS supported — Rain's press release lists "approved
+    // Exact-merchant locking IS supported, Rain's press release lists "approved
     // merchants or payment recipients" separately from merchant category codes, and
     // their Agent Control Layer post lists "merchant and category allowlists". See
     // docs/RAIN-API-CONFIRMED.md for the citations.
@@ -64,7 +64,7 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
     // ⚠️ Still commented out, but for a narrower reason than before: the capability is
     // confirmed, the `configuration` schema to express it is not. Sending a guessed shape
     // is worse than sending none, because the endpoint accepts a one-field body without
-    // validating the rest — so a wrong key would silently produce an unscoped card while
+    // validating the rest: so a wrong key would silently produce an unscoped card while
     // we believed it was locked. Uncomment once an engineer confirms the field name.
     // merchantLock: req.po.vendor,
   });
@@ -81,7 +81,7 @@ async function issueViaRain(req: IssueRequest): Promise<IssuedCard> {
 /**
  * What the issuer can actually do right now, as opposed to what it is configured to do.
  *
- * `off`       no API key — every card is a local stand-in and nothing pretends otherwise.
+ * `off`       no API key: every card is a local stand-in and nothing pretends otherwise.
  * `simulated` a key is present, but no real card has been issued yet, or the last real
  *             attempt failed. This is the dangerous state to get wrong: a key in the
  *             environment is not the same as a working integration, and a badge that
@@ -94,12 +94,12 @@ export type RainMode = "off" | "simulated" | "live";
 let lastRealIssuance: { ok: boolean; reason?: string } | null = null;
 
 /**
- * Real issuance is opt-in, and off by default. This is not timidity — it is that an
+ * Real issuance is opt-in, and off by default. This is not timidity, it is that an
  * attempt today has only downside:
  *
  * Rain accepts the create call but ignores the spend limit, returning an ACTIVE card with
  * no scope and a 2031 expiry. We then correctly refuse to present that as a scoped card,
- * so the demo shows a simulated one either way — but the unscoped card still exists on
+ * so the demo shows a simulated one either way: but the unscoped card still exists on
  * the account, and `PATCH` cannot deactivate it until the status enum is confirmed. So
  * every run would leave behind a live, unscoped, undeletable card in exchange for
  * nothing. Flip this to `true` the moment a Rain engineer confirms the `configuration`
@@ -112,7 +112,7 @@ function liveIssuanceEnabled(): boolean {
 /**
  * `realCardsEverIssued` comes from the decision log rather than this process's memory.
  * A cold serverless instance has no memory of anything, so the badge used to read
- * "simulated" on a system that had issued fifty real cards — the log knows better.
+ * "simulated" on a system that had issued fifty real cards, the log knows better.
  */
 export function rainIssuanceStatus(
   realCardsEverIssued = 0
@@ -145,7 +145,7 @@ export async function issueCard(req: IssueRequest): Promise<IssuedCard> {
     lastRealIssuance = { ok: true };
     return card;
   } catch (err) {
-    // Never fail the demo on a credential problem, and never claim a real card either —
+    // Never fail the demo on a credential problem, and never claim a real card either,
     // but do remember *why*, so the UI can say "simulated" instead of "live" rather than
     // silently degrading while the badge still reads green.
     lastRealIssuance = { ok: false, reason: (err as Error).message.split("\n")[0].slice(0, 160) };
@@ -154,7 +154,7 @@ export async function issueCard(req: IssueRequest): Promise<IssuedCard> {
 }
 
 /**
- * Stage 7 — retire the card once the obligation behind it is done.
+ * Stage 7: retire the card once the obligation behind it is done.
  *
  * Rain's own framing is that an agent's card is "retired automatically once the job is
  * done." Every team this weekend will demo a card being born; this is the other half. It
@@ -179,7 +179,7 @@ export async function revokeCard(cardId: string): Promise<{ revoked: boolean; si
     await setCardStatus(cardId, status);
     return { revoked: true, simulated: false };
   } catch {
-    // A card we could not retire is worth knowing about — do not report success.
+    // A card we could not retire is worth knowing about, do not report success.
     return { revoked: false, simulated: false };
   }
 }

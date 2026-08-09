@@ -8,7 +8,7 @@ import { getAgent } from "@/lib/agents";
  *
  * The catalogue used to read the request, then stop and offer a "start with Rae" button.
  * That extra click was the wrong idea twice over: it made the person do the routing the
- * product claims to do for them, and it hid the only part worth watching — the work.
+ * product claims to do for them, and it hid the only part worth watching, the work.
  *
  * So the request now runs the moment it is understood, and this shows the loop as it
  * goes. Every step is real: each one lights up when that stage has genuinely happened,

@@ -5,12 +5,12 @@ import { Badge, Panel } from "../ui";
  *
  * This panel exists because "we check *why*" is too vague to survive a follow-up question
  * from someone who works at Rain. Every dimension below is quoted from Rain's own
- * published material rather than inferred, and the overlap is stated rather than hidden —
+ * published material rather than inferred, and the overlap is stated rather than hidden,
  * three of the eleven checks partly duplicate controls Rain already enforces, and
  * pretending otherwise in front of the people who built it would be the fastest way to
  * lose the argument.
  *
- * The honest split: Rain's six dimensions all describe the **instrument** — how much,
+ * The honest split: Rain's six dimensions all describe the **instrument**, how much,
  * where, how often, how long. None of them describe the **obligation** the spend is
  * supposed to settle, because a card issuer has no view of a purchase-order system.
  *
@@ -40,7 +40,7 @@ const RAIN_DIMENSIONS: Dimension[] = [
   {
     name: "Approved merchants",
     stance: "overlap",
-    note: "Exact-merchant allowlisting, not just categories. Check 4 verifies the vendor against the quote — so this is defence in depth, not a gap in Rain.",
+    note: "Exact-merchant allowlisting, not just categories. Check 4 verifies the vendor against the quote. So this is defence in depth, not a gap in Rain.",
   },
   {
     name: "Merchant category codes",
@@ -54,7 +54,7 @@ const RAIN_DIMENSIONS: Dimension[] = [
     // Rain, was the one false statement on the site.
     name: "Transaction frequency",
     stance: "overlap",
-    note: "Rain limits how often a card can be used. We limit how fast an agent buys across every card it holds — a looping agent's purchases are each individually perfect, so only a rate sees it. Related controls, different subject.",
+    note: "Rain limits how often a card can be used. We limit how fast an agent buys across every card it holds. A looping agent's purchases are each individually perfect, so only a rate sees it. Related controls, different subject.",
   },
   {
     name: "Card expiry",
@@ -88,7 +88,7 @@ const MANDATE_ONLY: { name: string; check: string; why: string }[] = [
   {
     name: "Whether we already issued for this line",
     check: "check 6",
-    why: "Idempotency keyed on the order line. A retry returns the existing card instead of creating a second one — and a revoked card still counts.",
+    why: "Idempotency keyed on the order line. A retry returns the existing card instead of creating a second one. And a revoked card still counts.",
   },
   {
     name: "Who must approve above a threshold",
@@ -124,7 +124,7 @@ export function ControlCoverage() {
         <p className="border-t border-edge px-5 py-3 text-[12.5px] leading-relaxed text-muted">
           Every one of these describes the <b className="text-ink-800">instrument</b>: how
           much, where, how often, how long. Three of our checks partly overlap them, and we
-          say so — Rain decides whether to <i>allow</i>, we decide whether to{" "}
+          say so: Rain decides whether to <i>allow</i>, we decide whether to{" "}
           <i>ask at all</i>.
         </p>
       </Panel>
@@ -172,7 +172,7 @@ export function ControlCoverage() {
         >
           press release
         </a>
-        , which lists approved merchants separately from merchant category codes — so exact
+        , which lists approved merchants separately from merchant category codes, so exact
         merchant locking is supported, and we do not claim Rain misses it.
       </p>
     </div>

@@ -1,5 +1,5 @@
 /**
- * Mandate — core domain types. The join contract between A's half and B's half.
+ * Mandate: core domain types. The join contract between A's half and B's half.
  *
  * Two things matter here and both are design decisions, not incidental shapes:
  *
@@ -15,7 +15,7 @@ export type Cents = number;
 
 /**
  * The purchase order an agent declares before it is allowed to spend.
- * This is the "why" — the thing Rain's control layer never sees.
+ * This is the "why". The thing Rain's control layer never sees.
  *
  * Produced by A's `proposePurchase()`, consumed by B's `verify()`. Agree any change here
  * across both halves; nothing else is shared.
@@ -84,7 +84,7 @@ export interface IssuedCardRecord {
 
 /**
  * Everything the checker is allowed to read, captured at one instant.
- * This whole object is what gets stored on the decision — see design decision 4.
+ * This whole object is what gets stored on the decision, see design decision 4.
  */
 export interface RecordSnapshot {
   /** null means the agent declared a PO the system of record has never heard of. */
@@ -100,7 +100,7 @@ export interface RecordSnapshot {
    * What has already been spent around this purchase.
    *
    * Optional because the 47 seeded decisions were written before these rules existed, and
-   * a replay must never invent history it did not capture — the rules that read this skip
+   * a replay must never invent history it did not capture, the rules that read this skip
    * cleanly when it is absent rather than guessing.
    */
   history?: SpendHistory;
@@ -155,7 +155,7 @@ export interface Rule {
   enabled: boolean;
   params: Record<string, number | boolean | string>;
   /**
-   * The real-world control this implements. None of these rules were invented here — they
+   * The real-world control this implements. None of these rules were invented here, they
    * are controls finance departments already run, moved to before the money is committed.
    * Saying so is most of the answer to "why should I trust this?". See docs/CONTROLS.md.
    */
@@ -165,7 +165,7 @@ export interface Rule {
 /**
  * A version is proposed by one person and activated by another.
  *
- * Editing the rules is the most powerful action in the system — whoever can raise a
+ * Editing the rules is the most powerful action in the system, whoever can raise a
  * threshold can approve anything. Without a second pair of eyes, the honest criticism of
  * replay is "you can change the rules, so the audit proves nothing". Segregation of duties
  * is the standard answer, and it is what makes the version history worth trusting.
@@ -211,7 +211,7 @@ export interface CheckResult {
   /** true when the rule was disabled in this version, so it did not run. */
   skipped?: boolean;
   /**
-   * This check did not reject the purchase — it escalated it to a person.
+   * This check did not reject the purchase, it escalated it to a person.
    *
    * The distinction matters: a refusal means the purchase was wrong, a hold means it was
    * merely large enough that a human should look. Conflating the two would either block
@@ -232,7 +232,7 @@ export interface VerifyResult {
 
 /**
  * `held` means every check passed but the amount crossed the delegated authority limit,
- * so no card exists until a named person releases it. It is not a failure — it is the
+ * so no card exists until a named person releases it. It is not a failure, it is the
  * escalation path every delegation-of-authority matrix already has for humans.
  */
 export type Outcome = "approved" | "refused" | "held";
@@ -249,7 +249,7 @@ export interface Approval {
 /**
  * How the price on this PO was arrived at.
  *
- * Recorded, never checked. The checks read the record, not the story behind it — a
+ * Recorded, never checked. The checks read the record, not the story behind it, a
  * seller's reasoning is not evidence. But "where did this number come from" is a fair
  * audit question, and storing the answer alongside the decision means it can be answered
  * six months later without re-deriving anything.
@@ -306,7 +306,7 @@ export interface Decision {
   negotiation?: NegotiationSummary;
   /**
    * Set when a held decision was later released by a person. The original row is never
-   * mutated — this is written on the follow-up row, so the log shows both the hold and
+   * mutated: this is written on the follow-up row, so the log shows both the hold and
    * who lifted it.
    */
   approval?: Approval;

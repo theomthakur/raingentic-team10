@@ -5,13 +5,13 @@ import { RULE_BASIS } from "./basis";
 /**
  * Rule version 1. Seven rules, all data.
  *
- * Nothing in `lib/checks` hardcodes any of these numbers — a check reads its thresholds
+ * Nothing in `lib/checks` hardcodes any of these numbers, a check reads its thresholds
  * out of `params`. That is the whole difference between a policy a customer owns and a
  * policy buried in a deploy.
  *
  * Every rule carries a `basis`: the real-world control it implements. None of these were
  * invented here. That is deliberate, and it is most of the answer to "why should I trust
- * software to spend my money?" — because these are the controls your finance team already
+ * software to spend my money?". Because these are the controls your finance team already
  * runs, moved to before the money is committed. See docs/CONTROLS.md.
  */
 export const DEFAULT_RULES: Rule[] = [
@@ -89,7 +89,7 @@ export const DEFAULT_RULES: Rule[] = [
     //
     // 🔴 Every limit here must stay at or below rule 7's `thresholdCents`, the company-wide
     // unattended ceiling. The tighter of the two binds, so a per-agent limit above the
-    // company ceiling is dead data — it can never be the reason anything is held, and it
+    // company ceiling is dead data. It can never be the reason anything is held, and it
     // advertises authority the agent does not actually have. `procurement-02` used to sit
     // at $50,000 against a $25,000 ceiling, so Prue was documented as trusted to $50,000
     // while nothing above $25,000 ever ran unattended. There is a test for this invariant.
@@ -130,7 +130,7 @@ export function defaultRuleSet(): RuleSet {
     note: "Initial policy",
     rules: DEFAULT_RULES,
     hash: hashRules(DEFAULT_RULES),
-    // The baseline policy is active by definition — there was nothing before it to
+    // The baseline policy is active by definition. There was nothing before it to
     // segregate duties against.
     status: "active",
     proposedBy: "system",
@@ -141,7 +141,7 @@ export function defaultRuleSet(): RuleSet {
 
 /**
  * Build the next version from an edited rule list. The old version is never touched, and
- * the new one starts **pending** — it does not decide anything until someone other than
+ * the new one starts **pending**. It does not decide anything until someone other than
  * its author activates it.
  */
 export function nextRuleSet(

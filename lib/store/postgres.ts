@@ -24,8 +24,8 @@ async function getSql(): Promise<Sql> {
       // own cache. Without this, the first `select * from decisions` is memoised and
       // replayed for every later read: the write lands in Postgres, the query returns
       // stale rows, and the console shows a decision count that never moves. It fails
-      // exactly where it hurts — the append-only log and the replay both read through
-      // here — and it fails silently, with no error in any log.
+      // exactly where it hurts: the append-only log and the replay both read through
+      // here: and it fails silently, with no error in any log.
       neonConfig.fetchFunction = (input: unknown, init: unknown) =>
         fetch(input as RequestInfo, { ...(init as RequestInit), cache: "no-store" });
 
@@ -212,7 +212,7 @@ export function createPostgresStore(): Store {
     },
 
     /**
-     * Read straight off the decision log. Must match `memory.ts` exactly — a rule that
+     * Read straight off the decision log. Must match `memory.ts` exactly, a rule that
      * behaves differently on the deployed store than on a laptop is worse than no rule.
      *
      * **Exposure** (rate, structuring): approved *and* held. A held purchase is pending a
@@ -220,7 +220,7 @@ export function createPostgresStore(): Store {
      * structure a purchase through it. A refusal moved no money.
      *
      * **Payment history** (rule 10): approved only. A held purchase has paid nobody, and
-     * counting it made the control defeat itself — the first attempt was held for review,
+     * counting it made the control defeat itself: the first attempt was held for review,
      * and that hold alone made the vendor "known", so a retry passed with no human input.
      */
     async getSpendHistory({ agent, vendor, costCentre, windowHours, excludePoNumber }) {
@@ -249,7 +249,7 @@ export function createPostgresStore(): Store {
         sameVendorCostCentreCents: total(sameLine),
         sameVendorCostCentreCount: sameLine.length,
         // Across all time, not just the window: a vendor paid two years ago is not new.
-        // `settled`, not `committed` — see the note above.
+        // `settled`, not `committed`, see the note above.
         vendorEverPaid: settled.some((d) => d.po.vendor === vendor),
       };
     },
@@ -313,7 +313,7 @@ export function createPostgresStore(): Store {
       // demo. A negotiated task writes its own accepted quote (PO-71DDF45D and friends),
       // and settlement marks it fulfilled. Restoring only the seeded quotes left that row
       // behind with `fulfilled: true`, so the very first press of "Run task" after a reset
-      // was refused as a duplicate — the headline moment, broken, with no way back short
+      // was refused as a duplicate, the headline moment, broken, with no way back short
       // of a redeploy. The memory driver never had this because it rebuilds from scratch.
       const seededPoNumbers = SEED_QUOTES.map((q) => q.poNumber);
       await sql`delete from quotes where po_number != ALL(${seededPoNumbers})`;

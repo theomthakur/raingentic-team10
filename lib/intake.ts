@@ -4,7 +4,7 @@ import type { CatalogProduct } from "./catalog";
  * Turning a sentence a person typed into a structured purchase request.
  *
  * This is the one place a model is allowed to *interpret*, and it is worth being precise
- * about why that is safe. The model never decides whether a purchase is allowed — it only
+ * about why that is safe. The model never decides whether a purchase is allowed, it only
  * reads "I need a couple of boxes of paper, cheapest you can find" and returns
  * `{ productId: "office-supplies", quantity: 2 }`. Everything downstream is the same
  * eleven deterministic checks, reading the same system of record.
@@ -97,7 +97,7 @@ export function matchByKeyword(text: string, catalog: CatalogProduct[]): IntakeR
  * Ask the model to pick a catalogue line and a quantity.
  *
  * Constrained hard on purpose: it chooses from an enumerated list of ids that already
- * exist, and returns JSON. It cannot invent a product, a price, or a supplier — the worst
+ * exist, and returns JSON. It cannot invent a product, a price, or a supplier, the worst
  * it can do is pick the wrong row, which the checks then judge on its merits.
  */
 export async function interpretWithModel(

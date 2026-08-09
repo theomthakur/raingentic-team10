@@ -17,7 +17,7 @@ import { money } from "@/lib/format";
  *
  *  1. No I/O. A check reads its arguments and nothing else.
  *  2. No model. There is no LLM anywhere in this path, which is exactly why a replay of
- *     history is meaningful — the same inputs always produce the same verdict, so a diff
+ *     history is meaningful, the same inputs always produce the same verdict, so a diff
  *     can only be caused by the rule change.
  *  3. No wall clock. Time comes from `record.observedAt`, never `Date.now()`. If a check
  *     read the real clock, replaying a decision tomorrow would judge it against tomorrow,
@@ -31,13 +31,13 @@ function num(params: Rule["params"], key: string, fallback: number): number {
 
 /**
  * Every numeric comparison in this file has to be guarded, because in JavaScript a
- * comparison against `NaN` is always false — so `asked > limit` on a `NaN` amount does not
+ * comparison against `NaN` is always false. So `asked > limit` on a `NaN` amount does not
  * throw and does not fail. **It passes.**
  *
  * That is not hypothetical. A request with `quantity: 0` on the negotiated path produced a
  * PO with a null unit price, and the resulting `NaN` total silently satisfied six of the
- * eleven checks — the tolerance, the budget, the delegated limit, the agent's own limit,
- * structuring and velocity — then charged a cost centre `NaN`, which disabled that budget's
+ * eleven checks: the tolerance, the budget, the delegated limit, the agent's own limit,
+ * structuring and velocity: then charged a cost centre `NaN`, which disabled that budget's
  * check permanently, because from then on every `asked > NaN` was false too.
  *
  * So arithmetic in the decision path fails closed. A number we cannot reason about is a
@@ -59,7 +59,7 @@ function unusable(
     ruleId: rule.id,
     label: rule.label,
     passed: false,
-    reason: `${what} is not a usable amount, so this check cannot be satisfied. A figure that cannot be compared is refused rather than passed — a comparison against NaN is false, which would otherwise let it through.`,
+    reason: `${what} is not a usable amount, so this check cannot be satisfied. A figure that cannot be compared is refused rather than passed. A comparison against NaN is false, which would otherwise let it through.`,
     expected: "a finite amount in whole cents",
     actual,
     readFrom,
@@ -151,7 +151,7 @@ const poExists: CheckFn = (po, record, rule) => {
 const poOpen: CheckFn = (po, record, rule) => {
   const quote = record.quote;
   const base = { ruleId: rule.id, label: rule.label, readFrom: "record.quote.fulfilled" };
-  if (!quote) return skipped(rule, "No quote on record — see the PO exists check.", base.readFrom);
+  if (!quote) return skipped(rule, "No quote on record, see the PO exists check.", base.readFrom);
 
   if (quote.fulfilled) {
     return {
@@ -165,7 +165,7 @@ const poOpen: CheckFn = (po, record, rule) => {
 
   if (!bool(rule.params, "allowExpiredQuote", false)) {
     const graceMs = num(rule.params, "expiryGraceHours", 0) * 3_600_000;
-    // Wall clock deliberately not used — see the file header.
+    // Wall clock deliberately not used: see the file header.
     const observed = Date.parse(record.observedAt);
     const expiry = Date.parse(quote.quoteExpiry);
     if (Number.isFinite(observed) && Number.isFinite(expiry) && observed > expiry + graceMs) {
@@ -196,7 +196,7 @@ const poOpen: CheckFn = (po, record, rule) => {
 const amountMatches: CheckFn = (po, record, rule) => {
   const quote = record.quote;
   const base = { ruleId: rule.id, label: rule.label, readFrom: "record.quote.unitPrice × quantity" };
-  if (!quote) return skipped(rule, "No quote on record — see the PO exists check.", base.readFrom);
+  if (!quote) return skipped(rule, "No quote on record, see the PO exists check.", base.readFrom);
 
   const toleranceBps = num(rule.params, "toleranceBps", 0);
   const quoted = quote.unitPrice * quote.quantity;
@@ -239,14 +239,14 @@ const amountMatches: CheckFn = (po, record, rule) => {
 // 4. Right vendor AND right item
 //
 // The SKU half is the one no card network can express at any granularity. An issuer
-// bounds amount, merchant, category and frequency — it does not know your order system
+// bounds amount, merchant, category and frequency. It does not know your order system
 // exists, so "right vendor, right total, wrong item" passes every control there is.
 // ---------------------------------------------------------------------------
 
 const lineMatches: CheckFn = (po, record, rule) => {
   const quote = record.quote;
   const base = { ruleId: rule.id, label: rule.label, readFrom: "record.quote.vendor / .sku" };
-  if (!quote) return skipped(rule, "No quote on record — see the PO exists check.", base.readFrom);
+  if (!quote) return skipped(rule, "No quote on record, see the PO exists check.", base.readFrom);
 
   const caseSensitive = bool(rule.params, "caseSensitive", false);
   const norm = (s: string) => (caseSensitive ? s.trim() : s.trim().toLowerCase());
@@ -267,7 +267,7 @@ const lineMatches: CheckFn = (po, record, rule) => {
       ...base,
       readFrom: "record.quote.sku",
       passed: false,
-      reason: `The quote for ${po.poNumber} is for ${quote.sku}, but the agent is buying ${po.sku}. Right vendor, right total, wrong item — no card control can see this.`,
+      reason: `The quote for ${po.poNumber} is for ${quote.sku}, but the agent is buying ${po.sku}. Right vendor, right total, wrong item. No card control can see this.`,
       expected: quote.sku,
       actual: po.sku,
     };
@@ -378,7 +378,7 @@ const noExistingCard: CheckFn = (po, record, rule) => {
 };
 
 // ---------------------------------------------------------------------------
-// 7. Delegated authority. Not a refusal — an escalation.
+// 7. Delegated authority. Not a refusal: an escalation.
 //
 // "There is no human in the loop" is only alarming when it is unconditional. No company
 // gives an employee unlimited spending authority either; it gives bounded autonomy with
@@ -396,7 +396,7 @@ const requiresApproval: CheckFn = (po, _record, rule) => {
       ...base,
       passed: false,
       escalates: true,
-      reason: `${money(asked)} is above the ${money(threshold)} delegated limit, so this is held for ${role} to release. Every other check passed — no card exists until a person signs off.`,
+      reason: `${money(asked)} is above the ${money(threshold)} delegated limit, so this is held for ${role} to release. Every other check passed, no card exists until a person signs off.`,
       expected: `at most ${money(threshold)} without sign-off`,
       actual: money(asked),
     };
@@ -419,7 +419,7 @@ const requiresApproval: CheckFn = (po, _record, rule) => {
 /**
  * The counter to rule 7's obvious weakness.
  *
- * A $30,000 purchase gets held. Two $15,000 purchases do not — each is individually
+ * A $30,000 purchase gets held. Two $15,000 purchases do not, each is individually
  * within authority, and every other check passes on both. The only thing that sees it is
  * a rule that looks at the running total on the same vendor and cost centre rather than
  * at one line in isolation.
@@ -455,7 +455,7 @@ const noStructuring: CheckFn = (po, record, rule) => {
       ...base,
       passed: false,
       escalates: true,
-      reason: `On its own this is ${money(asked)}, under the ${money(threshold)} limit — but ${money(h.sameVendorCostCentreCents)} has already gone to ${po.vendor} on ${po.costCentre} in the last ${windowHours} hours, making ${money(combined)} together. Split purchases are how an approval limit gets sidestepped, so a person confirms this one.`,
+      reason: `On its own this is ${money(asked)}, under the ${money(threshold)} limit. But ${money(h.sameVendorCostCentreCents)} has already gone to ${po.vendor} on ${po.costCentre} in the last ${windowHours} hours, making ${money(combined)} together. Split purchases are how an approval limit gets sidestepped, so a person confirms this one.`,
       expected: `under ${money(threshold)} combined over ${windowHours}h`,
       actual: `${money(combined)} across ${h.sameVendorCostCentreCount + 1} purchases`,
     };
@@ -497,7 +497,7 @@ const agentAuthority: CheckFn = (po, record, rule) => {
       ...base,
       passed: false,
       escalates: true,
-      reason: `${agent} is trusted up to ${money(limit)} unattended, and this is ${money(asked)}. Not refused — it needs whoever holds a bigger limit to release it.`,
+      reason: `${agent} is trusted up to ${money(limit)} unattended, and this is ${money(asked)}. Not refused. It needs whoever holds a bigger limit to release it.`,
       expected: `at most ${money(limit)} for ${agent}`,
       actual: money(asked),
     };
@@ -518,7 +518,7 @@ const agentAuthority: CheckFn = (po, record, rule) => {
 
 /**
  * Invoice fraud almost always arrives as a payee nobody has ever paid. A first payment to
- * a new supplier is still perfectly normal business, so this holds rather than refuses —
+ * a new supplier is still perfectly normal business, so this holds rather than refuses,
  * it is the pairing of "new payee" and "nobody looked" that loses the money.
  */
 const knownVendor: CheckFn = (po, record, rule) => {
@@ -617,8 +617,8 @@ const velocity: CheckFn = (po, record, rule) => {
 
 /**
  * The six amount-dependent checks are wrapped so a malformed total refuses instead of
- * passing. The five that read no money — the PO existing, it still being open, the vendor
- * and SKU strings, an existing card, and whether the vendor is known — are unaffected.
+ * passing. The five that read no money: the PO existing, it still being open, the vendor
+ * and SKU strings, an existing card, and whether the vendor is known, are unaffected.
  */
 const CHECKS: Record<RuleId, CheckFn> = {
   "po-exists": poExists,

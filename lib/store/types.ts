@@ -55,7 +55,7 @@ export interface Store {
      * The order line being judged, excluded from every aggregate.
      *
      * Without this a purchase is counted against itself. A held purchase still counts as
-     * exposure — correctly, since it is pending a signature rather than abandoned — so when
+     * exposure (correctly, since it is pending a signature rather than abandoned) so when
      * a person releases it, the held row for that same order line is already in the totals
      * and the release adds the amount a second time. A $43,500 purchase looked like $87,000
      * and was refused on velocity, which read as the system contradicting its own approval.
@@ -68,7 +68,7 @@ export interface Store {
 
   /**
    * A negotiation concluded, so the winning quote becomes an accepted order line on the
-   * record. This is what gives the agent something to be checked *against* — without it
+   * record. This is what gives the agent something to be checked *against*, without it
    * the checker would be comparing the agent's declaration to itself.
    *
    * Deliberately does not overwrite an existing line: once an order line exists, a later
@@ -87,7 +87,7 @@ export interface Store {
    *
    * Rule 6 alone is not enough under concurrency: two identical requests both take their
    * snapshot before either writes a card, so both see "no card yet" and both issue. The
-   * check is honest about what it read — it just read it a moment too early. This closes
+   * check is honest about what it read, it just read it a moment too early. This closes
    * that window, and it is the difference between idempotency as a claim and idempotency
    * as a property.
    */

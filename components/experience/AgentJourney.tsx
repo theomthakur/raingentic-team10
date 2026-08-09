@@ -64,7 +64,7 @@ export function AgentJourney({
   const catalog = useMemo(() => getCatalog(), []);
   const [message, setMessage] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [status, setStatus] = useState("Hi — what would you like me to buy or keep stocked?");
+  const [status, setStatus] = useState("Hi. What would you like me to buy or keep stocked?");
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [decision, setDecision] = useState<Decision | null>(null);
   const [error, setError] = useState<string | null>(null);

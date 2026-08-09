@@ -12,13 +12,13 @@ import { Badge, Button, Panel } from "../ui";
 /**
  * The queue of purchases waiting on a person.
  *
- * This is the direct answer to the objection that lands first — "there is no human in the
+ * This is the direct answer to the objection that lands first, "there is no human in the
  * loop, why would I trust it?" There is one, above a limit you set, exactly as a
  * delegation-of-authority matrix works for employees. Nobody gives a person unlimited
  * spending authority either.
  *
  * What matters and is easy to miss: **no card exists while a purchase sits here.** The
- * approval is not a review of something already issued that would need clawing back — it
+ * approval is not a review of something already issued that would need clawing back, it
  * is the thing that causes the instrument to exist at all.
  */
 export function ApprovalInbox({
@@ -54,7 +54,7 @@ export function ApprovalInbox({
 
   return (
     <Panel
-      title="Exception — above an agent’s authority"
+      title="Exception, above an agent’s authority"
       right={
         <div className="flex items-center gap-2">
           {actionable.length > 0 && <Badge tone="warn">{actionable.length} to action</Badge>}
@@ -72,7 +72,7 @@ export function ApprovalInbox({
         {held.length === 1 ? "This one is" : `These ${held.length} are`} the exception:
         every check passed, but the amount is above the delegated authority of the agent
         that asked. Autonomy has boundaries, exactly as it does for an employee.{" "}
-        <span className="text-ink-700">No card exists while a purchase waits here</span> —
+        <span className="text-ink-700">No card exists while a purchase waits here</span>,
         approving is what creates it.
       </p>
 
@@ -154,7 +154,7 @@ export function ApprovalInbox({
                       </Button>
                     </div>
                     <p className="text-[11px] text-muted">
-                      The checks run again on release — the world may have moved while this
+                      The checks run again on release: the world may have moved while this
                       waited.
                     </p>
                   </div>
@@ -167,7 +167,7 @@ export function ApprovalInbox({
                 )
               ) : (
                 <p className="mt-1.5 font-mono text-[11px] text-ink-400">
-                  historical — released purchases re-run their checks, and this one&apos;s
+                  historical: released purchases re-run their checks, and this one&apos;s
                   records are no longer live
                 </p>
               )}

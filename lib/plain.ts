@@ -3,7 +3,7 @@ import type { Outcome, RuleId } from "./types";
 /**
  * Codes to English.
  *
- * The system of record speaks in SKUs, cost-centre codes and rule ids, and it has to —
+ * The system of record speaks in SKUs, cost-centre codes and rule ids, and it has to,
  * those are the identifiers the checks actually compare. But the person reading this
  * screen is a finance controller deciding whether to trust an agent with a card, and
  * "25 × VO-DESK-S2 · CC-ENG" makes them decode three things before they learn anything.
@@ -78,7 +78,7 @@ export function outcomeSummary(outcome: Outcome): { label: string; meaning: stri
     case "held":
       return {
         label: "Waiting for a person",
-        meaning: "Nothing is wrong with it — it is simply above this agent's limit, so no card exists until someone releases it.",
+        meaning: "Nothing is wrong with it. It is simply above this agent's limit, so no card exists until someone releases it.",
       };
     case "refused":
       return {

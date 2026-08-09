@@ -16,7 +16,7 @@ import type { PurchaseOrder } from "./types";
  * The PO number is derived from the task, not random.
  *
  * A purchase order identifies an order LINE, and running the same task twice is the same
- * line, not a new one — which is exactly what rule 6 is there to catch. A fresh uuid per
+ * line, not a new one. Which is exactly what rule 6 is there to catch. A fresh uuid per
  * run would make every retry look like new business and quietly defeat the idempotency
  * check, so the identity has to come from the task itself.
  */
@@ -48,7 +48,7 @@ export function proposePurchase(task: Task): ProposedPurchase {
   //
   // `quantity: 0` used to divide through the bidding and produce a PO with a null unit
   // price. The resulting NaN total then silently satisfied six of the eleven checks,
-  // because every comparison against NaN is false, and charged a cost centre NaN — which
+  // because every comparison against NaN is false, and charged a cost centre NaN, which
   // disabled that budget's check for good. The checks now fail closed on an unusable
   // figure, but a malformed order should never reach them in the first place.
   if (!Number.isInteger(task.quantity) || task.quantity <= 0) {

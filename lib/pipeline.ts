@@ -56,13 +56,13 @@ export interface ReleaseContext {
   releases: string;
   /**
    * The rules a person has actually signed off, taken from the held decision's own
-   * verdicts — not a hardcoded list.
+   * verdicts: not a hardcoded list.
    *
    * Four rules escalate rather than refuse: the delegated limit, a split purchase, an
    * agent's own limit, and a first payment to a new supplier. An approver is answering the
    * specific concerns that were raised, so only those are lifted. Every other rule still
    * runs against facts read now, which is why a release can still be refused or even held
-   * again for a *different* reason — approval is permission to proceed, not a promise that
+   * again for a *different* reason. Approval is permission to proceed, not a promise that
    * the facts have not moved.
    */
   liftedRules: RuleId[];
@@ -88,29 +88,29 @@ export async function runPipeline(
   const stages: Stage[] = [];
   const total = poTotal(po);
 
-  // 1b NEGOTIATE — already concluded upstream; recorded here so the decision keeps the
+  // 1b NEGOTIATE: already concluded upstream; recorded here so the decision keeps the
   // provenance of its own price.
   if (negotiation) {
     const won = negotiation.offers.find((o) => o.won);
     stages.push({
       name: "NEGOTIATE",
-      detail: `${negotiation.offers.length} sellers bid, ${negotiation.roundCount} counter-offer round — ${won?.vendor} won at ${(( won?.final ?? 0) / 100).toFixed(2)}/unit`,
+      detail: `${negotiation.offers.length} sellers bid, ${negotiation.roundCount} counter-offer round, ${won?.vendor} won at ${(( won?.final ?? 0) / 100).toFixed(2)}/unit`,
       ok: true,
     });
   }
 
-  // 2 PROPOSE — the agent declares the PO it negotiated.
+  // 2 PROPOSE: the agent declares the PO it negotiated.
   stages.push({
     name: "PROPOSE",
     detail: `${agent} declared ${po.poNumber}: ${po.quantity} × ${po.sku} from ${po.vendor}`,
     ok: true,
   });
 
-  // 3 VERIFY — deterministic, against a snapshot taken now and kept forever.
+  // 3 VERIFY: deterministic, against a snapshot taken now and kept forever.
   const record = await snapshot(store, po, agent);
   const ruleSet = await store.latestRuleSet();
 
-  // On a release, the rules a person signed off have already been satisfied — by that
+  // On a release, the rules a person signed off have already been satisfied, by that
   // person. Every other rule still runs, against a snapshot taken now, because the world
   // may have moved while the purchase sat in the queue.
   //
@@ -181,7 +181,7 @@ export async function runPipeline(
 
   // Reserve the order line before creating anything.
   //
-  // Rule 6 is honest about what it read — it just read it a moment too early. Two
+  // Rule 6 is honest about what it read, it just read it a moment too early. Two
   // identical requests arriving together both snapshot before either writes, so both see
   // "no card yet" and both would issue. In payments that is not hypothetical; it is a
   // double-click, a retried webhook, two queue workers. The claim closes the window, and
@@ -239,7 +239,7 @@ export async function runPipeline(
     return { decision, stages };
   }
 
-  // 4 ISSUE — a card scoped to exactly the approved amount, expiring with the quote.
+  // 4 ISSUE: a card scoped to exactly the approved amount, expiring with the quote.
   let card: Awaited<ReturnType<typeof issueCard>>;
   try {
     card = await issueCard({ po, limitCents: total });
@@ -254,7 +254,7 @@ export async function runPipeline(
     ok: true,
   });
 
-  // 5 SETTLE — exercise the actual scoped card in Rain's sandbox when opted in. A failed
+  // 5 SETTLE: exercise the actual scoped card in Rain's sandbox when opted in. A failed
   // simulator call is recorded as evidence rather than silently reported as settled; the
   // card has already been issued, so Mandate still writes the approved decision and makes
   // the discrepancy visible to an operator.
@@ -292,7 +292,7 @@ export async function runPipeline(
     ok: Boolean(rainSettlement) || card.simulated || !sandboxSettlementEnabled(),
   });
 
-  // 7 REVOKE — the obligation is discharged, so the instrument stops existing as a live
+  // 7 REVOKE: the obligation is discharged, so the instrument stops existing as a live
   // thing. Everyone will demo a card being born; this is the other half, and it answers
   // "what stops the agent reusing it" without needing to argue the point.
   const revokedAt = new Date().toISOString();
@@ -301,19 +301,19 @@ export async function runPipeline(
     await store.revokeCard(po.poNumber, revokedAt);
     stages.push({
       name: "REVOKE",
-      detail: `Card ••••${card.last4} retired — it existed for exactly this purchase${simulated ? " (simulated)" : ""}`,
+      detail: `Card ••••${card.last4} retired, it existed for exactly this purchase${simulated ? " (simulated)" : ""}`,
       ok: true,
     });
   } else {
     // Say so rather than claiming a revocation that did not happen.
     stages.push({
       name: "REVOKE",
-      detail: `Could not retire card ••••${card.last4} — it is still live`,
+      detail: `Could not retire card ••••${card.last4}, it is still live`,
       ok: false,
     });
   }
 
-  // 8 RECORD — append-only, never updated in place.
+  // 8 RECORD: append-only, never updated in place.
   const decision: Decision = {
     ...base,
     outcome: "approved",
@@ -334,7 +334,7 @@ export async function runPipeline(
 /**
  * Release a held purchase.
  *
- * The held row is never mutated — the release is written as its own row that points back
+ * The held row is never mutated. The release is written as its own row that points back
  * at it. So the log shows both that a person was asked and that a named person answered,
  * which is the part an auditor actually wants.
  *
@@ -355,8 +355,8 @@ export async function releaseHeld(
   if (!held) throw new Error(`No decision ${decisionId}.`);
   if (held.outcome !== "held") throw new Error(`Decision ${decisionId} is not awaiting release.`);
 
-  // Two approvers can open the same queue. Rule 6 would catch the second release anyway —
-  // it re-reads the record the first one wrote — but refusing it as a duplicate spend is
+  // Two approvers can open the same queue. Rule 6 would catch the second release anyway,
+  // it re-reads the record the first one wrote. But refusing it as a duplicate spend is
   // a confusing way to say "someone already did this", so say the clearer thing here.
   const existing = all.find((d) => d.releases === decisionId);
   if (existing) {
@@ -388,7 +388,7 @@ export async function releaseHeld(
   const stages: Stage[] = [
     {
       name: "APPROVE",
-      detail: `${by} released ${held.po.poNumber} — signed off: ${lifted}${note ? ` — "${note}"` : ""}`,
+      detail: `${by} released ${held.po.poNumber} (signed off: ${lifted}${note ? `) "${note}"` : ""}`,
       ok: true,
     },
   ];

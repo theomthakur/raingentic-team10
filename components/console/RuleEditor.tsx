@@ -9,7 +9,7 @@ import { Badge, Button, Panel } from "../ui";
  *
  * Every threshold on this screen is a row in a versioned table, and saving writes the
  * next version rather than editing the one in front of you. That is the difference
- * between a policy the customer owns and a policy that needs a deploy — and it is what
+ * between a policy the customer owns and a policy that needs a deploy, and it is what
  * makes the replay next to it mean anything.
  *
  * The "anchored" badge is the one place Monad's purple appears, deliberately: it is the
@@ -136,7 +136,7 @@ export function RuleEditor({
                 </div>
                 {/* The control this descends from. None of these rules were invented here,
                     and saying which established control each one implements is most of the
-                    answer to "why should I trust software to spend my money?" — these are
+                    answer to "why should I trust software to spend my money?", these are
                     the controls a finance team already runs, moved to before the money is
                     committed. Invisible until now: it was in the data and in the docs but
                     never on screen. */}
@@ -167,7 +167,7 @@ export function RuleEditor({
         </Button>
         {pending ? (
           <span className="text-[12px] text-muted">
-            v{pending.version} is waiting for approval — one change at a time.
+            v{pending.version} is waiting for approval, one change at a time.
           </span>
         ) : (
           <>
@@ -194,7 +194,7 @@ export function RuleEditor({
         <div className="space-y-2 border-t border-edge bg-rain-50/60 px-4 py-3">
           <p className="text-[12px] text-ink-900">
             <span className="font-semibold">v{pending.version} proposed by {pending.proposedBy}</span>
-            {pending.note ? ` — ${pending.note}` : ""}
+            {pending.note ? `, ${pending.note}` : ""}
           </p>
           <p className="text-[12px] text-muted">
             It decides nothing until someone else activates it. {pending.proposedBy} cannot

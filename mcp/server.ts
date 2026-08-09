@@ -6,13 +6,13 @@
  * the only "agent" was a deterministic function we call ourselves.
  *
  * This closes it. Point Claude, Cursor, or anything else that speaks MCP at this server
- * and it gets the same four endpoints the console uses — no privileged path, no separate
+ * and it gets the same four endpoints the console uses, no privileged path, no separate
  * code, the identical eleven checks. A real model can now try to spend real money and be
  * told no, with a reason it has to reason about.
  *
  * The interesting property is not that an agent can buy things. It is that an agent that
  * *wants* to get a purchase through cannot talk its way past a pure function. Ask a
- * capable model to split a purchase to stay under the approval limit and it will try —
+ * capable model to split a purchase to stay under the approval limit and it will try,
  * and rule 8 catches it, because the check reads the record rather than the request.
  *
  *   npm run mcp            # talks to the deployed app
@@ -60,13 +60,13 @@ interface Decision {
  *
  * Deliberately verbose about *why*: an agent that is only told "denied" will retry the
  * same thing. An agent told which rule failed and what it expected can either fix the
- * purchase or explain to its user why it cannot proceed — which is the whole point of a
+ * purchase or explain to its user why it cannot proceed. Which is the whole point of a
  * refusal carrying a reason rather than a status code.
  */
 function describe(d: Decision): string {
   const total = d.po.unitPrice * d.po.quantity;
   const lines: string[] = [
-    `${d.outcome.toUpperCase()} — ${d.po.quantity} × ${d.po.sku} from ${d.po.vendor}, ${money(total)}, ${d.po.costCentre}`,
+    `${d.outcome.toUpperCase()}, ${d.po.quantity} × ${d.po.sku} from ${d.po.vendor}, ${money(total)}, ${d.po.costCentre}`,
     `purchase order ${d.po.poNumber}`,
     "",
   ];
@@ -84,7 +84,7 @@ function describe(d: Decision): string {
     );
   } else {
     const failed = d.checks.filter((c) => !c.passed && !c.skipped && !c.escalates);
-    lines.push("No card was created. Nothing to cancel — the instrument never existed.", "");
+    lines.push("No card was created. Nothing to cancel. The instrument never existed.", "");
     for (const c of failed) lines.push(`✗ ${c.label}\n  ${c.reason}`);
   }
 
@@ -116,11 +116,11 @@ server.registerTool(
     }>("/api/state");
 
     const out = [
-      "NEGOTIATED — suppliers compete, the winner becomes the purchase order:",
-      ...negotiatedTasks.map((t) => `  ${t.task.taskKey} — ${t.label}. ${t.note}`),
+      "NEGOTIATED: suppliers compete, the winner becomes the purchase order:",
+      ...negotiatedTasks.map((t) => `  ${t.task.taskKey}, ${t.label}. ${t.note}`),
       "",
-      "ON CONTRACT — a quote already exists, declare against it:",
-      ...tasks.map((t) => `  ${t.id} — ${t.label}. ${t.note}`),
+      "ON CONTRACT: a quote already exists, declare against it:",
+      ...tasks.map((t) => `  ${t.id}, ${t.label}. ${t.note}`),
       "",
       "A purchase order you can edit and submit directly:",
       `  ${JSON.stringify(blankPO)}`,
@@ -169,7 +169,7 @@ server.registerTool(
     title: "Declare a specific purchase order",
     description:
       "Submit an exact purchase order rather than a catalogue task. This is the honest way to " +
-      "attempt anything unusual — a different supplier, a different quantity, a repeat of " +
+      "attempt anything unusual: a different supplier, a different quantity, a repeat of " +
       "something already bought. Every field is checked against the record.",
     inputSchema: {
       poNumber: z.string().describe("The purchase order number on the record."),
@@ -198,7 +198,7 @@ server.registerTool(
     title: "Read what has already been decided",
     description:
       "The append-only record of every purchase and why it was allowed or refused. Read this " +
-      "before retrying something — a purchase already fulfilled will be refused again.",
+      "before retrying something: a purchase already fulfilled will be refused again.",
     inputSchema: { limit: z.number().int().positive().max(50).optional() },
   },
   async ({ limit }) => {
@@ -206,7 +206,7 @@ server.registerTool(
     const rows = decisions.slice(0, limit ?? 12).map((d) => {
       const total = d.po.unitPrice * d.po.quantity;
       const why = d.checks.find((c) => !c.passed && !c.skipped);
-      return `${d.outcome.padEnd(8)} ${d.po.poNumber}  ${d.po.quantity} × ${d.po.sku}  ${money(total)}${why ? `  — ${why.reason}` : ""}`;
+      return `${d.outcome.padEnd(8)} ${d.po.poNumber}  ${d.po.quantity} × ${d.po.sku}  ${money(total)}${why ? ` , ${why.reason}` : ""}`;
     });
     return { content: [{ type: "text", text: rows.join("\n") }] };
   }

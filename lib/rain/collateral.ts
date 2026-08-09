@@ -2,7 +2,7 @@
  * Rain sandbox collateral funding.
  *
  * Collateral is the pot standing behind issued cards. Without it a card exists but has no
- * spending power, which is a confusing failure to debug — the card looks fine and the
+ * spending power, which is a confusing failure to debug, the card looks fine and the
  * authorization fails. Funding it is therefore worth doing explicitly rather than leaving
  * as folklore in someone's terminal history.
  *
@@ -13,7 +13,7 @@
  * treasury movement when read quickly.
  *
  * Contract, from the OpenAPI spec:
- *   contractId  uuid, required — must belong to your tenant
+ *   contractId  uuid, required, must belong to your tenant
  *   currency    "rusd" only
  *   amount      integer, minimum 0, in cents (10000 = $100.00)
  *   → 200 { transactionId }
@@ -106,7 +106,7 @@ export interface CollateralFundResult {
  * Fund the configured collateral contract in the sandbox.
  *
  * Returns only on a real success. A non-2xx throws, and the caller must not report a
- * funded balance on anything else — the whole reason this module exists is that "the
+ * funded balance on anything else: the whole reason this module exists is that "the
  * collateral is funded" has to be a fact rather than an assumption.
  */
 export async function fundCollateral(params: {
@@ -130,6 +130,6 @@ export async function fundCollateral(params: {
   if (!res.ok) throw new CollateralError(res.status, body);
 
   // Rain has answered 202 with only `{ success: true }` in practice, so a missing
-  // transactionId is not a failure — but it must not be invented either.
+  // transactionId is not a failure. But it must not be invented either.
   return { transactionId: body?.transactionId ?? "" };
 }

@@ -40,7 +40,7 @@ body {
 }
 
 /* The loading screen. A drop falls, stretches slightly as it accelerates, and fades before
-   it lands — a full splash would draw the eye to the bottom of an empty screen, which is
+   it lands: a full splash would draw the eye to the bottom of an empty screen, which is
    the one place there is nothing to look at. */
 /* Drops now vary in weight and speed, and a few fall slightly off-vertical, because real
    rain is not a set of identical vertical lines at identical speed. */

@@ -4,7 +4,7 @@ import type { BudgetRecord, QuoteRecord } from "@/lib/types";
  * The system of record Mandate checks declarations against.
  *
  * In production this is an ERP. Here it is a small in-process store that the demo can
- * reset, but the important part is that the checker only ever sees a *snapshot* of it —
+ * reset, but the important part is that the checker only ever sees a *snapshot* of it,
  * `lib/store` is what takes that snapshot, and the decision log keeps it forever.
  */
 
@@ -43,7 +43,7 @@ export const SEED_QUOTES: QuoteRecord[] = [
   {
     poNumber: "PO-4419",
     status: "accepted",
-    fulfilled: true, // already fulfilled — rule 2 catches a re-purchase
+    fulfilled: true, // already fulfilled, rule 2 catches a re-purchase
     vendor: "Ardent Materials",
     sku: "AM-ALLOY-7",
     unitPrice: 31_000,
@@ -52,7 +52,7 @@ export const SEED_QUOTES: QuoteRecord[] = [
   },
   {
     poNumber: "PO-4420",
-    status: "draft", // never accepted — rule 1 catches it
+    status: "draft", // never accepted, rule 1 catches it
     fulfilled: false,
     vendor: "Bellweather Industrial",
     sku: "BW-CONV-90",
@@ -81,7 +81,7 @@ export const SEED_QUOTES: QuoteRecord[] = [
     quoteExpiry: "2026-08-20T23:59:59.000Z",
   },
   {
-    // Correct in every way, but $43,500 — above the delegated limit, so it is held for a
+    // Correct in every way, but $43,500. Above the delegated limit, so it is held for a
     // person rather than refused. This is the task that demonstrates bounded autonomy.
     poNumber: "PO-4423",
     status: "accepted",
@@ -96,7 +96,7 @@ export const SEED_QUOTES: QuoteRecord[] = [
   //
   // This is the interesting attack, because nothing here is a lie: both quotes are real,
   // both are accepted, and each is comfortably under the delegated limit. An agent that
-  // wanted to avoid a signature would not need to forge anything — it would just buy the
+  // wanted to avoid a signature would not need to forge anything, it would just buy the
   // thing twice. Only a rule that looks at the running total on the same vendor and cost
   // centre sees it, which is why one check reads the pattern rather than the move.
   {
@@ -130,7 +130,7 @@ export const SEED_QUOTES: QuoteRecord[] = [
  * vendor mismatch; if CC-FAC were also near its limit, the refusal would cite two rules
  * and the point would blur.
  *
- * CC-MKT is deliberately left near its limit — no task touches it, so it drives the amber
+ * CC-MKT is deliberately left near its limit, no task touches it, so it drives the amber
  * budget meter without interfering with anything.
  */
 export const SEED_BUDGETS: BudgetRecord[] = [

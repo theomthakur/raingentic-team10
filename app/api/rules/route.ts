@@ -14,7 +14,7 @@ export async function GET() {
 /**
  * Propose a policy change.
  *
- * Editing a rule creates the next version — the version being edited is never mutated,
+ * Editing a rule creates the next version: the version being edited is never mutated,
  * which is what keeps every decision that referenced it explicable afterwards. The new
  * version is written as **pending**: it decides nothing until a second person activates
  * it, because whoever can raise a threshold can otherwise approve anything.
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   }
   if (!body.proposedBy?.trim()) {
     return NextResponse.json(
-      { error: "A proposer name is required — an unattributed policy change is not auditable." },
+      { error: "A proposer name is required. An unattributed policy change is not auditable." },
       { status: 400 }
     );
   }

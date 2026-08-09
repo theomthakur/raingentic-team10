@@ -9,7 +9,7 @@ export function AgentTag({ id, size = "sm" }: { id: string; size?: "sm" | "md" }
       <AgentAvatar id={id} size={dims} />
       <span className={size === "md" ? "text-[13px]" : "text-[12px]"}>
         <span className="font-medium text-ink-800">{agent.name}</span>
-        <span className="text-ink-400"> — deals with {agent.dealsWith}</span>
+        <span className="text-ink-400">, deals with {agent.dealsWith}</span>
       </span>
     </span>
   );

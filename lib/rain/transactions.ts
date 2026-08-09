@@ -3,11 +3,11 @@
  *
  * `GET /issuing/transactions` is the other half of the issuance story: the app can say a
  * card was created for exactly one purchase, and this is where you check whether anything
- * was ever authorised against it. Read-only by construction — nothing in this module can
+ * was ever authorised against it. Read-only by construction, nothing in this module can
  * move, hold, or refund money.
  *
  * **The projection is the point.** Rain's transaction objects carry cardholder personal
- * data — `userFirstName`, `userEmail` — alongside the merchant and amount fields. None of
+ * data (`userFirstName`, `userEmail`) alongside the merchant and amount fields. None of
  * that is needed to show what a card did, so none of it leaves this module. A product
  * whose argument is "bound authority, nothing more than required" cannot then hand a
  * browser a payload of names and email addresses because they happened to be in the
@@ -36,7 +36,7 @@ export class TransactionsError extends Error {
 
 /**
  * What we are willing to show. Deliberately a subset, and deliberately not extensible by
- * accident — anything new has to be added here on purpose, having been looked at.
+ * accident: anything new has to be added here on purpose, having been looked at.
  */
 export interface SafeTransaction {
   id: string;
@@ -70,7 +70,7 @@ export function validateLimit(input: unknown): LimitCheck {
 
 /**
  * Trimmed on the way out. Card networks pad merchant names to a fixed width, so Rain
- * returns things like `"Staples Business         "` — real data, badly shaped for display.
+ * returns things like `"Staples Business         "`, real data, badly shaped for display.
  */
 const str = (v: unknown): string | null => {
   if (typeof v !== "string") return null;
@@ -84,7 +84,7 @@ const num = (v: unknown): number | null => (typeof v === "number" && Number.isFi
  *
  * The response is a `oneOf` keyed on `type`, and only `spend` carries merchant detail, so
  * the shared fields are read defensively rather than assumed. Anything unrecognised still
- * produces a row with an id and a type instead of being dropped — a transaction we cannot
+ * produces a row with an id and a type instead of being dropped, a transaction we cannot
  * fully parse is still a transaction that happened, and hiding it would make the list
  * quietly wrong.
  */

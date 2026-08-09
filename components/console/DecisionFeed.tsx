@@ -91,7 +91,7 @@ export function DecisionFeed({
                         <span className="truncate font-medium">
                           {style.label}
                           {d.outcome === "refused" && firstFailure && (
-                            <span className="font-normal"> — {firstFailure.reason}</span>
+                            <span className="font-normal">, {firstFailure.reason}</span>
                           )}
                         </span>
                       </span>
@@ -100,7 +100,7 @@ export function DecisionFeed({
                       </span>
                     </span>
 
-                    {/* Reference codes last — present for an auditor, not in the way. */}
+                    {/* Reference codes last, present for an auditor, not in the way. */}
                     <span className="mt-1 block truncate font-mono text-[10.5px] text-ink-300">
                       {d.po.poNumber} · {d.po.sku} · {d.po.costCentre}
                     </span>

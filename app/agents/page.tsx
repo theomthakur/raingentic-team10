@@ -12,7 +12,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
 /**
- * The roster. Every stat here is counted off the live decision log, not written by hand —
+ * The roster. Every stat here is counted off the live decision log, not written by hand,
  * this page can't drift out of sync with what the console shows, because it reads the same
  * state the console does.
  */
@@ -40,7 +40,7 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
             </span>
           </div>
           <p className="text-[12.5px] font-medium" style={{ color: agent.color }}>
-            {agent.role} — deals with {agent.dealsWith}
+            {agent.role}: deals with {agent.dealsWith}
           </p>
           <p className="mt-2 rounded-xl bg-ink-50 px-3 py-2.5 text-[13px] font-medium leading-relaxed text-ink-700">
             “{agent.assurance}”
@@ -51,7 +51,7 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
             className="mt-2.5 border-l-2 pl-3 text-[12.5px] italic leading-relaxed text-muted"
             style={{ borderColor: `${agent.color}55` }}
           >
-            Named for — {agent.why}
+            Named for: {agent.why}
           </p>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
@@ -81,7 +81,7 @@ export default function AgentsPage() {
       .catch(() => setDecisions([]));
   }, []);
 
-  // Host tributes first — Rain, then Monad, then Encode — so the people who ran this
+  // Host tributes first (Rain, then Monad, then Encode) so the people who ran this
   // event see themselves at the top of the roster rather than three cards down.
   const ids = useMemo(() => {
     const hostOrder = { Rain: 0, Monad: 1, Encode: 2 } as const;
@@ -104,13 +104,13 @@ export default function AgentsPage() {
         <section className="mb-8">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">Who's spending</p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Five agents, five roles — the same eleven checks
+            Five agents, five roles, the same eleven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
             Every purchase order in the log was declared by one of these. The id is what
             the system actually keys on; the name is just so the feed reads like a team
             doing work rather than a service account making requests. Three are named for
-            the people hosting this — Rain, Monad and Encode — and two for the history of
+            the people hosting this (Rain, Monad and Encode) and two for the history of
             financial control, which is the same argument the rules make: none of this was
             invented here. Stats are counted live off the decision log, not written by hand.
           </p>

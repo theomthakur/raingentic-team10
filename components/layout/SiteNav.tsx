@@ -4,13 +4,13 @@ import Link from "next/link";
  * One nav, every page, always in the same order.
  *
  * Each page used to carry its own bespoke header, so where you could go next depended on
- * where you happened to be — the console offered no way out at all, and the workspace had
+ * where you happened to be: the console offered no way out at all, and the workspace had
  * a second, different nav of its own. In a five-minute demo that is a real cost: every
  * dead end is a fumble in front of a judge.
  *
  * The order is the order you would present in, left to right: what a customer sees, then
  * the machinery behind it, then what is for sale, who spends, how it is built, and the
- * pitch. `blurb` exists because a bare noun does not tell a judge what a page is for —
+ * pitch. `blurb` exists because a bare noun does not tell a judge what a page is for,
  * "Catalogue" could be anything until you read "what an agent can buy".
  */
 
@@ -65,15 +65,47 @@ export function NavBrand() {
   );
 }
 
-/** A small, ownable mark: a protected path through a spending boundary, not a letter M. */
+/**
+ * The mark: an aperture. Two brackets holding one payment.
+ *
+ * A mandate is a bracket: the thing that says everything inside this is authorised and
+ * nothing outside it is. So the mark is the two limits with the single payment sitting
+ * between them, never touching either edge. That is the whole product in one shape,
+ * bounded authority, one purchase at a time.
+ *
+ * It replaces a shield with a tick inside a pink squircle, which stacked three of the most
+ * over-used marks in fintech on top of each other and said nothing specific about this
+ * product. Any security company could have used it. Nobody else can use this one without
+ * also claiming to be about spending limits.
+ *
+ * Deliberately no coloured tile behind it. A glyph in a rounded square is the default
+ * startup logo, and the geometry should carry the brand on its own.
+ *
+ * Drawn on a 32 unit grid, with the fill outlined in its own colour so every corner rounds
+ * very slightly. The same geometry lives in `app/icon.svg`, so the tab icon and the header
+ * are genuinely one drawing rather than two things that resemble each other.
+ */
 function MandateMark() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rain-500 shadow-sm shadow-rain-500/20" aria-hidden="true">
-      <svg viewBox="0 0 32 32" className="h-5 w-5 fill-none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 10.5 16 6l9 4.5v7.2c0 4.7-3.4 7.8-9 8.9-5.6-1.1-9-4.2-9-8.9v-7.2Z" className="stroke-white" />
-        <path d="m11.5 16 3 3 6-6" className="stroke-white" />
-      </svg>
-    </span>
+    <svg
+      viewBox="0 0 32 32"
+      className="h-8 w-8 shrink-0"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <g
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+        className="fill-rain-500 stroke-rain-500 transition-colors group-hover:fill-rain-600 group-hover:stroke-rain-600"
+      >
+        {/* The two limits. */}
+        <path d="M5,6.5 H11 V8.6 H7.6 V23.4 H11 V25.5 H5 Z" />
+        <path d="M27,6.5 H21 V8.6 H24.4 V23.4 H21 V25.5 H27 Z" />
+      </g>
+      {/* The authorised payment, clear of both edges on purpose. */}
+      <circle cx="16" cy="16" r="3.4" className="fill-ink-900" />
+    </svg>
   );
 }
 
@@ -81,7 +113,7 @@ function MandateMark() {
 /**
  * The bar every page wears, identically.
  *
- * It used to differ by page — the console put the brand and a tagline on one row and the
+ * It used to differ by page: the console put the brand and a tagline on one row and the
  * nav underneath, sub-pages put brand and nav together on a shorter row. Same links, but a
  * different shape and height on every page, so moving around felt like moving between
  * three different products. This is now the single top bar; the console adds its hero

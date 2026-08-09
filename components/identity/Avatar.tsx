@@ -3,7 +3,7 @@
  *
  * The sellers a task can negotiate with (Office Depot, Staples, Akash Network...) are real
  * companies. Pulling their actual logos into a demo that shows them losing a fabricated
- * price negotiation is the kind of thing that reads fine right up until it doesn't — so
+ * price negotiation is the kind of thing that reads fine right up until it doesn't, so
  * every vendor and every agent gets the same generated mark instead: deterministic color,
  * first letters, no real brand asset anywhere.
  */

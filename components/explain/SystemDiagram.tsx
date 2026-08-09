@@ -1,7 +1,7 @@
 import { Badge } from "../ui";
 
 /**
- * The one diagram. Not the live per-run trace (that's PipelineDiagram, on the home page) —
+ * The one diagram. Not the live per-run trace (that's PipelineDiagram, on the home page),
  * this is the whole system, always fully drawn, color-coded by who owns each step, so it
  * can be understood without a run ever happening. One numbered, color-coded diagram beats
  * eight pages of prose: at a system-design-judged event, the diagram is the pitch.
@@ -17,14 +17,14 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { n: "1", name: "Task", owner: "agent", detail: "An agent is given a job — restock supplies, provision compute, book freight." },
-  { n: "1b", name: "Quote", owner: "agent", detail: "Sellers bid. A deterministic negotiation engine runs one counter-offer round per seller and picks a winner — the buyer never sees a fabricated price." },
+  { n: "1", name: "Task", owner: "agent", detail: "An agent is given a job: restock supplies, provision compute, book freight." },
+  { n: "1b", name: "Quote", owner: "agent", detail: "Sellers bid. A deterministic negotiation engine runs one counter-offer round per seller and picks a winner. The buyer never sees a fabricated price." },
   { n: "2", name: "Propose", owner: "agent", detail: "The agent declares the purchase order it wants: vendor, SKU, unit price, quantity, quote expiry." },
-  { n: "3", name: "Verify", owner: "check", detail: "Eleven pure functions check the declared PO against the record — no model, no I/O, no wall clock. Rules are versioned data, not code." },
+  { n: "3", name: "Verify", owner: "check", detail: "Eleven pure functions check the declared PO against the record. No model, no I/O, no wall clock. Rules are versioned data, not code." },
   { n: "4a", name: "Refuse", owner: "refuse", detail: "Any check fails → no card is ever created. A plain-English reason is logged, not a decline on an instrument that already exists." },
   { n: "4b", name: "Anchor + issue", owner: "rain", detail: "All checks pass → Mandate confirms the active policy's exact hash on Monad testnet, then Rain issues a scoped virtual card bound to exactly this PO: this vendor, this amount, this expiry. If Monad proof is unavailable, no card is created." },
   { n: "5", name: "Settle", owner: "rain", detail: "The purchase happens on that card. The cost centre's budget is charged and the PO is marked fulfilled." },
-  { n: "6", name: "Record", owner: "record", detail: "PO, checks, rule version, card, and outcome are appended to the log — never edited in place. The Monad receipt linked to the active policy makes the spend gate independently verifiable." },
+  { n: "6", name: "Record", owner: "record", detail: "PO, checks, rule version, card, and outcome are appended to the log. Never edited in place. The Monad receipt linked to the active policy makes the spend gate independently verifiable." },
   { n: "7", name: "Revoke", owner: "rain", detail: "The card is deactivated once the job is done, closing the window it was ever usable in." },
   { n: "—", name: "Hold", owner: "hold", detail: "The one exception, off the main path. If a purchase passes every check but is above the delegated authority of the agent that asked, it waits for a named person instead of being issued or refused. Autonomy has boundaries, exactly as it does for an employee — and no card exists while it waits." },
 ];
@@ -34,7 +34,7 @@ const OWNER_STYLE: Record<Owner, { dot: string; text: string; bg: string; label:
   check: { dot: "bg-mint-500", text: "text-mint-700", bg: "bg-mint-50/60", label: "deterministic check" },
   refuse: { dot: "bg-fail", text: "text-fail", bg: "bg-red-50/60", label: "refusal branch" },
   rain: { dot: "bg-rain-500", text: "text-rain-700", bg: "bg-rain-50/50", label: "Rain" },
-  hold: { dot: "bg-warn", text: "text-warn", bg: "bg-amber-50/60", label: "exception — above authority" },
+  hold: { dot: "bg-warn", text: "text-warn", bg: "bg-amber-50/60", label: "exception, above authority" },
   record: { dot: "bg-ink-700", text: "text-ink-900", bg: "bg-white", label: "log + Monad anchor" },
 };
 

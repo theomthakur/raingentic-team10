@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 /**
  * Read-only view of Rain issuing transactions.
  *
- * GET only. There is no POST, PATCH or DELETE here by design — this route can show what
+ * GET only. There is no POST, PATCH or DELETE here by design, this route can show what
  * happened on the cards and cannot change any of it.
  *
  * The rows are the projection from `lib/rain/transactions`, so no card number, CVC,

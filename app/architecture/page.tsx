@@ -8,7 +8,7 @@ import { ArchitectureMap } from "@/components/explain/ArchitectureMap";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
-export const metadata = { title: "Mandate — proof" };
+export const metadata = { title: "Mandate, proof" };
 
 const FLOW = [
   { n: "01", title: "Set a goal", text: "A customer asks Mandate to keep a team supplied or source a specific item." },

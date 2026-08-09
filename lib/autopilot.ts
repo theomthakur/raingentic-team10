@@ -40,7 +40,7 @@ const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
 const TIMEOUT_MS = 8000;
 
 /**
- * Without a model, the agent still runs — it just reasons arithmetically instead.
+ * Without a model, the agent still runs, it just reasons arithmetically instead.
  *
  * Worth keeping rather than failing closed: the point being demonstrated is unattended
  * spending inside limits, and that holds whether the chooser is a language model or a
@@ -123,7 +123,7 @@ export async function decideNextPurchase({
               "productId MUST be one of the listed ids. Never invent one.\n" +
               "quantity is a positive integer. Keep it proportionate to the budget remaining.\n" +
               "reasoning is one sentence, under 20 words, explaining why this and why now.\n" +
-              "Always choose something if any listed item has budget headroom — you are " +
+              "Always choose something if any listed item has budget headroom, you are " +
               "restocking, so there is nearly always a sensible next purchase.\n" +
               'Only if every listed item would exceed its remaining budget, reply ' +
               '{"productId": "none", "quantity": 0, "reasoning": "..."}.',
@@ -146,7 +146,7 @@ export async function decideNextPurchase({
     const quantity = Number(parsed.quantity);
 
     // The model declining is not the same as there being nothing to buy, and an 8B model
-    // takes the "none" escape far too readily — it did so on the very first tick, with an
+    // takes the "none" escape far too readily: it did so on the very first tick, with an
     // empty basket and five figures of headroom, which silently killed the whole demo.
     // So a decline falls through to the arithmetic chooser, and the run only ends when
     // *that* also finds nothing affordable and unbought.
@@ -158,7 +158,7 @@ export async function decideNextPurchase({
       productId: product.id,
       // Two ceilings, for different reasons. An accepted quote already fixes its own
       // quantity, so altering it would invent a PO the amount check rightly refuses. And
-      // no supplier can ship more than it holds — the model asked for 670 GPU-hours out of
+      // no supplier can ship more than it holds, the model asked for 670 GPU-hours out of
       // 8, which throws instead of deciding, and an error demos far worse than a refusal.
       quantity:
         product.quotedQuantity ??

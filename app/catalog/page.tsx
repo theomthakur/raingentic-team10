@@ -19,7 +19,7 @@ import { SubPageHeader } from "@/components/layout/SiteNav";
  * The buying side, as a person would actually meet it.
  *
  * Every button here posts to the same two endpoints the console already uses. There is no
- * catalogue-only code path and no shortcut past the checks — a purchase made from this
+ * catalogue-only code path and no shortcut past the checks, a purchase made from this
  * page is indistinguishable, downstream, from one an agent made on its own.
  */
 
@@ -143,7 +143,7 @@ function ProductCard({
 
           {product.alreadyFulfilled && (
             <p className="mt-2 text-[12px] text-warn">
-              This line is already fulfilled — buying it is the duplicate-spend demo.
+              This line is already fulfilled. Buying it is the duplicate-spend demo.
             </p>
           )}
         </div>
@@ -155,7 +155,7 @@ function ProductCard({
           {product.kind === "contract" && product.quotedQuantity != null && (
             <p className={`mt-1 text-[11px] ${offQuote ? "text-warn" : "text-ink-400"}`}>
               {offQuote
-                ? `quote is for ${product.quotedQuantity} — the amount check will refuse this`
+                ? `quote is for ${product.quotedQuantity}. The amount check will refuse this`
                 : `matches the quoted ${product.quotedQuantity}`}
             </p>
           )}
@@ -299,7 +299,7 @@ function RequestChat({
   catalog: CatalogProduct[];
   busy: boolean;
   loop: LoopState | null;
-  /** Runs the whole thing. There is no confirm step — delegating is the product. */
+  /** Runs the whole thing. There is no confirm step. Delegating is the product. */
   onDelegate: (product: CatalogProduct, quantity: number, understood: string) => void;
 }) {
   const [request, setRequest] = useState("");
@@ -352,7 +352,7 @@ function RequestChat({
       const agent = getAgent(product.agent);
       setMatch({ product, quantity });
       setVia(data.via === "model" ? "model" : "keywords");
-      setReply(`On it — ${data.understood}. ${agent.name} is handling this. ${agent.assurance}`);
+      setReply(`On it: ${data.understood}. ${agent.name} is handling this. ${agent.assurance}`);
       // No confirm step. Being asked to press "start with Rae" would make the person do
       // the routing the product exists to do for them.
       onDelegate(product, quantity, data.understood as string);
@@ -389,7 +389,7 @@ function RequestChat({
           <p className="text-[11.5px] text-ink-400">
             {via === "model"
               ? "Read by the model, then handed to the deterministic checks."
-              : "Model unavailable — read by keyword matching, then handed to the same checks."}
+              : "Model unavailable: read by keyword matching, then handed to the same checks."}
           </p>
         )}
         {loop && (
@@ -504,7 +504,7 @@ export default function CatalogPage() {
           ? {
               taskKey: product.taskKey,
               quantity,
-              // Open the counter-offer round a little under the cheapest list price —
+              // Open the counter-offer round a little under the cheapest list price,
               // the same posture the canned demo tasks take.
               targetPriceCents: Math.round(product.fromCents * 0.93),
               costCentre: product.costCentre,

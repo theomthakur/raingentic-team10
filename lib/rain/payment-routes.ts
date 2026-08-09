@@ -1,5 +1,5 @@
 /**
- * Rain sandbox payment routes — the treasury rail, kept deliberately separate from
+ * Rain sandbox payment routes: the treasury rail, kept deliberately separate from
  * supplier checkout.
  *
  * A payment route moves value between a fiat rail and an on-chain address. That is a
@@ -14,7 +14,7 @@
  * from a green tick.
  *
  * Configuration is explicit and never invented. Creating a route requires a destination
- * address — a real wallet on a real testnet — and this module will not make one up. Either
+ * address (a real wallet on a real testnet) and this module will not make one up. Either
  * an operator supplies a route that already exists, or the feature reports itself as not
  * configured and does nothing.
  *
@@ -61,7 +61,7 @@ async function railsFetch<T>(path: string, init?: RequestInit): Promise<T> {
 /**
  * Why this is a single id rather than a wallet address in code.
  *
- * Creating a route means naming a destination — an on-chain address that belongs to
+ * Creating a route means naming a destination, an on-chain address that belongs to
  * somebody. Hard-coding one would either be fictional, in which case the demo is a lie, or
  * real and not ours, which is worse. So the only supported path is an operator pointing at
  * a route they created themselves in the sandbox and pasting its id into the environment.
@@ -85,7 +85,7 @@ export function readConfig(): ConfigState {
       configured: false,
       reason:
         "RAIN_PAYMENT_ROUTE_ID is not set. Create a payment route in the Rain sandbox " +
-        "(POST /payment-routes) and set its id — this feature will not invent a destination address.",
+        "(POST /payment-routes) and set its id: this feature will not invent a destination address.",
     };
   }
 
@@ -123,7 +123,7 @@ export async function getPaymentRoute(id: string): Promise<PaymentRoute> {
 /**
  * Trigger a transfer against a configured route, exactly as if a deposit had arrived.
  *
- * `amount` is a decimal string in major units — Rain's own contract, not a convenience.
+ * `amount` is a decimal string in major units, Rain's own contract, not a convenience.
  * Cents would be wrong here, which is worth stating because everywhere else in this
  * codebase money is an integer number of cents.
  *

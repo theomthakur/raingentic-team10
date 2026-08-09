@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "decisionId is required." }, { status: 400 });
   }
   if (!body.by?.trim()) {
-    // An unattributed approval is not an approval — the point of the control is that a
+    // An unattributed approval is not an approval. The point of the control is that a
     // named person accepted responsibility.
     return NextResponse.json({ error: "An approver name is required." }, { status: 400 });
   }

@@ -6,7 +6,7 @@
  *  1. An amount is validated against Rain's own contract before a network call, including
  *     the $2 floor and the no-floats rule.
  *  2. Missing configuration reports itself as missing. The failure mode that would
- *     actually matter — claiming a transfer happened when nothing was configured — is
+ *     actually matter (claiming a transfer happened when nothing was configured) is
  *     tested explicitly, because that is the one bug here that would be dishonest rather
  *     than merely broken.
  */

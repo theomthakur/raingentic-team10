@@ -7,7 +7,7 @@ import { SiteNav } from "./SiteNav";
  * It used to say "Loading…" in grey. It is on screen for well under a second, which is
  * precisely why it is worth doing: it is the first frame anyone sees, including the three
  * judges whose company it is named after. Drops are positioned and timed from a fixed
- * table rather than Math.random(), so the server and client render identical markup —
+ * table rather than Math.random(), so the server and client render identical markup,
  * random values here would produce a hydration mismatch on every load.
  */
 
@@ -96,11 +96,22 @@ export function LoadingRain({ error }: { error?: string | null }) {
           ))}
         </span>
 
+        {/*
+          The same aperture as the header and the tab icon. This used to be a bold letter M
+          in a pink tile, so the very first frame anyone saw introduced a mark that appears
+          nowhere else in the product.
+        */}
         <div
-          className="mark-settle relative flex h-12 w-12 items-center justify-center rounded-2xl bg-rain-500 text-xl font-bold text-white shadow-lg shadow-rain-500/30"
+          className="mark-settle relative flex h-12 w-12 items-center justify-center"
           style={{ animation: "mark-settle 620ms cubic-bezier(.2,.8,.2,1) both" }}
         >
-          M
+          <svg viewBox="0 0 32 32" className="h-12 w-12" role="img" aria-hidden="true" focusable="false">
+            <g fill="#ff2fb6" stroke="#ff2fb6" strokeWidth="1.1" strokeLinejoin="round">
+              <path d="M5,6.5 H11 V8.6 H7.6 V23.4 H11 V25.5 H5 Z" />
+              <path d="M27,6.5 H21 V8.6 H24.4 V23.4 H21 V25.5 H27 Z" />
+            </g>
+            <circle cx="16" cy="16" r="3.4" className="fill-ink-900" />
+          </svg>
         </div>
 
         {error ? (

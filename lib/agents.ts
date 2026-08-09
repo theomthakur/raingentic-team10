@@ -1,7 +1,7 @@
 /**
  * A name and a face for every id that shows up in `Decision.agent`.
  *
- * The id itself (`facilities-01`) is what the system actually keys on — nothing here
+ * The id itself (`facilities-01`) is what the system actually keys on, nothing here
  * changes behavior. This is purely so a judge watching the feed sees "Rae, Facilities"
  * make a purchase rather than a string that reads like a service account.
  */
@@ -16,7 +16,7 @@ export interface AgentPersona {
   /** Set when the name is a tribute to one of the three hosts. Drives ordering. */
   host?: "Rain" | "Monad" | "Encode";
   /**
-   * Why this agent is called this. Every name earns its place — three are tributes to the
+   * Why this agent is called this. Every name earns its place, three are tributes to the
    * hosts (Rain, Monad, Encode), two come from the history of financial control, which is
    * the same argument the rules themselves make: none of this was invented here. A judge
    * who catches the reference gets a second thing to like; one who doesn't just sees
@@ -37,10 +37,10 @@ export const AGENTS: Record<string, AgentPersona> = {
     role: "Facilities agent",
     dealsWith: "facility purchases",
     host: "Rain",
-    why: "For Rain. Rae's refusal is the one that shows why a card control alone can't catch a swapped vendor — the reason has to be checked before the card exists.",
+    why: "For Rain. Rae's refusal is the one that shows why a card control alone can't catch a swapped vendor. The reason has to be checked before the card exists.",
     color: "#0891b2",
     face: "rae",
-    description: "Declares purchase orders against quotes already on file — desks, chairs, building services. No negotiation stage; Rae's job is to get the declaration exactly right, not to find the price.",
+    description: "Declares purchase orders against quotes already on file, desks, chairs, building services. No negotiation stage; Rae's job is to get the declaration exactly right, not to find the price.",
     assurance: "I keep facilities moving without letting a supplier or line-item swap slip through.",
   },
   "procurement-01": {
@@ -52,7 +52,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     why: "For Monad. Mona's refusals are only provable months later because the rule version that judged them is anchored on chain and cannot be quietly rewritten.",
     color: "#7c3aed",
     face: "mona",
-    description: "Runs general procurement against standing quotes — freight lanes, components, logistics. Mid-sized spend, usually under the delegated limit, so most of Mona's purchases clear without a person.",
+    description: "Runs general procurement against standing quotes, freight lanes, components, logistics. Mid-sized spend, usually under the delegated limit, so most of Mona's purchases clear without a person.",
     assurance: "I keep procurement on course, so your team does not have to chase suppliers or second-guess the spend.",
   },
   "procurement-02": {
@@ -63,7 +63,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     why: "For the prudence principle in accounting: when the amount is large, be conservative and get a person to look. That is exactly the rule Prue's purchases trigger.",
     color: "#c2410c",
     face: "prue",
-    description: "Handles the purchases everyone else's rules were sized for — equipment, capital orders, the ones that clear every check and still land above $25,000. Prue's PO doesn't get refused; it gets held for a person.",
+    description: "Handles the purchases everyone else's rules were sized for, equipment, capital orders, the ones that clear every check and still land above $25,000. Prue's PO doesn't get refused; it gets held for a person.",
     assurance: "I move capital purchases forward and surface only the commitments that genuinely need your judgment.",
   },
   "office-supplies": {
@@ -71,7 +71,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     name: "Luca",
     role: "Supplies buyer",
     dealsWith: "office supply negotiations",
-    why: "For Luca Pacioli, who codified double-entry bookkeeping in 1494 — the original rule that every entry needs a matching counter-entry. The three-way match this system runs on is his idea, 532 years later.",
+    why: "For Luca Pacioli, who codified double-entry bookkeeping in 1494, the original rule that every entry needs a matching counter-entry. The three-way match this system runs on is his idea, 532 years later.",
     color: "#0f9d58",
     face: "luca",
     description: "Runs the office-supplies negotiation: four sellers, one counter-offer round, cheapest qualifying bid wins. Luca never sees a price the negotiation didn't already settle.",
@@ -85,7 +85,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     name: "a person",
     role: "Bought by hand from the catalogue",
     dealsWith: "purchases someone made themselves",
-    why: "Not an agent at all. Ordering from the catalogue takes the same path through the same eleven checks, which is the point — the rules do not care who is asking.",
+    why: "Not an agent at all. Ordering from the catalogue takes the same path through the same eleven checks, which is the point. The rules do not care who is asking.",
     color: "#4b5160",
     face: "generic",
     description: "A purchase raised by a person on the catalogue page instead of by an agent. It runs the identical pipeline, so nothing is trusted more for having come from a human.",
@@ -97,7 +97,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     role: "Infra buyer",
     dealsWith: "GPU compute contracts",
     host: "Encode",
-    why: "For Encode — enCODE — the developer community hosting this. Cody buys the training compute that builders actually run on, which is the most builder-shaped line in the catalogue.",
+    why: "For Encode (enCODE) the developer community hosting this. Cody buys the training compute that builders actually run on, which is the most builder-shaped line in the catalogue.",
     color: "#b30f7c",
     face: "cody",
     description: "Negotiates GPU capacity for training runs across three compute vendors in a tighter, faster-expiring market. Same negotiation engine as Luca's, different sellers and a shorter quote window.",

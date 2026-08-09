@@ -51,7 +51,7 @@ const STEP_DELAY_MS = 380;
  * Minimum time the Raining… screen stays up.
  *
  * State usually returns in well under 100ms warm, and a loader that appears for 70ms
- * reads as a flicker rather than a loader — worse than not having one. This is a floor,
+ * reads as a flicker rather than a loader. Worse than not having one. This is a floor,
  * not a delay: if the data takes longer, the screen simply stays until it arrives.
  * Nothing waits on this timer except the animation being visible long enough to be seen.
  */
@@ -156,7 +156,7 @@ export default function Page() {
     setError(null);
     setStages([]);
     try {
-      // The full result comes back in one call — it's fast and deterministic. What
+      // The full result comes back in one call, it's fast and deterministic. What
       // follows is an honest, choreographed reveal of that same real result, one step at
       // a time, not a second slower computation. The numbers never change; only the pace
       // of showing them does, so watching it is closer to watching it happen.
@@ -171,7 +171,7 @@ export default function Page() {
       setRacing(false);
       if (taskId) setRanTasks((prev) => new Set(prev).add(taskId));
       await load();
-      // Jump straight to the decision that was just made — in the demo this is what
+      // Jump straight to the decision that was just made, in the demo this is what
       // puts the refusal and its four provenance fields on screen with no clicking.
       setSelectedId(decision.id);
       setTab("provenance");
@@ -186,8 +186,8 @@ export default function Page() {
   }
 
   /**
-   * The challenge panel needs the decision back to score the attempt. Everything else —
-   * the stage reveal, the log, the provenance jump — is the same path a task takes, so
+   * The challenge panel needs the decision back to score the attempt. Everything else,
+   * the stage reveal, the log, the provenance jump, is the same path a task takes, so
    * there is no separate code for "the judge's attempt" that could behave differently.
    */
   async function attempt(po: PurchaseOrder, agent?: string): Promise<Decision> {
@@ -239,7 +239,7 @@ export default function Page() {
     }
   }
 
-  /** Write the edit down as the next version — pending, deciding nothing yet. */
+  /** Write the edit down as the next version: pending, deciding nothing yet. */
   async function propose(proposedBy: string) {
     if (!draftRules) return;
     setBusy(true);
@@ -293,7 +293,7 @@ export default function Page() {
     setError(null);
     try {
       // Reset is the only destructive route, so production gates it behind a token. Ask
-      // the presenter once and remember it — a judge never needs this button, and nobody
+      // the presenter once and remember it: a judge never needs this button, and nobody
       // who merely found the URL should be able to wipe the demo mid-judging.
       let token = typeof window === "undefined" ? null : window.localStorage.getItem("demoToken");
       const res = await fetch("/api/reset", {
@@ -526,7 +526,7 @@ export default function Page() {
 /**
  * The version that actually decides things: the highest **active** one.
  *
- * A pending version has a higher number but no authority — treating it as current would
+ * A pending version has a higher number but no authority, treating it as current would
  * show the console governing by a policy nobody has approved yet, which is exactly the
  * thing dual control exists to prevent.
  */

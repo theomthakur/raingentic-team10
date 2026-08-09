@@ -9,7 +9,7 @@ export { snapshot } from "./types";
  * Storage, decided once.
  *
  * Vercel's filesystem is ephemeral and module memory does not survive a cold start, so an
- * in-memory log would empty itself on the exact deployed URL the submission requires —
+ * in-memory log would empty itself on the exact deployed URL the submission requires,
  * and the feature it would silently break, replay, is the one that cannot be cut.
  *
  * So: Postgres whenever DATABASE_URL is set, in-memory otherwise for local work. The

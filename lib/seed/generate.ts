@@ -6,7 +6,7 @@
  * centres, agents and vendors makes the replay diff read like a system of record, which is
  * the entire point of the feature.
  *
- * The output is deterministic — a fixed-seed PRNG — so regenerating never produces a
+ * The output is deterministic (a fixed-seed PRNG) so regenerating never produces a
  * spurious diff, and the committed file is the same one every driver loads.
  *
  *   npm run seed
@@ -20,7 +20,7 @@ import { defaultRuleSet } from "@/lib/rules/defaults";
 import { AGENTS, COST_CENTRES } from "@/lib/fixtures/records";
 import { SELLERS_BY_TASK } from "@/lib/sellers";
 
-/** mulberry32 — small, fast, and identical on every machine. */
+/** mulberry32: small, fast, and identical on every machine. */
 function rng(seed: number) {
   return () => {
     seed |= 0;
@@ -56,7 +56,7 @@ const OTHER_VENDORS = [
 
 /**
  * The shapes of history. `drift` is the interesting one: those purchases sit inside the
- * 2% tolerance of rule version 1, so they were approved — and they are exactly what flips
+ * 2% tolerance of rule version 1, so they were approved. And they are exactly what flips
  * when someone tightens that tolerance and hits replay.
  */
 type Shape =
@@ -85,7 +85,7 @@ const END = Date.parse("2026-08-08T11:30:00.000Z");
 
 function build(shape: Shape, index: number): Decision {
   // Picked first so it can go into the snapshot. Rule 9 reads `record.agent`, and leaving
-  // it out meant the per-agent authority check could not run on any historical row — so a
+  // it out meant the per-agent authority check could not run on any historical row, so a
   // seeded decision was judged by fewer rules than a live one, for no better reason than
   // the order two lines happened to be written in.
   const agent = pick(AGENTS);
@@ -118,7 +118,7 @@ function build(shape: Shape, index: number): Decision {
   };
 
   const quoted = item.unit * quantity;
-  // Budget scales with the line so headroom is guaranteed — otherwise a big-ticket item
+  // Budget scales with the line so headroom is guaranteed, otherwise a big-ticket item
   // trips rule 5 by accident and the shape distribution stops being deliberate, which
   // would make the replay diff unpredictable.
   const headroom = quoted + between(3, 15) * 100_000;
@@ -177,7 +177,7 @@ function build(shape: Shape, index: number): Decision {
   const result = verify(po, record, ruleSet);
 
   // Three outcomes now. A purchase that only tripped the delegated limit was not wrong,
-  // it was large — it waited for a person rather than being rejected.
+  // it was large, it waited for a person rather than being rejected.
   const outcome: Decision["outcome"] = result.ok
     ? "approved"
     : result.failures.length > 0
@@ -209,7 +209,7 @@ function build(shape: Shape, index: number): Decision {
 /**
  * Prior settled payments to the suppliers the negotiation can pick.
  *
- * Rule 10 escalates a first-ever payment to a supplier, which is correct — and it meant
+ * Rule 10 escalates a first-ever payment to a supplier, which is correct, and it meant
  * that from a clean reset the very first demo run was *held* on a new payee rather than
  * approved, so the run-it-twice moment needed three presses and opened on a rule that had
  * to be explained away.
@@ -251,7 +251,7 @@ function buildPrior(vendor: string, sku: string, unit: number, index: number): D
     spentCents: 0,
   };
 
-  // Verified against the same rules as everything else — nothing is asserted approved.
+  // Verified against the same rules as everything else. Nothing is asserted approved.
   const record: RecordSnapshot = {
     quote: { ...quote, fulfilled: false },
     budget,
@@ -300,12 +300,12 @@ const priors = negotiationVendors.map((v, i) => buildPrior(v.vendor, v.sku, v.un
  * Every historical escalation was resolved.
  *
  * Seeded holds used to sit in the queue forever, so the console greeted a judge with six
- * purchases waiting on a human before they had clicked anything — the exact opposite of
+ * purchases waiting on a human before they had clicked anything, the exact opposite of
  * the impression this project needs to make. Real history does not look like that either:
  * a capital purchase gets escalated on Tuesday and signed off on Tuesday.
  *
  * So each held row gets its follow-up release row, exactly as a live release writes one.
- * The hold is never mutated — both rows exist, so the log still shows that a person was
+ * The hold is never mutated. Both rows exist, so the log still shows that a person was
  * asked and that a named person answered. The queue simply starts empty, which is the
  * truthful state of a system whose backlog has been worked.
  */

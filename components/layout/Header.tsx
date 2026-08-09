@@ -5,7 +5,7 @@ import { Badge } from "../ui";
 /**
  * The front door. A judge who has never seen this before should know, in five seconds and
  * without clicking anything: what this is called, what it does, and who it was built for.
- * That's a job the old thin title bar never did — this is the fix.
+ * That's a job the old thin title bar never did, this is the fix.
  */
 export function Header({
   errorBadge,
@@ -27,7 +27,7 @@ export function Header({
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
               Mandate sits between an AI agent and company money. It turns a goal into a
-              limited, traceable payment—not an unlimited company card.
+              limited, traceable payment, not an unlimited company card.
             </p>
           </div>
         </div>

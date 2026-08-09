@@ -6,7 +6,7 @@ import { privateKeyToAccount } from "viem/accounts";
  *
  * **Why the rule version and not every decision.** Replay proves the rules are data rather
  * than code. It does not prove the rules were not rewritten afterwards to fit a history
- * someone already had — and "trust our timestamps" is no answer, because the timestamps
+ * someone already had. And "trust our timestamps" is no answer, because the timestamps
  * are ours too. Publishing each version's hash to a chain nobody controls gives it an
  * independent existence proof, so every decision citing v1 is provably judged against
  * rules that existed before it.
@@ -21,13 +21,13 @@ import { privateKeyToAccount } from "viem/accounts";
  * this cheap and this fast lets you afford both.
  *
  * **The transaction.** A zero-value transaction to the sender's own address carrying the
- * hash in the calldata. No contract to deploy, no contract to get wrong — the payload is
+ * hash in the calldata. No contract to deploy, no contract to get wrong, the payload is
  * the point, and it is a real transaction either way.
  */
 
 /**
  * Monad testnet, chain id 10143, per Monad's own network information page. Mainnet is
- * live and is chain id 143 — deliberately not used here, since the bounty asks for
+ * live and is chain id 143, deliberately not used here, since the bounty asks for
  * testnet and a real testnet transaction is still a real transaction.
  * https://docs.monad.xyz/developer-essentials/testnet
  */
@@ -56,7 +56,7 @@ export interface ConfirmedAnchor extends AnchorResult {
 
 /**
  * Enabled as soon as a key exists. The RPC falls back to Monad's public testnet endpoint,
- * which is rate-limited but ample for a handful of rule-version writes — so requiring it
+ * which is rate-limited but ample for a handful of rule-version writes, so requiring it
  * explicitly would only mean silently disabling anchoring for someone who supplied the
  * one credential that cannot be defaulted.
  *

@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  * question underneath it: **can the agent be left alone at all.** No human types
  * anything here. The agent is given a standing objective and a budget, looks at what it
  * has already bought and what is left in each cost centre, and decides on its own what to
- * buy next — or decides to stop.
+ * buy next: or decides to stop.
  *
  * The decision of *what* to buy is a model call and is allowed to be wrong. Whether that
  * purchase is permitted is still the eleven deterministic checks reading the system of
@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
  * autonomy is safe not because the agent is good, but because being wrong is bounded.
  *
  * Returns the agent's reasoning and the chosen purchase. The client posts it to the same
- * purchase endpoints everything else uses — there is no autopilot code path through the
+ * purchase endpoints everything else uses: there is no autopilot code path through the
  * checks.
  */
 export async function POST(request: Request) {

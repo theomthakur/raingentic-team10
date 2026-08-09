@@ -6,7 +6,7 @@ import { money } from "@/lib/format";
 import { Badge, Empty, Panel } from "../ui";
 
 /**
- * The replay diff — the headline moment.
+ * The replay diff: the headline moment.
  *
  * It is only trustworthy because of two earlier decisions: each decision stored the record
  * as it read it rather than a pointer to a record that has since moved, and nothing in the
@@ -221,7 +221,7 @@ export function ReplayDiff({
       {!noChange && (
         <p className="border-t border-edge px-4 py-2 text-[11px] text-muted">
           Click any row to audit that decision. Nothing here is recomputed from today&apos;s
-          records — each one is re-judged against the snapshot it read at the time.
+          records: each one is re-judged against the snapshot it read at the time.
         </p>
       )}
     </Panel>

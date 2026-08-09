@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/purchase — the join, end to end.
+ * POST /api/purchase: the join, end to end.
  *
  *   1b NEGOTIATE  competing sellers, one counter-offer round, a winner   (A)
  *   ——            the winning quote is accepted onto the record
@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
  * is what gets written to the record, and the PO the agent then declares is checked
  * against exactly that. A deviation anywhere in between is what rules 3 and 4 catch.
  *
- * Post the same task twice to see the headline refusal — the PO number is derived from the
+ * Post the same task twice to see the headline refusal. The PO number is derived from the
  * task, so the second call is the same order line, and the record the first call wrote is
  * what refuses it.
  */
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
   // Optional, additive, never blocks or changes the outcome: swaps in an LLM-written
   // seller remark if GROQ_API_KEY is set and responds in time. Falls back silently to the
-  // deterministic note otherwise — the price and the winner were already decided above,
+  // deterministic note otherwise: the price and the winner were already decided above,
   // and this runs upstream of PROPOSE, so no model is anywhere near the verify path.
   const negotiation = await enrichWithLLMFlavor(proposed.negotiation);
 

@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
 export const metadata = {
-  title: "Mandate — presentation",
+  title: "Mandate: presentation",
 };
 
 /**
@@ -13,7 +13,7 @@ export const metadata = {
  *
  * Five minutes in front of judges are lost to window-switching: slides in one app, the
  * running product in another. Keeping the deck inside the product means every claim on a
- * slide is one click from the screen that proves it — and the deck can never drift out of
+ * slide is one click from the screen that proves it. And the deck can never drift out of
  * date with the build the way an exported file does.
  *
  * Server component, like /architecture, so the page owns its metadata. The deck itself is

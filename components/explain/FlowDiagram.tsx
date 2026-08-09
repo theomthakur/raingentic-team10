@@ -4,7 +4,7 @@
  * Colors carry meaning, not decoration: black/white boxes are the agent's own logic,
  * green is the one deterministic gate everything passes through, red is the dead end
  * (no card, ever), pink is every touchpoint that belongs to Rain, and the purple tag is
- * the one thing Monad's brand actually explains here — a rule version anchored as a real
+ * the one thing Monad's brand actually explains here, a rule version anchored as a real
  * transaction, not a decorative accent reused everywhere.
  */
 
@@ -88,7 +88,7 @@ export function FlowDiagram() {
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-edge bg-white p-4 shadow-sm shadow-ink-900/[0.03]">
-      <svg viewBox="0 0 1040 366" className="h-auto w-full min-w-[860px]" role="img" aria-label="Mandate architecture: task, quote, propose, verify, then either refuse or issue, settle, record, revoke — with rule versions anchored on Monad.">
+      <svg viewBox="0 0 1040 366" className="h-auto w-full min-w-[860px]" role="img" aria-label="Mandate architecture: task, quote, propose, verify, then either refuse or issue, settle, record, revoke, with rule versions anchored on Monad.">
         <defs>
           <marker id="arrow-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="#c3c8d1" />

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  *
  * Two modes, and the difference matters for the demo. Pass a `version` to replay against
  * a version that was actually committed. Pass `rules` to preview an edit that has not
- * been saved yet — a dry run, so a finance team can see what a change would do to history
+ * been saved yet: a dry run, so a finance team can see what a change would do to history
  * before committing to it.
  */
 export async function POST(request: Request) {

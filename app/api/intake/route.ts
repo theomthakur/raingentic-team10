@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 /**
  * Read a sentence, return a structured purchase request.
  *
- * Interpretation only. This route never decides anything and never touches money — the
+ * Interpretation only. This route never decides anything and never touches money, the
  * client takes what comes back and posts it to the same purchase endpoint every other
  * path uses, where the eleven checks judge it exactly as harshly as any other request.
  *

@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Activate a pending policy version — the second half of dual control.
+ * Activate a pending policy version: the second half of dual control.
  *
  * The author may not approve their own change. That refusal is the entire value of the
  * control, so it is enforced in `activateRuleSet` rather than being a UI convention that

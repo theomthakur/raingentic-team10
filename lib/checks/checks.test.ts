@@ -1,5 +1,5 @@
 /**
- * Tests for the decision layer. No framework — `tsx lib/checks/checks.test.ts`.
+ * Tests for the decision layer. No framework: `tsx lib/checks/checks.test.ts`.
  *
  * The point of these is not coverage, it is the two properties the pitch rests on:
  * determinism, and that every threshold comes from rule data rather than from code.
@@ -390,7 +390,7 @@ test("disabling the vendor and SKU rule flips refusals to approvals", () => {
 });
 
 test("the seeded log leaves nothing waiting on a person", () => {
-  // The console must not greet anyone with a queue of purchases needing a signature —
+  // The console must not greet anyone with a queue of purchases needing a signature,
   // this is autonomous spending, and history should read as a backlog that was worked.
   const released = new Set(history.map((d) => d.releases).filter(Boolean));
   const waiting = history.filter((d) => d.outcome === "held" && !released.has(d.id));
@@ -437,7 +437,7 @@ test("a purchase under the delegated limit needs no human", () => {
 /**
  * A rule set with one rule switched off, for isolating another.
  *
- * Needed because every per-agent limit is now at or below the company-wide ceiling — that
+ * Needed because every per-agent limit is now at or below the company-wide ceiling, that
  * invariant is enforced by its own test, since a per-agent limit above the ceiling can never
  * bind. The consequence is that anything over the company ceiling is also over every
  * agent's own limit, so rules 7 and 9 escalate together and neither can be isolated by
@@ -580,7 +580,7 @@ asyncTest("a held purchase does not make its vendor a known payee", async () => 
   assert.equal(
     (await ask()).vendorEverPaid,
     false,
-    "a hold paid nobody — counting it lets a retry bypass the control"
+    "a hold paid nobody: counting it lets a retry bypass the control"
   );
 
   await store.appendDecision(mk("dec_refused", "refused"));
@@ -591,7 +591,7 @@ asyncTest("a held purchase does not make its vendor a known payee", async () => 
 });
 
 asyncTest("a purchase is not counted against itself when it is released", async () => {
-  // Held rows count as exposure, correctly — but that means the held row for this very
+  // Held rows count as exposure, correctly. But that means the held row for this very
   // order line is already in the totals when a person releases it, so the release used to
   // add the amount a second time. A $43,500 purchase looked like $87,000 and was refused on
   // velocity, which reads as the system contradicting its own approval.
@@ -622,7 +622,7 @@ asyncTest("a purchase is not counted against itself when it is released", async 
   });
 
   // Compared against the same snapshot taken before the hold existed, because reset()
-  // loads the committed history and absolute totals are not the point — the delta is.
+  // loads the committed history and absolute totals are not the point, the delta is.
   const after = await snapshot(store, order, "procurement-02");
   assert.deepEqual(
     {
@@ -636,7 +636,7 @@ asyncTest("a purchase is not counted against itself when it is released", async 
 });
 
 asyncTest("a different order line to the same vendor does still count", async () => {
-  // The exclusion is scoped to the order line, not the vendor — otherwise structuring
+  // The exclusion is scoped to the order line, not the vendor, otherwise structuring
   // detection would be trivially defeated by using a fresh PO number each time.
   const { createMemoryStore } = await import("@/lib/store/memory");
   const { snapshot } = await import("@/lib/store/types");
@@ -769,7 +769,7 @@ test("the scoreboard counts only tagged attempts, not demo tasks", () => {
   assert.equal(challengeStats(mixed).attempts, 2);
 });
 
-test("a refusal is not a defeat — only a card the record cannot support is", () => {
+test("a refusal is not a defeat, only a card the record cannot support is", () => {
   const { challengeStats, CHALLENGER, deviatesFromRecord } = require("@/lib/challenge");
 
   // Refused, and deviating: the check worked. Not a defeat.
@@ -800,7 +800,7 @@ test("an approved purchase that deviates from the record IS a defeat", () => {
 asyncTest("reset clears quotes a negotiation created, not just the seeded ones", async () => {
   // The headline demo runs a negotiated task, which writes its own accepted quote and then
   // marks it fulfilled on settlement. If reset restores only the seeded quotes, that row
-  // survives as fulfilled and the very next run is refused as a duplicate — the demo's
+  // survives as fulfilled and the very next run is refused as a duplicate, the demo's
   // first beat, broken, with no way back short of a redeploy.
   const { createMemoryStore } = await import("@/lib/store/memory");
   const store = createMemoryStore();
@@ -825,7 +825,7 @@ asyncTest("reset clears quotes a negotiation created, not just the seeded ones",
     null,
     "a negotiated quote must not survive a reset, or the demo cannot be re-run"
   );
-  // The seeded quotes must still be there — reset restores the demo, it does not empty it.
+  // The seeded quotes must still be there. Reset restores the demo, it does not empty it.
   assert.ok(await store.getQuote("PO-4417"), "seeded quotes must survive a reset");
 });
 
@@ -873,7 +873,7 @@ asyncTest("no page or document quotes a count from an older build", async () => 
 /**
  * The basis strings are load-bearing for the argument, not decoration: the provenance panel
  * shows the control a rule descends from on the row that just refused a purchase. A rule
- * whose id is missing from RULE_BASIS renders nothing and fails silently — the row simply
+ * whose id is missing from RULE_BASIS renders nothing and fails silently, the row simply
  * is not there, and nobody notices until a judge asks where the rule came from.
  *
  * They also live in their own module so a client component can read them without dragging
@@ -915,7 +915,7 @@ test("proposePurchase accepts a sane quantity and prices it", () => {
  * The bug these lock down: `quantity: 0` on the negotiated path produced a PO with a null
  * unit price, and the NaN total silently PASSED six of the eleven checks, because every
  * comparison against NaN is false. It then charged a cost centre NaN, which disabled that
- * budget's check permanently — from then on `asked > NaN` was false too.
+ * budget's check permanently: from then on `asked > NaN` was false too.
  *
  * A figure a check cannot reason about must be a refusal, never a pass.
  */
@@ -936,7 +936,7 @@ for (const bad of [NaN, Infinity, -Infinity]) {
     for (const id of AMOUNT_DEPENDENT) {
       const check = result.checks.find((c) => c.ruleId === id)!;
       assert.ok(check, `${id} did not run`);
-      assert.equal(check.passed, false, `${id} PASSED on a ${bad} total — must fail closed`);
+      assert.equal(check.passed, false, `${id} PASSED on a ${bad} total, must fail closed`);
       assert.equal(check.escalates, undefined, `${id} must refuse, not escalate, on garbage`);
     }
     assert.equal(result.ok, false, "a malformed total must never be approved");
@@ -987,7 +987,7 @@ test("a rule param that is NaN falls back instead of poisoning the comparison", 
 });
 
 test("the five non-monetary checks still run on a malformed total", () => {
-  // Fail-closed must not blind the checks that read no money — the provenance panel should
+  // Fail-closed must not blind the checks that read no money, the provenance panel should
   // still show why the PO itself was or was not on record.
   const order = po({ unitPrice: NaN });
   const result = verify(order, record(), RULES);
@@ -1002,12 +1002,12 @@ test("the five non-monetary checks still run on a malformed total", () => {
  *
  * Four rules escalate rather than refuse. The release path used to lift `requires-approval`
  * alone, so a hold caused by any of the other three re-escalated on release and could never
- * be cleared — and because the release still wrote a row pointing back at the held one, a
+ * be cleared: and because the release still wrote a row pointing back at the held one, a
  * second attempt reported "already released" while nothing had been approved.
  *
  * These tests assert the property that actually matters: whatever escalated, signing off
  * exactly those rules clears the hold. `releaseHeld` derives the list from the held row's
- * own verdicts, so a rule added later is covered without touching the release code — and
+ * own verdicts, so a rule added later is covered without touching the release code, and
  * the last test here fails if someone adds an escalating rule and that stops being true.
  */
 const ESCALATION_CASES: [string, PurchaseOrder, RecordSnapshot, RuleId][] = [
@@ -1071,14 +1071,14 @@ for (const [label, order, snap, expectedRule] of ESCALATION_CASES) {
     assert.equal(
       onRelease.escalations.length,
       0,
-      `${label}: still escalating after release — this hold can never be cleared`
+      `${label}: still escalating after release. This hold can never be cleared`
     );
     assert.equal(onRelease.failures.length, 0, `${label}: release should not refuse`);
     assert.ok(onRelease.ok, `${label}: release should approve`);
   });
 }
 
-test("lifting only requires-approval is not enough — the old bug stays fixed", () => {
+test("lifting only requires-approval is not enough. The old bug stays fixed", () => {
   // The exact regression: a hold caused by a different escalating rule, released the old
   // way. If this ever passes, the release path has been narrowed back to one rule.
   const [, order, snap] = ESCALATION_CASES[1];
@@ -1111,7 +1111,7 @@ test("every escalating rule is covered by a release test", () => {
 
 test("no per-agent limit exceeds the company-wide unattended ceiling", () => {
   // The tighter of rule 7 and rule 9 binds, so a per-agent limit above rule 7's threshold
-  // can never be the reason anything is held — it is dead data that advertises authority
+  // can never be the reason anything is held. It is dead data that advertises authority
   // the agent does not have. procurement-02 sat at $50,000 against a $25,000 ceiling, and
   // the docs duly claimed Prue was trusted to $50,000 while nothing over $25,000 ever ran
   // unattended.

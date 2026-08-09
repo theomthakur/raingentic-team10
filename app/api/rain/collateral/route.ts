@@ -17,8 +17,8 @@ export const dynamic = "force-dynamic";
  * chain transaction is executed and nothing of value moves. The response says so in its
  * own fields rather than trusting the reader to remember which environment they are in.
  *
- * Success is only ever reported when Rain returns success. Every other path — unconfigured,
- * invalid amount, Rain refusing — is its own status code with its own reason.
+ * Success is only ever reported when Rain returns success. Every other path (unconfigured,
+ * invalid amount, Rain refusing) gets its own status code with its own reason.
  */
 export async function POST(request: Request) {
   let body: { amountCents?: unknown };

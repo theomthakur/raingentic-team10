@@ -29,7 +29,7 @@ export function replay(decisions: Decision[], target: RuleSet): ReplayResult {
 
   for (const decision of decisions) {
     // A released decision is judged with the rules a person signed off already lifted,
-    // exactly as `runPipeline` does on release — derived from the held row it releases, so
+    // exactly as `runPipeline` does on release, derived from the held row it releases, so
     // replay and the live path can never disagree about what an approval covered. Without
     // this, every historical release flips straight back to "held" on any replay.
     //

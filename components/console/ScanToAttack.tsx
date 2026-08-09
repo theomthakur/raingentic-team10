@@ -8,14 +8,14 @@ import type { ChallengeStats } from "@/lib/challenge";
  * Scan to attack.
  *
  * Every other part of a pitch asks a judge to believe something. This asks them to
- * disprove it, from their own phone, while you are still talking — and the counter behind
+ * disprove it, from their own phone, while you are still talking, and the counter behind
  * you moves when they do, because it is the same deployment and the same append-only log.
  *
  * The number is derived from the log rather than incremented alongside it, so it is
  * checkable: every attempt is a decision row a judge can open and audit. That matters more
  * than the drama. A scoreboard nobody can verify is just a claim in a bigger font.
  *
- * The QR encodes wherever this is actually being served from — never a hardcoded URL, so
+ * The QR encodes wherever this is actually being served from, never a hardcoded URL, so
  * it is correct on localhost, on a preview build, and in production without anyone
  * remembering to change it.
  */
@@ -55,7 +55,7 @@ export function ScanToAttack({ stats }: { stats: ChallengeStats }) {
         </p>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">
           Scan it and try to get money out, from your seat, right now. Everyone in the room
-          is attacking the same deployment — the counter below is shared, and every attempt
+          is attacking the same deployment. The counter below is shared, and every attempt
           is a decision you can open and audit.
         </p>
 
@@ -94,7 +94,7 @@ export function ScanToAttack({ stats }: { stats: ChallengeStats }) {
           // Worth saying out loud rather than letting someone hold a phone up to a QR that
           // points at a laptop nobody else can reach.
           <p className="mt-3 text-[11px] text-warn">
-            Running locally — this QR points at {url}, which only works on this machine.
+            Running locally: this QR points at {url}, which only works on this machine.
             Deployed, it points at the live URL automatically.
           </p>
         )}

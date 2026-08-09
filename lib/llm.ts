@@ -15,7 +15,7 @@ import type { NegotiationOffer, NegotiationResult } from "./negotiation";
  * `GROQ_API_KEY` silently failed to arrive on Vercel while four other variables set the
  * same way arrived fine, and `llmEnabled` stayed false through several redeploys. Rather
  * than keep debugging one dashboard row against a deadline, the code accepts a second
- * name — set `GROQ_KEY` and it works regardless of what is wrong with the first.
+ * name: set `GROQ_KEY` and it works regardless of what is wrong with the first.
  */
 function groqKey(): string | undefined {
   return process.env.GROQ_API_KEY ?? process.env.GROQ_KEY;
@@ -27,7 +27,7 @@ const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
  *
  * 3s was fine on a laptop and marginal on Vercel: the enrichment fires six requests at
  * once and a cold container pays TLS setup on top, so the abort could fire before any of
- * them returned — indistinguishable, from the outside, from the key being absent.
+ * them returned: indistinguishable, from the outside, from the key being absent.
  */
 const TIMEOUT_MS = 8000;
 

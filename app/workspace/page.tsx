@@ -1,6 +1,6 @@
 import { CustomerWorkspace } from "@/components/explain/CustomerWorkspace";
 
-export const metadata = { title: "Mandate — spending workspace" };
+export const metadata = { title: "Mandate, spending workspace" };
 
 /**
  * Customer home. The existing root route is intentionally retained as the Operations

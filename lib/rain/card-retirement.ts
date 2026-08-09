@@ -7,7 +7,7 @@
  *
  * ## How the status values were established
  *
- * Rain's published sandbox reference documents only two card endpoints — create-scoped and
+ * Rain's published sandbox reference documents only two card endpoints, create-scoped and
  * get-by-id. `PATCH /issuing/cards/{cardId}` is undocumented, so the accepted `status`
  * values were confirmed against the API itself rather than guessed. The server validates
  * the body against a schema *before* it looks the card up, which makes the two failures
@@ -104,7 +104,7 @@ async function readCardStatus(cardId: string, apiKey: string): Promise<string | 
  * Retire a card, then verify it.
  *
  * Throws if Rain rejects the write. Returns `retired: false` with the real status if the
- * write was accepted but the card is still live — those are different problems and
+ * write was accepted but the card is still live. Those are different problems and
  * collapsing them would hide the more interesting one.
  */
 export async function retireCard(cardId: string): Promise<RetirementResult> {
@@ -119,7 +119,7 @@ export async function retireCard(cardId: string): Promise<RetirementResult> {
   const body = await res.json().catch(() => null);
   if (!res.ok) {
     // Retirement is terminal: Rain answers 400 "Cannot update a canceled card" on a second
-    // attempt. That is not a failure to report — the card is retired, which is what the
+    // attempt. That is not a failure to report. The card is retired, which is what the
     // caller wanted to know. Confirmed by reading it back rather than by matching the
     // message text, so a reworded error does not turn into a false negative.
     const current = await readCardStatus(cardId, apiKey);

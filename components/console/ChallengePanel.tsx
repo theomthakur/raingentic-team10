@@ -9,19 +9,19 @@ import { ScanToAttack } from "./ScanToAttack";
 import { CHALLENGER, type ChallengeStats } from "@/lib/challenge";
 
 /**
- * Beat the checks — hand the judge the attack.
+ * Beat the checks: hand the judge the attack.
  *
  * Every other part of this console shows the system working. This one invites you to break
  * it, which is a different and much stronger claim: a judge who tries to get money out and
  * fails believes the thing far more than one who watches a scripted run succeed.
  *
  * It is also the honest shape of the problem. An agent under pressure to complete its task
- * is a player with every incentive to defect, and the interesting defections are not lies —
+ * is a player with every incentive to defect, and the interesting defections are not lies,
  * splitting a purchase to duck an approval limit is a strategy in which every individual
  * line is true. The answer is not a cleverer incentive, it is that defection is
  * mechanically visible.
  *
- * **What counts as a defeat.** Not "did something get refused" — a refusal is the check
+ * **What counts as a defeat.** Not "did something get refused", a refusal is the check
  * doing its job. A check is defeated only if a card comes out the other side for an order
  * that does not match the record. That is a deliberately hard bar, and it is the only one
  * worth counting.
@@ -53,7 +53,7 @@ function attacks(base: PurchaseOrder): { label: string; hint: string; po: Purcha
     },
     {
       label: "Skim the price",
-      hint: "A few percent over the quote — small enough to miss",
+      hint: "A few percent over the quote: small enough to miss",
       po: { ...base, unitPrice: Math.round(base.unitPrice * 1.06) },
     },
     {
@@ -63,7 +63,7 @@ function attacks(base: PurchaseOrder): { label: string; hint: string; po: Purcha
     },
     {
       label: "Inflate the quantity",
-      hint: "Order far more than was quoted — and find the quote pins quantity too",
+      hint: "Order far more than was quoted, and find the quote pins quantity too",
       po: { ...base, quantity: Math.max(1, Math.ceil(3_000_000 / base.unitPrice)) },
     },
     {
@@ -79,7 +79,7 @@ function attacks(base: PurchaseOrder): { label: string; hint: string; po: Purcha
  *
  * Both halves are genuine accepted quotes and each sits comfortably under the delegated
  * limit, so there is nothing false to catch. Only the running total on the same vendor and
- * cost centre gives it away — which is the whole argument for reading the pattern instead
+ * cost centre gives it away: which is the whole argument for reading the pattern instead
  * of the move.
  */
 const SPLIT: { label: string; hint: string; halves: PurchaseOrder[] } = {
@@ -158,7 +158,7 @@ export function ChallengePanel({
     const caughtBy = decision.checks.filter((c) => !c.passed);
 
     // A card came out for an order that does not match what was quoted. That, and only
-    // that, is a defeat — being refused means the check worked.
+    // that, is a defeat. Being refused means the check worked.
     const deviates =
       po.vendor !== blankPO.vendor ||
       po.sku !== blankPO.sku ||
@@ -200,7 +200,7 @@ export function ChallengePanel({
         Try to get money out. Here is a purchase order that would pass, and{" "}
         <strong>{enabledRules.length} checks</strong> between you and a card. Change
         anything you like, or take one of the shortcuts below. A check only counts as
-        defeated if a card is <em>issued</em> for an order that does not match the record —
+        defeated if a card is <em>issued</em> for an order that does not match the record,
         being refused means it worked.
       </p>
 
@@ -247,9 +247,9 @@ export function ChallengePanel({
             title={SPLIT.hint}
             onClick={async () => {
               // First half on its own is honest and goes through. The second is what the
-              // structuring rule is for — the demo only works if both are fired.
-              await fire(SPLIT.halves[0], `${SPLIT.label} — first half`, "procurement-02");
-              await fire(SPLIT.halves[1], `${SPLIT.label} — second half`, "procurement-02");
+              // structuring rule is for. The demo only works if both are fired.
+              await fire(SPLIT.halves[0], `${SPLIT.label}, first half`, "procurement-02");
+              await fire(SPLIT.halves[1], `${SPLIT.label}, second half`, "procurement-02");
             }}
             className="rounded-full border border-rain-200 bg-rain-50 px-2.5 py-1 text-[12px] font-medium text-rain-700 transition hover:border-rain-300 hover:bg-rain-100 disabled:opacity-40"
           >
@@ -315,7 +315,7 @@ export function ChallengePanel({
                   {a.defeat
                     ? "DEFEATED A CHECK"
                     : a.outcome === "approved"
-                      ? "issued — this order was honest"
+                      ? "issued, this order was honest"
                       : a.outcome === "held"
                         ? "held for a person"
                         : "stopped"}
@@ -323,7 +323,7 @@ export function ChallengePanel({
               </div>
               {a.caughtBy.map((c) => (
                 <p key={c.ruleId} className="mt-0.5 text-[12px] text-muted">
-                  <span className="text-ink-700">{c.label}</span> — {c.reason}
+                  <span className="text-ink-700">{c.label}</span>, {c.reason}
                 </p>
               ))}
             </div>
@@ -332,7 +332,7 @@ export function ChallengePanel({
       )}
 
       <p className="border-t border-edge px-4 py-2.5 text-[11px] leading-relaxed text-muted">
-        Splitting a purchase to duck an approval limit is not a lie — every line is true.
+        Splitting a purchase to duck an approval limit is not a lie, every line is true.
         That is why one of these checks looks at the <em>pattern</em> rather than the move.
       </p>
     </Panel>
