@@ -26,6 +26,10 @@ export async function GET() {
     // environment says nothing about whether Rain accepts the call.
     rain: rainIssuanceStatus(),
     anchoringEnabled: anchoringEnabled(),
+    // Whether the negotiation dialogue is model-written. A boolean, never the key — this
+    // exists because "is Groq actually configured on this deployment" was otherwise only
+    // answerable by reading the seller notes and guessing.
+    llmEnabled: Boolean(process.env.GROQ_API_KEY),
     // Shared across everyone hitting this URL, so a judge attacking from their phone
     // moves the same number the projector is showing.
     challenge: challengeStats(decisions),

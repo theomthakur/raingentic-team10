@@ -10,7 +10,14 @@
 import type { NegotiationOffer, NegotiationResult } from "./negotiation";
 
 const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
-const TIMEOUT_MS = 3000;
+/**
+ * Generous enough for a cold serverless instance, short enough that a demo never stalls.
+ *
+ * 3s was fine on a laptop and marginal on Vercel: the enrichment fires six requests at
+ * once and a cold container pays TLS setup on top, so the abort could fire before any of
+ * them returned — indistinguishable, from the outside, from the key being absent.
+ */
+const TIMEOUT_MS = 8000;
 
 async function askGroq(prompt: string): Promise<string | null> {
   const apiKey = process.env.GROQ_API_KEY;
