@@ -21,9 +21,9 @@ const fraunces = Fraunces({
 const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Mandate — autonomous purchasing, bounded by proof",
+  title: "Mandate — the reason, checked before the card exists",
   description:
-    "An autonomous purchasing agent negotiates, verifies and spends within its mandate. Rain and Mandate make every action bounded and provable.",
+    "Rain bounds how much an agent spends and where. Mandate checks why, and if the reason does not hold, no card is ever issued.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

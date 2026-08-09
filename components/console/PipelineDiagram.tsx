@@ -21,7 +21,7 @@ const PROPOSE: Node = { key: "PROPOSE", n: 1, label: "Propose", hint: "agent dec
 const VERIFY: Node = { key: "VERIFY", n: 2, label: "Verify", hint: "checked against the record" };
 const ISSUE: Node = { key: "ISSUE", n: 3, label: "Issue", hint: "Rain issues a scoped card" };
 const REFUSE: Node = { key: "REFUSE", n: 3, label: "Refuse", hint: "no card is ever created" };
-const HOLD: Node = { key: "HOLD", n: 3, label: "Escalate", hint: "outside the mandate" };
+const HOLD: Node = { key: "HOLD", n: 3, label: "Hold", hint: "waiting on a person" };
 const SETTLE: Node = { key: "SETTLE", n: 4, label: "Settle", hint: "the purchase happens" };
 const REVOKE: Node = { key: "REVOKE", n: 5, label: "Revoke", hint: "the card is retired" };
 const RECORD: Node = { key: "RECORD", n: 6, label: "Record", hint: "written, append-only" };
@@ -31,8 +31,8 @@ type NodeState = "idle" | "pass" | "fail" | "held" | "skipped";
 function stateFor(stages: Stage[], key: Stage["name"]): NodeState {
   const s = stages.find((x) => x.name === key);
   if (!s) return stages.length > 0 ? "skipped" : "idle";
-  // An escalation is not a failure — it is the explicit exception path, and colouring it
-  // red would say the purchase was wrong when it simply falls outside the mandate.
+  // A hold is not a failure — it is the escalation path, and colouring it red would say
+  // the purchase was wrong when it was only large.
   if (key === "HOLD") return "held";
   return s.ok ? "pass" : "fail";
 }
@@ -115,7 +115,7 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
             {refused
               ? "Refused before a card could exist"
               : held
-                ? "Outside the mandate — no card exists"
+                ? "Held for a person — no card exists yet"
                 : "Approved, issued, settled and retired"}
           </p>
         )}
@@ -158,8 +158,8 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
 
       <p className="mt-4 border-t border-edge pt-3 text-[12px] leading-relaxed text-muted">
         Rain bounds <b className="text-ink-700">how much</b> an agent spends and{" "}
-        <b className="text-ink-700">where</b>. Mandate verifies that the proposed purchase is
-        supported by the obligation on record — otherwise step 3 never creates a card.
+        <b className="text-ink-700">where</b>. Mandate checks <b className="text-ink-700">why</b>{" "}
+        — and if the reason does not hold, step 3 never creates a card at all.
       </p>
     </div>
   );

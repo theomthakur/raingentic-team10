@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
+  BudgetRecord,
   Decision,
   PurchaseOrder,
   ReplayResult,
@@ -9,27 +10,36 @@ import type {
   RuleSet,
 } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
-import type { NegotiatedTask } from "@/lib/fixtures/tasks";
+import type { NegotiatedTask, Task } from "@/lib/fixtures/tasks";
 import { RunPanel } from "@/components/console/RunPanel";
+import { ChallengePanel } from "@/components/console/ChallengePanel";
 import { NegotiationPanel } from "@/components/console/NegotiationPanel";
+import { ApprovalInbox } from "@/components/console/ApprovalInbox";
+import { DecisionFeed } from "@/components/console/DecisionFeed";
 import { ProvenancePanel } from "@/components/console/ProvenancePanel";
 import { RuleEditor } from "@/components/console/RuleEditor";
 import { ReplayDiff } from "@/components/console/ReplayDiff";
+import { BudgetMeter } from "@/components/console/BudgetMeter";
 import { PipelineDiagram } from "@/components/console/PipelineDiagram";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LoadingRain } from "@/components/layout/LoadingRain";
 import { Badge } from "@/components/ui";
 import { diffRules } from "@/lib/rules/diff";
+import type { ChallengeStats } from "@/lib/challenge";
 
 interface State {
   storage: "memory" | "postgres";
   rain: { mode: "off" | "simulated" | "live"; reason?: string };
   anchoringEnabled: boolean;
+  challenge: ChallengeStats;
   ephemeralInProduction: boolean;
   decisions: Decision[];
   ruleSets: RuleSet[];
+  budgets: BudgetRecord[];
   negotiatedTasks: NegotiatedTask[];
+  tasks: Task[];
+  blankPO: PurchaseOrder;
 }
 
 type Tab = "provenance" | "policy";
@@ -99,6 +109,29 @@ export default function Page() {
     [state, selectedId]
   );
 
+  /**
+   * How many approved purchases no person touched.
+   *
+   * Counted off `approval` rather than by subtracting the queue: a refusal is not an
+   * autonomous completion, and neither is a purchase a named human released.
+   */
+  const autonomy = useMemo(() => {
+    const approved = state?.decisions.filter((d) => d.outcome === "approved") ?? [];
+    return {
+      total: approved.length,
+      autonomous: approved.filter((d) => !d.approval).length,
+    };
+  }, [state]);
+
+  // A held decision that a later row already released is no longer waiting on anyone.
+  const heldDecisions = useMemo(() => {
+    if (!state) return [];
+    const released = new Set(
+      state.decisions.map((d) => d.releases).filter(Boolean) as string[]
+    );
+    return state.decisions.filter((d) => d.outcome === "held" && !released.has(d.id));
+  }, [state]);
+
   // --- actions -------------------------------------------------------------
 
   async function post<T>(url: string, body?: unknown): Promise<T> {
@@ -146,6 +179,43 @@ export default function Page() {
       setError((err as Error).message);
       setRacing(false);
       return null;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /**
+   * The challenge panel needs the decision back to score the attempt. Everything else —
+   * the stage reveal, the log, the provenance jump — is the same path a task takes, so
+   * there is no separate code for "the judge's attempt" that could behave differently.
+   */
+  async function attempt(po: PurchaseOrder, agent?: string): Promise<Decision> {
+    const decision = await run("/api/run", { po, agent });
+    if (!decision) throw new Error("The attempt could not be run.");
+    return decision;
+  }
+
+  async function approve(decisionId: string, by: string, note: string) {
+    setBusy(true);
+    setRacing(true);
+    setError(null);
+    setStages([]);
+    try {
+      const { decision, stages: next } = await post<{ decision: Decision; stages: Stage[] }>(
+        "/api/approve",
+        { decisionId, by, note }
+      );
+      for (let i = 0; i < next.length; i++) {
+        setStages(next.slice(0, i + 1));
+        if (i < next.length - 1) await sleep(STEP_DELAY_MS);
+      }
+      setRacing(false);
+      await load();
+      setSelectedId(decision.id);
+      setTab("provenance");
+    } catch (err) {
+      setError((err as Error).message);
+      setRacing(false);
     } finally {
       setBusy(false);
     }
@@ -278,9 +348,16 @@ export default function Page() {
         <section className="mb-10">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
             <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              Live autonomous control path
+              1 · How it works
             </p>
-            <p className="text-[12.5px] text-muted">The console is the flight recorder, not an approval queue.</p>
+            {/* The challenge is the most convincing thing here and it sits at the bottom
+                of a long page, so it needs a pointer from where people actually look. */}
+            <a
+              href="#break-it"
+              className="rounded-full border border-rain-200 bg-rain-50 px-3 py-1.5 text-[12.5px] font-medium text-rain-700 transition hover:bg-rain-100"
+            >
+              Try to break it →
+            </a>
           </div>
 
           {/* The one failure that works perfectly on a laptop and breaks on the deployed
@@ -296,28 +373,40 @@ export default function Page() {
           <PipelineDiagram stages={stages} racing={racing} />
         </section>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          {/* Dispatch is the only primary action. The system owns every step afterwards. */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          {/* left: what the agents did, and the append-only record of it */}
           <section className="flex flex-col gap-6">
             <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              1 · Dispatch an agent
+              2 · Run it
             </p>
             <RunPanel
               negotiatedTasks={state.negotiatedTasks}
+              tasks={state.tasks}
+              blankPO={state.blankPO}
               stages={stages}
               busy={busy}
               ranTasks={ranTasks}
               onRunNegotiated={(t) => run("/api/purchase", { taskId: t.id }, t.id)}
+              onRunTask={(t) => run("/api/run", { taskId: t.id }, t.id)}
+              onRunPO={(po) => run("/api/run", { po })}
               onReset={reset}
             />
+            <DecisionFeed
+              decisions={state.decisions}
+              selectedId={selectedId}
+              onSelect={(d) => {
+                setSelectedId(d.id);
+                setTab("provenance");
+              }}
+            />
+            <BudgetMeter budgets={state.budgets} />
           </section>
 
-          {/* The only two pieces of evidence a judge needs: why this run decided as it did,
-              and what a policy change would have done to history. */}
+          {/* right: audit one decision, or change the policy and re-judge all of them */}
           <section className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-                2 · Inspect the proof
+                3 · Audit it
               </p>
               <nav className="flex gap-1.5 rounded-full border border-edge bg-ink-50 p-1">
                 {(["provenance", "policy"] as Tab[]).map((t) => (
@@ -348,6 +437,16 @@ export default function Page() {
                   />
                 )}
                 <ProvenancePanel decision={selected} />
+                {/* Below the provenance panel on purpose. Normal purchases complete with
+                    no human at all; this is the exception path for spending above an
+                    agent's delegated authority, and it should read as an exception. */}
+                <ApprovalInbox
+                  held={heldDecisions}
+                  autonomousApprovals={autonomy.autonomous}
+                  totalApprovals={autonomy.total}
+                  busy={busy}
+                  onApprove={approve}
+                />
               </>
             ) : (
               <>
@@ -381,6 +480,18 @@ export default function Page() {
           </section>
         </div>
 
+        <section id="break-it" className="mt-14 scroll-mt-6">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            4 · Try to break it
+          </p>
+          <ChallengePanel
+            blankPO={state.blankPO}
+            rules={currentRuleSet.rules}
+            stats={state.challenge}
+            busy={busy}
+            onAttempt={attempt}
+          />
+        </section>
       </main>
 
       <Footer />

@@ -33,12 +33,13 @@ export function Header({
         <div className="flex min-w-0 items-start gap-4">
           <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              Autonomous purchasing, bounded by proof
+              The guardrail an agent cannot talk its way past
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
-              Finance sets the mandate once. From there, an agent negotiates, proposes,
-              verifies and spends on its own. Mandate only creates a payment instrument
-              when the exact purchase is supported by the record.
+              Agents can already reason and negotiate, and Rain lets them move money. The
+              missing piece is proving the transaction is the one they were authorised to
+              make — so Mandate verifies that intent, and no payment instrument exists
+              until it holds.
             </p>
           </div>
         </div>
