@@ -107,11 +107,18 @@ export default function AgentsPage() {
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
             Five agents, five roles — the same eleven checks
           </h1>
-          <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
-            Each specialist owns a category and can act without a person clicking through
-            supplier pages. Every order still runs through the same eleven Mandate checks.
-            The activity shown below is counted from the shared decision log, not written by hand.
-          </p>
+          <div className="mt-5 grid w-full gap-4 rounded-2xl border border-edge bg-ink-50/55 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-6">
+            <p className="max-w-3xl text-[14px] leading-relaxed text-muted">
+              Each specialist owns a category and can act without a person clicking through
+              supplier pages. Every order still runs through the same eleven Mandate checks.
+              The activity below comes from the shared decision log—not a hand-written demo.
+            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-edge pt-3 text-[11.5px] font-medium text-ink-600 sm:justify-end sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
+              <span><strong className="text-ink-900">5</strong> specialists</span>
+              <span><strong className="text-ink-900">11</strong> checks each</span>
+              <span><strong className="text-ink-900">1</strong> shared log</span>
+            </div>
+          </div>
         </section>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
