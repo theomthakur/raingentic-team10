@@ -11,6 +11,7 @@ import { Avatar } from "@/components/identity/Avatar";
 import { getAgent } from "@/lib/agents";
 import { Badge, Button, Panel } from "@/components/ui";
 import { TaskLoop, type LoopState } from "@/components/console/TaskLoop";
+import { Autopilot } from "@/components/console/Autopilot";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
@@ -533,6 +534,10 @@ export default function CatalogPage() {
               loop={loop}
               onDelegate={delegate}
             />
+
+            <div className="mt-6">
+              <Autopilot catalog={catalog} />
+            </div>
           </section>
 
           <aside className="lg:sticky lg:top-6 lg:self-start">
