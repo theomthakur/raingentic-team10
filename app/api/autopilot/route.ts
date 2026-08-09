@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
  * checks.
  */
 export async function POST(request: Request) {
-  let body: { objective?: string; alreadyBought?: string[] };
+  let body: { objective?: string; alreadyBought?: string[]; sourceOnly?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -37,7 +37,12 @@ export async function POST(request: Request) {
     "Keep the office and engineering teams supplied for the week without exhausting any budget.";
 
   const store = getStore();
-  const catalog = getCatalog();
+  // The customer journey can ask for a sourcing run specifically. The agent still picks
+  // the category and quantity; this simply narrows its mandate to orders where supplier
+  // competition is required, making the sourcing work visible instead of incidental.
+  const catalog = body.sourceOnly
+    ? getCatalog().filter((product) => product.kind === "negotiated")
+    : getCatalog();
   const budgets = await Promise.all(
     ["CC-OPS", "CC-ENG", "CC-FAC", "CC-MKT"].map((c) => store.getBudget(c))
   );

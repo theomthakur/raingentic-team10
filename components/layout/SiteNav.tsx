@@ -15,11 +15,11 @@ import Link from "next/link";
  */
 
 export const PAGES = [
-  { href: "/workspace", label: "Workspace", blurb: "what a customer sees" },
-  { href: "/", label: "Console", blurb: "run it and watch the checks" },
-  { href: "/catalog", label: "Catalogue", blurb: "what an agent can buy" },
+  { href: "/", label: "Mandate", blurb: "give the agent a goal" },
+  { href: "/workspace", label: "Activity", blurb: "orders, budgets, and approvals" },
+  { href: "/catalog", label: "Sourcing", blurb: "catalogue and supplier competition" },
   { href: "/agents", label: "Agents", blurb: "who is allowed to spend" },
-  { href: "/architecture", label: "System design", blurb: "how it works" },
+  { href: "/architecture", label: "Proof", blurb: "controls, Rain, and Monad" },
   { href: "/presentation", label: "Deck", blurb: "the pitch" },
 ] as const;
 
@@ -49,9 +49,7 @@ export function SiteNav({ current }: { current: string }) {
 }
 
 /**
- * The mark plus wordmark. Always points at the console, from every page including the
- * workspace — a brand that goes somewhere different depending on where you are is how
- * people get lost.
+ * The mark plus wordmark. Always points to the customer journey, from every page.
  */
 export function NavBrand() {
   return (

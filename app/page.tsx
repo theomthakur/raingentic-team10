@@ -21,8 +21,7 @@ import { RuleEditor } from "@/components/console/RuleEditor";
 import { ReplayDiff } from "@/components/console/ReplayDiff";
 import { BudgetMeter } from "@/components/console/BudgetMeter";
 import { PipelineDiagram } from "@/components/console/PipelineDiagram";
-import { Autopilot } from "@/components/console/Autopilot";
-import { getCatalog } from "@/lib/catalog";
+import { AgentJourney } from "@/components/experience/AgentJourney";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LoadingRain } from "@/components/layout/LoadingRain";
@@ -60,7 +59,6 @@ const MIN_LOADING_MS = 900;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Page() {
-  const catalog = useMemo(() => getCatalog(), []);
   const [state, setState] = useState<State | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [stages, setStages] = useState<Stage[]>([]);
@@ -348,25 +346,14 @@ export default function Page() {
       />
 
       <main className="mx-auto max-w-[1600px] px-6 py-8 md:px-10">
-        {/*
-          The front door.
-          
-          A judge lands here with no context and about thirty seconds of patience, and the
-          unusual claim — an agent spending money on its own — is the one that has to land
-          first. Everything below explains how it is safe; this proves it happens at all,
-          without the judge having to type a good prompt or read anything.
-        */}
         <section className="mb-10">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-rain-600">
-              Start here
-            </p>
-            <p className="text-[12.5px] text-muted">
-              Press it and stop touching the keyboard. Nobody picks the product, nobody
-              approves the spend.
-            </p>
-          </div>
-          <Autopilot catalog={catalog} />
+          <AgentJourney
+            onDecision={(decision) => {
+              setSelectedId(decision.id);
+              setTab("provenance");
+              load();
+            }}
+          />
         </section>
 
         <section className="mb-10">

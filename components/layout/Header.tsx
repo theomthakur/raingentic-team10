@@ -33,13 +33,11 @@ export function Header({
         <div className="flex min-w-0 items-start gap-4">
           <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              The guardrail an agent cannot talk its way past
+              Safe autonomous purchasing
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
-              Agents can already reason and negotiate, and Rain lets them move money. The
-              missing piece is proving the transaction is the one they were authorised to
-              make — so Mandate verifies that intent, and no payment instrument exists
-              until it holds.
+              Give an agent a goal once. Mandate lets it source, negotiate, and pay within
+              a verifiable mandate—without giving it an unbounded company card.
             </p>
           </div>
         </div>
