@@ -4,6 +4,27 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · The pitch leads with the real card, and ends on their hands
+
+Real scoped Rain cards are now being issued on the live deployment — verified from
+outside: two cards with real ids and Rain-enforced limits, not `sim_`. That was the single
+biggest gap in the submission and it is closed. The deck was still burying it on slide 12.
+
+- **The real card is now the first thing on the opening slide.** Most submissions this
+  weekend will demo something simulated; this is Rain's own API, Rain's own enforcement.
+  It belongs in the first twenty seconds, not the twelfth slide.
+- **The collateral gap is volunteered in the same breath.** No collateral is linked, so a
+  card will not authorise a purchase — a funding step, not a code one. Saying it first
+  costs nothing and buys the credibility for everything after it.
+- **The demo now ends on the room attacking, not on us clicking.** The last beat was
+  "hand over the keyboard"; it is now "scan the QR, and stop talking". A judge who tries
+  to break it and fails believes it in a way no slide achieves, and the last thing they
+  should remember is their own hands on it rather than ours.
+
+The two beats that carry the pitch are now the same move twice: our own system refusing
+us, then refusing them.
+
+
 ## 2026-08-08 · Scan to attack — the room becomes the demo
 
 The challenge panel was the strongest thing here and it was passive: a judge had to find

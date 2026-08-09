@@ -129,10 +129,14 @@ const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
       "Propose under one name, activate under the same name. Refused. Someone else has to type theirs.",
   },
   {
+    // The last thing they see should be their own hands on it, not ours. A judge who
+    // attacks something and fails believes it in a way no slide achieves — so this beat
+    // ends with the room typing and the presenter quiet.
     n: "7",
-    what: "Hand over the keyboard.",
+    what: "Scan the QR. Stop talking.",
     detail:
-      "Anyone can write their own purchase order — change the vendor, the item, a single cent — and press issue. Identical code path.",
+      "Everyone attacks the same deployment from their own phone; the counter on screen moves as they do. Change the supplier, skim the price, split a purchase to duck approval. Attempts climb, defeats stay at zero. Let the silence do it.",
+    key: true,
   },
 ];
 
@@ -251,8 +255,26 @@ const SLIDES: Slide[] = [
           negotiated. If the declared order does not match the record, no card is created at
           all — not a decline, an instrument that never comes into existence.
         </p>
+
+        {/* The strongest fact in the deck, and it used to be on slide 12. Most submissions
+            this weekend will demo something simulated; this is a real card from Rain's own
+            API with a limit Rain enforces. It belongs in the first twenty seconds. */}
+        <div className="mt-6 max-w-2xl rounded-xl border border-rain-200 bg-rain-50/70 px-4 py-3">
+          <p className="text-[14px] leading-relaxed text-ink-900">
+            <strong className="font-semibold">These are real Rain cards.</strong> Issued
+            through <span className="font-mono text-[12.5px]">/issuing/users/:id/cards/scoped</span>,
+            limited to the exact purchase-order total, and retired after settlement. Not a
+            mock — the limit is Rain&apos;s to enforce, and it does.
+          </p>
+          <p className="mt-1.5 text-[12.5px] text-muted">
+            No collateral is linked to our contract yet, so a card will not authorise a
+            purchase. That is a funding step, not a code one — and we would rather say it
+            than have you find it.
+          </p>
+        </div>
+
         <div className="mt-7 flex flex-wrap items-center gap-2">
-          <Badge tone="rain">rain</Badge>
+          <Badge tone="rain">real rain cards</Badge>
           <Badge tone="monad">monad</Badge>
           <Badge tone="pass">84 tests passing</Badge>
           <Badge tone="neutral">11 checks, all data</Badge>
@@ -486,7 +508,7 @@ const SLIDES: Slide[] = [
           </ol>
         </Panel>
         <p className="mt-3 text-[13px] leading-relaxed text-muted">
-          Steps 2 and 4 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
+          Steps 2 and 7 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
           they answer it by being refused and held on stage, not by being asserted.
         </p>
       </div>

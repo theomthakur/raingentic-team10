@@ -28,6 +28,15 @@ Nobody checks **why**.
 
 ## 2. What we built
 
+**These are real Rain cards.** Issued through Rain's scoped-card endpoint, limited to the
+exact purchase-order total, and retired after settlement. The limit is Rain's to enforce
+and it does. Not a mock, and worth saying first because most of what follows is an argument
+about payments — this is the payment.
+
+*One thing we would rather tell you than have you find:* no collateral is linked to our
+contract yet, so a card will not authorise a purchase. That is a funding step, not a code
+one.
+
 **Mandate makes the agent say why before it can pay, and then checks whether that's true.**
 
 Before any card exists, the agent has to hand over the actual purchase order it negotiated:
@@ -209,17 +218,24 @@ nothing.
    Change the price by a few percent → refused.
 4. **Click the refusal.** Which rule, what it expected, what it got, and the exact record
    field it read. Anyone can audit it in five seconds.
-5. **Change a rule and hit replay.** *"Across 60 decisions, 8 approvals would now be
+5. **Change a rule and hit replay.** *"Across 60 decisions, 9 decisions would now be
    refused."* Each row shows what the rule expected before and after.
-6. **Hand over the keyboard.** A form where anyone can write their own purchase order and
-   press issue. Same code path. Nothing is special-cased for the demo.
+6. **Scan the QR, and stop talking.** Everyone attacks the same deployment from their own
+   phone, and the counter on screen moves as they do — change the supplier, skim the
+   price, split a purchase in two to duck approval. Attempts climb; defeats stay at zero.
+   There is a form for writing a purchase order by hand too, same code path, nothing
+   special-cased. **End here**, and let the silence do it: a judge who tries to break this
+   and fails believes it in a way no slide achieves, and the last thing they should
+   remember is their own hands on it rather than ours.
 
 **Then, only if there is time, one sentence:** *"And for a purchase above the agent's own
 delegated authority — a $43,500 capital order — it's held for a named person instead. No
 card exists while it waits. Autonomy has boundaries, the same way an employee's does."*
 
-Step 2 is the one that matters. Most demos show a failure the team wrote in advance; ours
-is caused by the first half of our own demo. It cannot be staged, because nothing was.
+Steps 2 and 6 are the ones that matter, and they are the same move twice: our own system
+refusing us, then refusing them. Most demos show a failure the team wrote in advance; ours
+is caused by the first half of our own demo, and then by whoever is holding a phone. It
+cannot be staged, because nothing was.
 
 ---
 
