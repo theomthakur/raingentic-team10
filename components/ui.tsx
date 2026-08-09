@@ -63,12 +63,14 @@ export function Button({
   variant = "default",
   disabled,
   title,
+  type = "button",
 }: {
   onClick?: () => void;
   children: ReactNode;
   variant?: "default" | "primary" | "ghost";
   disabled?: boolean;
   title?: string;
+  type?: "button" | "submit";
 }) {
   const variants = {
     primary: "border-transparent bg-rain-500 text-white hover:bg-rain-600 active:scale-[0.98]",
@@ -77,7 +79,7 @@ export function Button({
   } as const;
   return (
     <button
-      type="button"
+      type={type}
       title={title}
       onClick={onClick}
       disabled={disabled}

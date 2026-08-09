@@ -26,6 +26,25 @@ interface RunResult {
   stages: Stage[];
 }
 
+const PRODUCT_TERMS: Array<{ terms: string[]; id: string }> = [
+  { id: "office-supplies", terms: ["paper", "a4", "ream"] },
+  { id: "cloud-compute", terms: ["gpu", "compute", "a100", "training"] },
+  { id: "PO-4417", terms: ["bracket", "mounting"] },
+  { id: "PO-4418", terms: ["sensor", "proximity"] },
+  { id: "PO-4419", terms: ["alloy", "billet", "stock"] },
+  { id: "PO-4421", terms: ["chair", "chairs", "task chair"] },
+  { id: "PO-4422", terms: ["freight", "lane", "shipping"] },
+  { id: "PO-4423", terms: ["conveyor", "conveyer"] },
+];
+
+function interpretRequest(text: string, catalog: CatalogProduct[]) {
+  const normalized = text.toLowerCase();
+  const match = PRODUCT_TERMS.find(({ terms }) => terms.some((term) => normalized.includes(term)));
+  const product = match ? catalog.find((item) => item.id === match.id) : undefined;
+  const quantity = Number(normalized.match(/\b(\d+)\b/)?.[1] ?? product?.quotedQuantity ?? 1);
+  return product && Number.isFinite(quantity) && quantity > 0 ? { product, quantity } : null;
+}
+
 function Stepper({
   value,
   onChange,
@@ -62,12 +81,14 @@ function ProductCard({
   setQty,
   onBuy,
   busy,
+  selected = false,
 }: {
   product: CatalogProduct;
   qty: number;
   setQty: (n: number) => void;
   onBuy: () => void;
   busy: boolean;
+  selected?: boolean;
 }) {
   const estimate = product.fromCents * qty;
   const agent = getAgent(product.agent);
@@ -75,7 +96,7 @@ function ProductCard({
     product.kind === "contract" && product.quotedQuantity != null && qty !== product.quotedQuantity;
 
   return (
-    <Panel className="flex h-full flex-col">
+    <Panel className={`flex h-full flex-col transition ${selected ? "ring-2 ring-rain-400 ring-offset-2" : ""}`}>
       <div className="relative aspect-[16/9] overflow-hidden rounded-t-2xl bg-ink-50">
         <Image
           src={product.image}
@@ -248,6 +269,69 @@ function ResultPanel({ result, error }: { result: RunResult | null; error: strin
   );
 }
 
+function RequestChat({
+  catalog,
+  busy,
+  onMatch,
+  onRun,
+}: {
+  catalog: CatalogProduct[];
+  busy: boolean;
+  onMatch: (product: CatalogProduct, quantity: number) => void;
+  onRun: (product: CatalogProduct) => void;
+}) {
+  const [request, setRequest] = useState("");
+  const [match, setMatch] = useState<{ product: CatalogProduct; quantity: number } | null>(null);
+  const [reply, setReply] = useState(
+    "Tell me what you need. I’ll route it to the right purchasing agent and keep the work inside your mandate."
+  );
+
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const next = interpretRequest(request, catalog);
+    if (!next) {
+      setMatch(null);
+      setReply("I couldn’t match that to an available request yet. Try A4 paper, GPU compute, brackets, sensors, chairs, freight, or conveyor equipment.");
+      return;
+    }
+    const agent = getAgent(next.product.agent);
+    onMatch(next.product, next.quantity);
+    setMatch(next);
+    setReply(`Got it. I’ve routed ${next.quantity} ${next.product.unit}${next.quantity === 1 ? "" : "s"} of ${next.product.name} to ${agent.name}. ${agent.assurance}`);
+  }
+
+  return (
+    <section className="mt-6 overflow-hidden rounded-2xl border border-rain-200 bg-rain-50/40 shadow-sm shadow-rain-900/[0.03]">
+      <div className="border-b border-rain-100 bg-white/80 px-5 py-3.5">
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">Ask your purchasing agent</p>
+        <p className="mt-1 text-[12.5px] text-muted">Example: “I need two boxes of A4 paper. Find the best deal and handle it.”</p>
+      </div>
+      <div className="space-y-3 px-5 py-4">
+        <p className="max-w-2xl rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-[13px] leading-relaxed text-ink-700 shadow-sm shadow-ink-900/[0.03]">{reply}</p>
+        <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row">
+          <input
+            value={request}
+            onChange={(event) => setRequest(event.target.value)}
+            placeholder="What do you need?"
+            className="min-w-0 flex-1 rounded-xl border border-edge bg-white px-3.5 py-2.5 text-[13px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
+          />
+          <Button type="submit" variant="primary" disabled={!request.trim() || busy}>Find my agent</Button>
+        </form>
+        {match && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rain-200 bg-white px-3.5 py-3">
+            <p className="text-[12.5px] text-ink-700">
+              Ready to delegate <strong>{match.quantity} × {match.product.name}</strong>
+            </p>
+            <Button variant="primary" disabled={busy} onClick={() => onRun(match.product)}>
+              {busy ? "Agent is working…" : `Start with ${getAgent(match.product.agent).name}`}
+            </Button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function CatalogPage() {
   const catalog = useMemo(() => getCatalog(), []);
   const [qty, setQty] = useState<Record<string, number>>(() =>
@@ -256,6 +340,7 @@ export default function CatalogPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [result, setResult] = useState<RunResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   async function buy(product: CatalogProduct) {
     setBusyId(product.id);
@@ -325,6 +410,15 @@ export default function CatalogPage() {
               the agent either sources competing offers or buys from an approved supplier,
               and controls verify every dollar before a card can exist.
             </p>
+            <RequestChat
+              catalog={catalog}
+              busy={busyId !== null}
+              onMatch={(product, quantity) => {
+                setQty((current) => ({ ...current, [product.id]: quantity }));
+                setSelectedProductId(product.id);
+              }}
+              onRun={(product) => buy(product)}
+            />
           </section>
 
           <aside className="lg:sticky lg:top-6 lg:self-start">
@@ -353,6 +447,7 @@ export default function CatalogPage() {
                 setQty={(n) => setQty((q) => ({ ...q, [p.id]: n }))}
                 onBuy={() => buy(p)}
                 busy={busyId === p.id}
+                selected={selectedProductId === p.id}
               />
             ))}
           </div>
