@@ -1,4 +1,7 @@
-# Team 10, current state
+# Team 10, early build context
+
+> Historical working notes from the hackathon build. The current implementation and
+> deployment status live in the repository root [README](../README.md).
 
 One page. Read this, then read `THE-IDEA.md` if you need the why.
 
@@ -15,14 +18,14 @@ and anchored as a real testnet transaction).
 
 ## Repo
 
-`github.com/theomthakur/raingentic-team10`, pushed, one commit, scaffold only (Next.js,
-Tailwind, `.gitignore` covers `.env.local`). **Repo must be public**, confirmed rule.
+`github.com/theomthakur/raingentic-team10`. `.gitignore` covers `.env.local`; the public
+repository contains only placeholder environment values.
 
 ## Credentials
 
-Team 10. Team ID, User ID, Collateral contract ID are in `.env.local.example` and
-`LOGISTICS.md`. **The API key is on the paper sheet only**, never written anywhere digital,
-type it straight into your own local `.env.local`.
+Keep all team-specific values in an untracked `.env.local` or the Vercel environment.
+The public `.env.local.example` intentionally contains placeholders only. Never commit or
+share an API key.
 
 ## The split
 
