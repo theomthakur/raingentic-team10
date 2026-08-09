@@ -9,9 +9,11 @@
     "lint": "next lint",
     "test": "tsx lib/checks/checks.test.ts",
     "test:rain": "tsx scripts/check-rain-connection.ts",
-    "seed": "tsx lib/seed/generate.ts"
+    "seed": "tsx lib/seed/generate.ts",
+    "mcp": "tsx mcp/server.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@neondatabase/serverless": "0.10.4",
     "@types/qrcode": "^1.5.5",
     "jspdf": "2.5.2",
