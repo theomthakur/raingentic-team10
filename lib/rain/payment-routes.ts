@@ -103,7 +103,12 @@ export interface PaymentRoute {
 }
 
 export interface TransferSimulation {
-  simulationId: string;
+  /**
+   * Rain documents this field for accepted simulations. Sandbox responses can also be
+   * asynchronous acknowledgements with no tracking fields, so callers must treat it as
+   * optional rather than inventing an id.
+   */
+  simulationId?: string;
   /** Rain's own label, e.g. `usd_onramp` or `usd_offramp`. */
   flow?: string;
   status?: string;

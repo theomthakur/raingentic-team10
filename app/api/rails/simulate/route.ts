@@ -81,10 +81,12 @@ export async function POST(request: Request) {
         destination: route.destination ?? null,
       },
       transfer: {
-        simulationId: simulation.simulationId,
-        flow: simulation.flow ?? null,
+        // Keep an absent sandbox tracking id explicit. Omitting it makes an accepted
+        // response look more complete than Rain actually returned.
+        simulationId: simulation?.simulationId ?? null,
+        flow: simulation?.flow ?? null,
         // Rain returns 202: accepted and processing, which is not the same as settled.
-        status: simulation.status ?? "accepted",
+        status: simulation?.status ?? "accepted",
         amountUsd: amount.amountUsd,
       },
     });
