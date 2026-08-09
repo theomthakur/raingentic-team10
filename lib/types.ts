@@ -280,7 +280,24 @@ export interface Decision {
   checks: CheckResult[];
   outcome: Outcome;
   /** Present only when the outcome was approved and Rain actually issued. */
-  card?: { cardId: string; last4: string; limitCents: Cents; expiresAt: string } | null;
+  card?: {
+    cardId: string;
+    last4: string;
+    limitCents: Cents;
+    expiresAt: string;
+    /**
+     * A real Rain sandbox authorization and settlement, if this run was configured to
+     * exercise the scoped card. This is deliberately separate from Mandate's own budget
+     * write-back: a Rain transaction id is evidence that the card lifecycle happened.
+     */
+    rainSettlement?: {
+      transactionId: string;
+      status: "settled";
+      amountCents: Cents;
+      merchantName: string;
+      merchantCategoryCode: string;
+    };
+  } | null;
   /** True for rows written by the seed script rather than a live run. */
   seeded?: boolean;
   /** Which agent produced the PO. Cosmetic, but makes the feed read like a real system. */
