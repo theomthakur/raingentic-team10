@@ -9,6 +9,18 @@
 
 import type { NegotiationOffer, NegotiationResult } from "./negotiation";
 
+/**
+ * The key, under either name.
+ *
+ * `GROQ_API_KEY` silently failed to arrive on Vercel while four other variables set the
+ * same way arrived fine, and `llmEnabled` stayed false through several redeploys. Rather
+ * than keep debugging one dashboard row against a deadline, the code accepts a second
+ * name — set `GROQ_KEY` and it works regardless of what is wrong with the first.
+ */
+function groqKey(): string | undefined {
+  return process.env.GROQ_API_KEY ?? process.env.GROQ_KEY;
+}
+
 const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
 /**
  * Generous enough for a cold serverless instance, short enough that a demo never stalls.
@@ -20,7 +32,7 @@ const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
 const TIMEOUT_MS = 8000;
 
 async function askGroq(prompt: string): Promise<string | null> {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = groqKey();
   if (!apiKey) return null;
 
   const controller = new AbortController();
@@ -80,7 +92,7 @@ function flavorPrompt(offer: NegotiationOffer, isWinner: boolean): string {
  * Every call is independent and every failure is silent, this can never throw.
  */
 export async function enrichWithLLMFlavor(result: NegotiationResult): Promise<NegotiationResult> {
-  if (!process.env.GROQ_API_KEY) return result; // not configured, skip entirely, no cost
+  if (!groqKey()) return result; // not configured, skip entirely, no cost
 
   const enrichOffer = async (offer: NegotiationOffer): Promise<NegotiationOffer> => {
     const isWinner = offer.vendor === result.winner.vendor;

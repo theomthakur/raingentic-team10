@@ -29,7 +29,7 @@ export async function GET() {
     // Whether the negotiation dialogue is model-written. A boolean, never the key — this
     // exists because "is Groq actually configured on this deployment" was otherwise only
     // answerable by reading the seller notes and guessing.
-    llmEnabled: Boolean(process.env.GROQ_API_KEY),
+    llmEnabled: Boolean(process.env.GROQ_API_KEY ?? process.env.GROQ_KEY),
     // Shared across everyone hitting this URL, so a judge attacking from their phone
     // moves the same number the projector is showing.
     challenge: challengeStats(decisions),
