@@ -25,8 +25,8 @@ interface WorkspaceState {
  *
  * A controller needs to answer three questions before learning any system vocabulary:
  * what needs my attention, what is safe to ignore, and what happens if I act. The
- * Controls & audit remains available when someone needs to inspect a specific run. This is
- * the calmer surface a finance customer would open daily.
+ * existing home remains the Operations view for demonstrating agents, controls and raw
+ * provenance. This workspace is the calmer surface a finance customer would open daily.
  */
 export function CustomerWorkspace() {
   const [state, setState] = useState<WorkspaceState | null>(null);
@@ -130,15 +130,15 @@ export function CustomerWorkspace() {
 
         <section id="overview" className="mb-8 flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-rain-600">Aperture Labs · spending operations</p>
-            <h1 className="mt-1 font-display text-[32px] font-medium tracking-[-0.03em] text-ink-900">Your agents are operating within mandate.</h1>
-            <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted">Set the boundaries once, then let agents buy within them. This is the small set of exceptions and spending signals that need your attention today.</p>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-rain-600">Spending overview</p>
+            <h1 className="mt-1 font-display text-[32px] font-medium tracking-[-0.03em] text-ink-900">Good morning, Princy.</h1>
+            <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted">Your agents are working within the rules you set. Here is what needs a person today.</p>
           </div>
-          <Link href="#approvals"><Button variant={pending.length ? "primary" : "default"}>{pending.length ? `Review ${pending.length} exceptions` : "All agents operating normally"}</Button></Link>
+          <Link href="#approvals"><Button variant={pending.length ? "primary" : "default"}>{pending.length ? `Review ${pending.length} approvals` : "No approvals waiting"}</Button></Link>
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Spending summary">
-          <SummaryCard label="Exceptions to review" value={String(pending.length)} detail={pending.length ? `${money(awaitingCents)} outside delegated authority` : "Nothing needs your intervention"} tone={pending.length ? "warn" : "pass"} />
+          <SummaryCard label="Needs your approval" value={String(pending.length)} detail={pending.length ? `${money(awaitingCents)} waiting for a decision` : "Nothing is waiting on you"} tone={pending.length ? "warn" : "pass"} />
           <SummaryCard label="Protected this session" value={String(protectedToday)} detail="Requests stopped before a card was created" tone="pass" />
           <SummaryCard label="Budgets to watch" value={String(tightBudgets.length)} detail={tightBudgets.length ? tightBudgets.map((budget) => departmentName(budget.costCentre)).join(", ") : "All departments have room to spend"} tone={tightBudgets.length ? "warn" : "pass"} />
           <SummaryCard label="Spending rules" value={`v${latestPolicy.version}`} detail="Active policy, reviewed before every purchase" tone="neutral" />
@@ -146,8 +146,8 @@ export function CustomerWorkspace() {
 
         <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
           <section id="approvals">
-            <Panel title="Exceptions outside delegated authority" right={<Badge tone={pending.length ? "warn" : "pass"}>{pending.length ? `${pending.length} waiting` : "All clear"}</Badge>}>
-              {pending.length === 0 ? <Empty>Everything is within delegated authority. Nothing needs your intervention right now.</Empty> : (
+            <Panel title="Requests that need your approval" right={<Badge tone={pending.length ? "warn" : "pass"}>{pending.length ? `${pending.length} waiting` : "All clear"}</Badge>}>
+              {pending.length === 0 ? <Empty>Everything is within delegated authority. Nothing needs your approval right now.</Empty> : (
                 <ul className="divide-y divide-edge">
                   {pending.map((decision) => {
                     const total = decision.po.unitPrice * decision.po.quantity;
@@ -189,14 +189,14 @@ export function CustomerWorkspace() {
               <div className="space-y-3 px-5 py-4 text-[13px] leading-relaxed text-muted">
                 <p><strong className="text-ink-900">Agents can propose.</strong> They cannot decide whether money moves.</p>
                 <p><strong className="text-ink-900">Every request is checked first.</strong> A mismatch means no card is ever created.</p>
-                <Link href="/control" className="inline-block font-medium text-rain-600 hover:text-rain-700">Open controls and audit evidence →</Link>
+                <Link href="/" className="inline-block font-medium text-rain-600 hover:text-rain-700">See controls and audit evidence →</Link>
               </div>
             </Panel>
           </section>
         </div>
 
         <section id="activity" className="mt-8">
-          <Panel title="Recent spending activity" right={<Link href="/control" className="text-[12.5px] font-medium text-rain-600 hover:text-rain-700">View full audit trail →</Link>}>
+          <Panel title="Recent spending activity" right={<Link href="/" className="text-[12.5px] font-medium text-rain-600 hover:text-rain-700">View full audit trail →</Link>}>
             <ul className="divide-y divide-edge">
               {recent.map((decision) => <ActivityRow key={decision.id} decision={decision} />)}
             </ul>

@@ -8,13 +8,11 @@ import { Badge } from "../ui";
  * That's a job the old thin title bar never did — this is the fix.
  */
 export function Header({
-  current = "/",
   storage,
   rain,
   ruleVersion,
   errorBadge,
 }: {
-  current?: string;
   storage: "memory" | "postgres";
   rain: { mode: "off" | "simulated" | "live"; reason?: string };
   ruleVersion: number;
@@ -30,7 +28,7 @@ export function Header({
   return (
     <header className="border-b border-edge bg-white">
       {/* Identical to every other page. The hero below is the only thing that differs. */}
-      <NavBar current={current} />
+      <NavBar current="/" />
       <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-6 py-7 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-6 md:px-10">
         <div className="flex min-w-0 items-start gap-4">
           <div className="min-w-0">
