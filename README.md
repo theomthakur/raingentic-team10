@@ -10,7 +10,7 @@ Built by Team 10 for the Raingentic Commerce Hackathon NYC, August 2026.
 
 ## What a judge can do
 
-1. Open **Start** and give Mandate a task, such as “I need two boxes of A4 paper.”
+1. Open **Home** and give Mandate a task, such as “I need two boxes of A4 paper.”
 2. Watch it route the goal to a specialist, compare modeled supplier offers, and choose a qualifying PO.
 3. See eleven deterministic checks either approve, hold, or refuse that PO.
 4. Open **Orders** to see the same persistent decision log and budgets.
@@ -87,7 +87,7 @@ The app works without credentials using clearly labeled local simulations. For a
 | `lib/monad/` | Monad testnet policy anchor and receipt verification |
 | `lib/rain/` | Rain sandbox cards, lifecycle, routes, and conditional treasury payout |
 | `lib/store/` | Append-only decision log backed by Postgres when configured |
-| `app/api/` | The API surface used by Start, Suppliers, Orders, and Proof |
+| `app/api/` | The API surface used by Home, Suppliers, Orders, and Proof |
 | `docs/` | Design notes, deployment notes, and hackathon context |
 
 ## Team

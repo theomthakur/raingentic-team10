@@ -15,7 +15,7 @@ import Link from "next/link";
  */
 
 export const PAGES = [
-  { href: "/", label: "Start", blurb: "give Mandate a goal" },
+  { href: "/", label: "Home", blurb: "give Mandate a goal" },
   { href: "/workspace", label: "Orders", blurb: "orders, budgets, and approvals" },
   { href: "/catalog", label: "Suppliers", blurb: "catalogue and supplier competition" },
   { href: "/agents", label: "Agents", blurb: "who is allowed to spend" },
