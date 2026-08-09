@@ -294,13 +294,20 @@ export function AgentJourney({
               </div>
               <p className="font-mono text-[16px] font-semibold text-ink-900">{money(decision.po.unitPrice * decision.po.quantity)}</p>
             </div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {decision.checks.filter((check) => !check.skipped).map((check) => (
-                <div key={check.ruleId} className={`rounded-lg px-3 py-2 text-[11.5px] ${check.passed ? "bg-mint-50 text-mint-800" : "bg-red-50 text-fail"}`}>
-                  <strong>{check.passed ? "Passed" : "Stopped"}</strong> · {check.label}
-                </div>
-              ))}
-            </div>
+            <details className="group mt-3 rounded-xl border border-edge bg-ink-50/50">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-[12.5px] text-ink-700 marker:hidden">
+                <span><strong>{passed} controls passed.</strong> Review why this order was safe.</span>
+                <span className="font-mono text-[11px] text-rain-600 group-open:hidden">show checks +</span>
+                <span className="hidden font-mono text-[11px] text-rain-600 group-open:inline">hide checks −</span>
+              </summary>
+              <div className="grid gap-2 border-t border-edge px-3.5 py-3 sm:grid-cols-2">
+                {decision.checks.filter((check) => !check.skipped).map((check) => (
+                  <div key={check.ruleId} className={`rounded-lg px-3 py-2 text-[11.5px] ${check.passed ? "bg-mint-50 text-mint-800" : "bg-red-50 text-fail"}`}>
+                    <strong>{check.passed ? "Passed" : "Stopped"}</strong> · {check.label}
+                  </div>
+                ))}
+              </div>
+            </details>
           </div>
         )}
 

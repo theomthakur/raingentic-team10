@@ -356,6 +356,17 @@ export default function Page() {
           />
         </section>
 
+        <details id="evidence" className="group mb-10 rounded-2xl border border-edge bg-ink-50/40">
+          <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-4 px-5 py-4 marker:hidden md:px-6">
+            <div>
+              <p className="text-[13px] font-semibold text-ink-900">View activity, audit, and policy evidence</p>
+              <p className="mt-1 text-[12.5px] text-muted">The agent handled the work above. Open this only when you want to inspect how and why.</p>
+            </div>
+            <span className="rounded-full border border-edge bg-white px-3 py-1.5 text-[12px] font-medium text-rain-700 group-open:hidden">Open evidence →</span>
+            <span className="hidden rounded-full border border-edge bg-white px-3 py-1.5 text-[12px] font-medium text-rain-700 group-open:inline">Close evidence ↑</span>
+          </summary>
+
+          <div className="border-t border-edge bg-white px-6 py-8 md:px-10">
         <section className="mb-10">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
             <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
@@ -503,6 +514,8 @@ export default function Page() {
             onAttempt={attempt}
           />
         </section>
+          </div>
+        </details>
       </main>
 
       <Footer />
