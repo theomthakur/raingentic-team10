@@ -762,9 +762,9 @@ const SLIDES: Slide[] = [
               href={m.linkedin}
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center gap-2 rounded-full border border-edge bg-white py-1.5 pl-4 pr-3.5 transition hover:border-ink-300"
+              className="group flex items-center gap-2 rounded-full border border-edge bg-white py-1.5 pl-4 pr-3.5 transition hover:border-rain-300 hover:bg-rain-50/50"
             >
-              <span className="font-display text-[17px] font-medium text-ink-900">
+              <span className="font-display text-[17px] font-medium text-ink-900 transition group-hover:text-rain-700">
                 {m.name}
               </span>
               <LinkedinIcon className="h-3.5 w-3.5 text-ink-300 transition group-hover:text-rain-600" />
@@ -777,7 +777,7 @@ const SLIDES: Slide[] = [
             href="https://github.com/theomthakur/raingentic-team10"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 font-medium text-muted transition hover:text-ink-900"
+            className="flex items-center gap-1.5 font-medium text-muted transition hover:text-rain-600"
           >
             <GithubIcon className="h-4 w-4" />
             theomthakur/raingentic-team10

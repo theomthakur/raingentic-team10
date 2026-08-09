@@ -19,7 +19,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               title={label}
-              className="flex items-center gap-1.5 text-muted transition hover:text-ink-900"
+              className="flex items-center gap-1.5 text-muted transition hover:text-rain-600"
             >
               <Icon />
               <span>{label}</span>

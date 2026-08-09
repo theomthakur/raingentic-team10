@@ -53,12 +53,27 @@ export function SiteNav({ current }: { current: string }) {
  */
 export function NavBrand() {
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-2.5">
-      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rain-500 text-[12px] font-bold text-white">
-        M
+    <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="Mandate home">
+      <MandateMark />
+      <span className="leading-none">
+        <span className="block text-[14px] font-semibold tracking-tight text-ink-900 transition group-hover:text-rain-700">Mandate</span>
+        <span className="mt-1 block text-[9.5px] font-medium tracking-[0.01em] text-muted">
+          Autonomous spend, inside your limits
+        </span>
       </span>
-      <span className="text-[14px] font-semibold tracking-tight text-ink-900">Mandate</span>
     </Link>
+  );
+}
+
+/** A small, ownable mark: a protected path through a spending boundary, not a letter M. */
+function MandateMark() {
+  return (
+    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rain-500 shadow-sm shadow-rain-500/20" aria-hidden="true">
+      <svg viewBox="0 0 32 32" className="h-5 w-5 fill-none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 10.5 16 6l9 4.5v7.2c0 4.7-3.4 7.8-9 8.9-5.6-1.1-9-4.2-9-8.9v-7.2Z" className="stroke-white" />
+        <path d="m11.5 16 3 3 6-6" className="stroke-white" />
+      </svg>
+    </span>
   );
 }
 
