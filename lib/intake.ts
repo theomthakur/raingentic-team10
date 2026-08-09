@@ -51,13 +51,44 @@ const TERMS: Array<{ id: string; terms: string[] }> = [
   { id: "PO-4423", terms: ["conveyor", "conveyer"] },
 ];
 
+/**
+ * Suggestions should not depend on the model merely to understand "two boxes". The
+ * model remains the primary interpreter, but this small fallback covers ordinary written
+ * quantities too, so the main-page examples stay dependable during a model timeout.
+ */
+const QUANTITY_WORDS: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  dozen: 12,
+};
+
+function quantityFromText(text: string, fallback: number): number {
+  const numeric = text.match(/\b(\d+)\b/)?.[1];
+  if (numeric) return Number(numeric);
+
+  const word = text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|dozen)\b/)?.[1];
+  if (word) return QUANTITY_WORDS[word];
+
+  if (/\ba couple(?: of)?\b/.test(text)) return 2;
+  if (/\ba few\b/.test(text)) return 3;
+  return fallback;
+}
+
 export function matchByKeyword(text: string, catalog: CatalogProduct[]): IntakeResult | null {
   const normalized = text.toLowerCase();
   const hit = TERMS.find(({ terms }) => terms.some((t) => normalized.includes(t)));
   if (!hit) return null;
   const product = catalog.find((p) => p.id === hit.id);
   if (!product) return null;
-  const quantity = Number(normalized.match(/\b(\d+)\b/)?.[1] ?? product.quotedQuantity ?? 1);
+  const quantity = quantityFromText(normalized, product.quotedQuantity ?? 1);
   if (!Number.isFinite(quantity) || quantity <= 0) return null;
   return { productId: product.id, quantity, understood: `${quantity} × ${product.name}` };
 }

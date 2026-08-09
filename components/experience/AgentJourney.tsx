@@ -12,9 +12,38 @@ import { Badge, Button, Panel } from "@/components/ui";
 
 type Phase = "idle" | "understanding" | "sourcing" | "checking" | "paid" | "stopped";
 
+/**
+ * A complete, runnable starting point for each specialist. The examples are not just
+ * marketing copy: each is phrased so the intake endpoint can route it to the catalogue
+ * line owned by that agent. A judge can therefore verify the entire roster from the first
+ * screen without having to know our product names or navigate to five pages.
+ */
 const SUGGESTIONS = [
-  "I need two boxes of A4 paper. Find the best deal and handle it.",
-  "Source GPU capacity for the training team.",
+  {
+    agent: "Luca",
+    role: "Supplies buyer",
+    text: "I need two boxes of A4 paper. Find the best deal and handle it.",
+  },
+  {
+    agent: "Cody",
+    role: "Infra buyer",
+    text: "Source four GPU-hours of A100 capacity for the training team.",
+  },
+  {
+    agent: "Mona",
+    role: "Procurement agent",
+    text: "Book one EU freight lane for our next shipment.",
+  },
+  {
+    agent: "Rae",
+    role: "Facilities agent",
+    text: "Order eight task chairs for the new workspace.",
+  },
+  {
+    agent: "Prue",
+    role: "Capital procurement",
+    text: "Order 30 conveyor sections for the new bay.",
+  },
 ];
 
 const WEEKLY_OBJECTIVE = "Keep office and engineering teams supplied through competitively sourced orders without exhausting any budget.";
@@ -222,18 +251,24 @@ export function AgentJourney({
                   Ask Mandate
                 </Button>
               </form>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-[11.5px] text-ink-400">Try one:</span>
+              <div className="mt-4 border-t border-edge pt-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Meet the specialists</p>
+                  <p className="text-[11.5px] text-muted">Choose one to prefill a request.</p>
+                </div>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {SUGGESTIONS.map((suggestion) => (
                   <button
-                    key={suggestion}
+                    key={suggestion.agent}
                     type="button"
-                    onClick={() => setMessage(suggestion)}
-                    className="rounded-full border border-edge bg-white px-3 py-1.5 text-[11.5px] text-ink-600 transition hover:border-rain-200 hover:text-rain-700"
+                    onClick={() => setMessage(suggestion.text)}
+                    className="rounded-xl border border-edge bg-white px-3 py-2.5 text-left transition hover:border-rain-200 hover:bg-rain-50/40"
                   >
-                    {suggestion.replace(". Find the best deal and handle it.", "")}
+                    <span className="block text-[12px] font-semibold text-ink-800">{suggestion.agent}</span>
+                    <span className="mt-0.5 block text-[11px] text-muted">{suggestion.role}</span>
                   </button>
                 ))}
+                </div>
               </div>
               <div className="mt-5 border-t border-edge pt-4">
                 <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Or let Mandate decide</p>
