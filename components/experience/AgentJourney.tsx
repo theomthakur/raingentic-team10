@@ -7,6 +7,7 @@ import { money } from "@/lib/format";
 import { generateReceipt } from "@/lib/receipt";
 import { getAgent } from "@/lib/agents";
 import { AgentAvatar } from "@/components/identity/AgentAvatar";
+import { MandateAvatar } from "@/components/identity/MandateAvatar";
 import { Avatar } from "@/components/identity/Avatar";
 import { Badge, Button, Panel } from "@/components/ui";
 
@@ -218,7 +219,7 @@ export function AgentJourney({
       <Panel className="mt-8 overflow-hidden border-rain-200 shadow-[0_16px_50px_rgba(91,71,196,0.08)]">
         <div className="border-b border-edge bg-gradient-to-r from-rain-50 via-white to-white px-5 py-4 sm:px-7">
           <div className="flex items-center gap-3">
-            <AgentAvatar id="procurement-01" size={36} />
+            <MandateAvatar size={36} />
             <div>
               <p className="text-[14px] font-semibold text-ink-900">Mandate, your purchasing agent</p>
               <p className="text-[12.5px] text-muted">Tell me the outcome. I will take care of the order.</p>
@@ -229,7 +230,7 @@ export function AgentJourney({
 
         <div className="bg-ink-50/40 px-5 py-6 sm:px-7">
           <div className="flex max-w-3xl items-start gap-2.5 rounded-2xl rounded-tl-sm border border-rain-100 bg-rain-50/70 px-4 py-3 text-[14px] leading-relaxed text-ink-700">
-            <AgentAvatar id={agent?.id ?? "procurement-01"} size={22} />
+            {agent ? <AgentAvatar id={agent.id} size={22} /> : <MandateAvatar size={22} />}
             <p>{status}</p>
           </div>
 
