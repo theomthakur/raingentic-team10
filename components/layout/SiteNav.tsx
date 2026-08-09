@@ -65,15 +65,20 @@ export function NavBrand() {
   );
 }
 
-/** A small, ownable mark: a protected path through a spending boundary, not a letter M. */
+/** The Mandate aperture: two limits holding one authorised payment. */
 function MandateMark() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rain-500 shadow-sm shadow-rain-500/20" aria-hidden="true">
-      <svg viewBox="0 0 32 32" className="h-5 w-5 fill-none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 10.5 16 6l9 4.5v7.2c0 4.7-3.4 7.8-9 8.9-5.6-1.1-9-4.2-9-8.9v-7.2Z" className="stroke-white" />
-        <path d="m11.5 16 3 3 6-6" className="stroke-white" />
-      </svg>
-    </span>
+    <svg viewBox="0 0 32 32" className="h-8 w-8 shrink-0" aria-hidden="true" focusable="false">
+      <g
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+        className="fill-rain-500 stroke-rain-500 transition-colors group-hover:fill-rain-600 group-hover:stroke-rain-600"
+      >
+        <path d="M5,6.5 H11 V8.6 H7.6 V23.4 H11 V25.5 H5 Z" />
+        <path d="M27,6.5 H21 V8.6 H24.4 V23.4 H21 V25.5 H27 Z" />
+      </g>
+      <circle cx="16" cy="16" r="3.4" className="fill-ink-900" />
+    </svg>
   );
 }
 

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <style>
+    .payment { fill: #121212 }
+    @media (prefers-color-scheme: dark) { .payment { fill: #ffffff } }
+  </style>
+  <g fill="#ff2fb6" stroke="#ff2fb6" stroke-width="1.1" stroke-linejoin="round">
+    <path d="M5,6.5 H11 V8.6 H7.6 V23.4 H11 V25.5 H5 Z"/>
+    <path d="M27,6.5 H21 V8.6 H24.4 V23.4 H21 V25.5 H27 Z"/>
+  </g>
+  <circle class="payment" cx="16" cy="16" r="3.4"/>
+</svg>
