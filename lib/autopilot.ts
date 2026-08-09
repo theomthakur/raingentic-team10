@@ -78,7 +78,7 @@ export async function decideNextPurchase({
   if (!apiKey) return chooseWithoutModel(catalog, budgets, alreadyBought);
 
   const menu = catalog
-    .filter((p) => !alreadyBought.includes(p.id))
+    .filter((p) => !alreadyBought.includes(p.id) && !p.alreadyFulfilled)
     .map(
       (p) =>
         `${p.id} = ${p.name}, ${(p.fromCents / 100).toFixed(2)} per ${p.unit}, paid from ${p.costCentre}`
@@ -139,7 +139,10 @@ export async function decideNextPurchase({
 
     return {
       productId: product.id,
-      quantity: Math.floor(quantity),
+      // An agent may choose which approved line to buy, but an accepted supplier quote
+      // already fixes its quantity. Letting the model alter that quantity would create a
+      // made-up PO that the amount check quite rightly refuses; it is not useful autonomy.
+      quantity: product.quotedQuantity ?? Math.floor(quantity),
       reasoning:
         typeof parsed.reasoning === "string" && parsed.reasoning.trim()
           ? parsed.reasoning.trim()
