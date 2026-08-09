@@ -1,12 +1,14 @@
 import Link from "next/link";
 
 /**
- * The live demo has one front door. The deeper pages remain available by URL for follow-up
- * questions, but they do not compete with the autonomous run on the primary surface.
+ * A familiar operator hierarchy: people start with their organization, then move into the
+ * agents and the evidence behind their work. Presentation-only pages stay out of the way.
  */
 
 export const PAGES = [
-  { href: "/", label: "Agent control", blurb: "watch an autonomous purchase run" },
+  { href: "/", label: "Overview", blurb: "what needs attention across your agents" },
+  { href: "/agents", label: "Agents", blurb: "who can act for your organization" },
+  { href: "/control", label: "Controls & audit", blurb: "inspect a run and its evidence" },
 ] as const;
 
 export function SiteNav({ current }: { current: string }) {
@@ -65,7 +67,7 @@ export function NavBar({ current }: { current: string }) {
     <div className="border-b border-edge bg-white">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3 md:px-10">
         <NavBrand />
-        {PAGES.length > 1 && <SiteNav current={current} />}
+        <SiteNav current={current} />
       </div>
     </div>
   );

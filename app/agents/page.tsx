@@ -32,10 +32,9 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-[15px] font-semibold text-ink-900">
-              This is {agent.name}
+              {agent.name}
             </p>
             <span className="flex shrink-0 items-center gap-1.5">
-              {agent.host && <Badge tone="rain">for {agent.host}</Badge>}
               <span className="font-mono text-[10.5px] text-ink-400">{agent.id}</span>
             </span>
           </div>
@@ -43,13 +42,6 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
             {agent.role} — deals with {agent.dealsWith}
           </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-700">{agent.description}</p>
-
-          <p
-            className="mt-2.5 border-l-2 pl-3 text-[12.5px] italic leading-relaxed text-muted"
-            style={{ borderColor: `${agent.color}55` }}
-          >
-            Named for — {agent.why}
-          </p>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
             <Badge tone="neutral">{mine.length} decisions</Badge>
@@ -78,19 +70,9 @@ export default function AgentsPage() {
       .catch(() => setDecisions([]));
   }, []);
 
-  // Host tributes first — Rain, then Monad, then Encode — so the people who ran this
-  // event see themselves at the top of the roster rather than three cards down.
   const ids = useMemo(() => {
-    const hostOrder = { Rain: 0, Monad: 1, Encode: 2 } as const;
     // `catalog` is a person buying by hand, not an agent, so it stays off the roster.
-    return Object.keys(AGENTS).filter((k) => k !== "catalog").sort((a, b) => {
-      const ha = AGENTS[a].host;
-      const hb = AGENTS[b].host;
-      if (ha && hb) return hostOrder[ha] - hostOrder[hb];
-      if (ha) return -1;
-      if (hb) return 1;
-      return 0;
-    });
+    return Object.keys(AGENTS).filter((k) => k !== "catalog");
   }, []);
 
   return (
@@ -99,17 +81,14 @@ export default function AgentsPage() {
 
       <main className="mx-auto max-w-[1100px] px-6 py-10 md:px-10">
         <section className="mb-8">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">Who's spending</p>
+          <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">Agent directory</p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Five agents, five roles — the same eleven checks
+            The agents authorized to buy for your organization
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
-            Every purchase order in the log was declared by one of these. The id is what
-            the system actually keys on; the name is just so the feed reads like a team
-            doing work rather than a service account making requests. Three are named for
-            the people hosting this — Rain, Monad and Encode — and two for the history of
-            financial control, which is the same argument the rules make: none of this was
-            invented here. Stats are counted live off the decision log, not written by hand.
+            Each agent has a defined job and delegated authority. Their activity is counted
+            from the live decision log, so finance can see what each one has attempted,
+            completed, or been stopped from doing.
           </p>
         </section>
 
