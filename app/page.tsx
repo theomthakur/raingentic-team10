@@ -107,6 +107,20 @@ export default function Page() {
     [state, selectedId]
   );
 
+  /**
+   * How many approved purchases no person touched.
+   *
+   * Counted off `approval` rather than by subtracting the queue: a refusal is not an
+   * autonomous completion, and neither is a purchase a named human released.
+   */
+  const autonomy = useMemo(() => {
+    const approved = state?.decisions.filter((d) => d.outcome === "approved") ?? [];
+    return {
+      total: approved.length,
+      autonomous: approved.filter((d) => !d.approval).length,
+    };
+  }, [state]);
+
   // A held decision that a later row already released is no longer waiting on anyone.
   const heldDecisions = useMemo(() => {
     if (!state) return [];
@@ -401,7 +415,8 @@ export default function Page() {
                     agent's delegated authority, and it should read as an exception. */}
                 <ApprovalInbox
                   held={heldDecisions}
-                  totalDecisions={state.decisions.length}
+                  autonomousApprovals={autonomy.autonomous}
+                  totalApprovals={autonomy.total}
                   busy={busy}
                   onApprove={approve}
                 />

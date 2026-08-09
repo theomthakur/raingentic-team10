@@ -4,6 +4,26 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Three corrections from a review, two of them about honesty
+
+- 🔴 **A JSX escape rendered literally.** `title="Exception — above an agent\u2019s
+  authority"` — JSX attribute strings are literal, so the heading read `agent\u2019s` on
+  screen. Confirmed in the built bundle, fixed with the real character, and the source
+  swept for any other escape inside an attribute.
+- 🔴 **The autonomy claim overstated itself.** It computed `totalDecisions - held.length`
+  and called the result "purchases completed with no human involved" — which counted the
+  13 refusals and the 6 human-released purchases as autonomous completions. The honest
+  figure is **35 of 41 approved purchases**, now counted off `approval` rather than by
+  subtracting the queue. On a project whose whole pitch is not overstating, this is exactly
+  the sentence a judge would check.
+- **The replay headline said "approvals" where it meant "decisions".** The stricter bucket
+  holds anything that became less permissive, and under a zero-tolerance policy that is 8
+  approved→refused *plus* one held→refused. Nine, but not nine approvals.
+- Pluralisation: "These 1 are the exception" → "This one is".
+- Doc sweep: 54 → 60 decisions and 82 → 84 tests across the live documents. The planning
+  trail and this changelog are left alone — they record what was true when written.
+
+
 ## 2026-08-08 · The console now opens with nobody waiting
 
 The reframe fixed the words but not the screen. The console still loaded with **six

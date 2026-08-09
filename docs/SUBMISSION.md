@@ -209,7 +209,7 @@ nothing.
    Change the price by a few percent → refused.
 4. **Click the refusal.** Which rule, what it expected, what it got, and the exact record
    field it read. Anyone can audit it in five seconds.
-5. **Change a rule and hit replay.** *"Across 54 decisions, 8 approvals would now be
+5. **Change a rule and hit replay.** *"Across 60 decisions, 8 approvals would now be
    refused."* Each row shows what the rule expected before and after.
 6. **Hand over the keyboard.** A form where anyone can write their own purchase order and
    press issue. Same code path. Nothing is special-cased for the demo.
@@ -387,7 +387,7 @@ disqualified under the event's own rules.
 | [lib/pipeline.ts](../lib/pipeline.ts) | The eight stages, in order — this file *is* the architecture diagram |
 | [app/api/purchase/](../app/api/purchase/) | The full journey: negotiate → propose → verify → issue |
 
-**82 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
+**84 automated tests** cover the checks, the fingerprinting, replay, and the two human controls. They exist to prove
 the two claims the pitch rests on: that the same input always gives the same answer, and
 that every threshold lives in editable settings rather than in code.
 

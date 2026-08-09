@@ -387,7 +387,7 @@ weakness: buy twice, just under the limit each time.
 | Negotiation | Deterministic strategy engine | Same task always produces the same winner, so the result is checkable. |
 | AI | Groq, `llama-3.1-8b-instant` | Writes the suppliers' dialogue. Capped at 40 words, three second timeout, silent fallback. |
 | Documents | jsPDF | A downloadable receipt per decision, loaded only when clicked. |
-| Tests | 82 automated tests | Every check on both sides of its boundary, plus the concurrency race, fail-closed arithmetic, the release path for every escalating rule, new-payee history, and the per-agent ceiling invariant. |
+| Tests | 84 automated tests | Every check on both sides of its boundary, plus the concurrency race, fail-closed arithmetic, the release path for every escalating rule, new-payee history, and the per-agent ceiling invariant. |
 
 ### One bug worth knowing about
 
@@ -405,7 +405,7 @@ Say this before anyone asks. Volunteering it is worth far more than being caught
 
 | Part | State |
 |---|---|
-| The eleven checks | **Real**, 82 tests |
+| The eleven checks | **Real**, 84 tests |
 | Negotiation between suppliers | **Real**, deterministic |
 | Append-only decision log | **Real**, in Postgres |
 | Replay across history | **Real** |

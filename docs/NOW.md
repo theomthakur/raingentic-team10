@@ -4,7 +4,7 @@ Everything remaining, merged into a single priority order. Blockers, code, deplo
 Work top to bottom. Notes explain why each item sits where it does, so the order can be
 argued with rather than followed blindly.
 
-**Status at the time of writing:** 82 tests passing. All 11 checks, replay, dual control,
+**Status at the time of writing:** 84 tests passing. All 11 checks, replay, dual control,
 oversight hold, revoke, the Monad anchor and negotiation are all built. What is left is
 mostly **not code**.
 
@@ -52,7 +52,7 @@ replay has nothing to replay. It works perfectly on a laptop either way, which i
 why it gets missed. The app shows a red banner in production without it. Do not ship with
 that banner showing.
 
-Currently empty in `.env.local`. Tables self-create on first request and the 54 seeded
+Currently empty in `.env.local`. Tables self-create on first request and the 60 seeded
 decisions load automatically, so there is nothing to migrate.
 
 ---

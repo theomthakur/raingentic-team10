@@ -7,10 +7,10 @@ is deliberately one function.
 
 ## What already works
 
-- The eleven checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 82 tests
+- The eleven checks, `verify(po, record, ruleSet) -> { ok, checks, failures }`, pure, 84 tests
 - Rules as versioned data, a new version on every edit, sha256 per version
 - Append-only decision log, storing a **snapshot** of the record rather than a pointer
-- Replay across 54 seeded decisions plus everything the demo adds
+- Replay across 60 seeded decisions plus everything the demo adds
 - The full pipeline, `PROPOSE → VERIFY → ISSUE → SETTLE → RECORD`, with the refusal branch
 - The console: decision feed, provenance panel, rule editor, replay diff, budget meters
 - The run-it-twice demo path, verified end to end

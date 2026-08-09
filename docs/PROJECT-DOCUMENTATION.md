@@ -231,14 +231,14 @@ lib/
   sellers.ts         seller fixtures per task (A)
   agent.ts           task -> negotiation -> PurchaseOrder (A)
   llm.ts             optional seller dialogue, upstream of PROPOSE, never in verify (A)
-  checks/            the eleven checks + verify(), pure functions, 82 tests (B)
+  checks/            the eleven checks + verify(), pure functions, 84 tests (B)
   rules/             versioned rule data + the sha256 anchored on Monad (B)
   replay/            re-judging stored decisions against another rule version (B)
   store/             append-only log; Postgres when DATABASE_URL is set, memory otherwise (B)
   pipeline.ts        every stage in order — this file IS the architecture diagram (B)
   monad/anchor.ts    publishing a rule version's hash to Monad testnet (B)
   rain/issuer.ts     the issue seam: verify passes -> rain-client is called
-  seed/              54 committed historical decisions, deterministically generated (B)
+  seed/              60 committed historical decisions, deterministically generated (B)
 app/
   page.tsx           the console        /
   workspace/         the customer view  /workspace

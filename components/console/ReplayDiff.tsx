@@ -183,9 +183,9 @@ export function ReplayDiff({
             Across <span className="tabular font-mono font-semibold">{result.total}</span>{" "}
             recorded decisions,{" "}
             <span className="tabular font-mono font-semibold text-fail">{refusedNow}</span>{" "}
-            {refusedNow === 1 ? "approval" : "approvals"} would now be refused and{" "}
+            {refusedNow === 1 ? "decision" : "decisions"} would now be refused and{" "}
             <span className="tabular font-mono font-semibold text-mint-700">{approvedNow}</span>{" "}
-            {approvedNow === 1 ? "refusal" : "refusals"} would now pass.
+            {approvedNow === 1 ? "decision" : "decisions"} would now pass.
           </>
         )}
       </p>

@@ -23,7 +23,7 @@ remedy is a dispute, to *before the instrument exists*.
 - **11 deterministic checks.** No model, no I/O, no wall clock in the decision path.
 - **Rules are versioned data**, not code. Changing one needs a second person to approve it —
   the author can't approve their own change.
-- **Replay.** Edit a rule, re-run all 54 recorded decisions against it, see what flips.
+- **Replay.** Edit a rule, re-run all 60 recorded decisions against it, see what flips.
   Only meaningful because nothing in the check path is a model.
 - **Append-only log** storing a *snapshot* of the record read, not a pointer to it.
 - **Negotiation** — four sellers, distinct strategies, one counter-offer round. The winner
@@ -31,7 +31,7 @@ remedy is a dispute, to *before the instrument exists*.
 - **Idempotency under concurrency.** Two identical requests at the same instant produce
   exactly one card. (This was a real bug we found and fixed — rule 6 only protected the
   sequential case.)
-- **82 tests.**
+- **84 tests.**
 
 Cards are currently **simulated and labelled as such** in the UI. See the blockers below.
 

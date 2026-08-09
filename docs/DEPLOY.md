@@ -29,7 +29,7 @@ ship with that banner showing.
 3. Vercel → Project → Settings → Environment Variables → `DATABASE_URL` → paste → save.
 4. Redeploy.
 
-Tables are created automatically on first request, and the 54 seeded decisions are loaded
+Tables are created automatically on first request, and the 60 seeded decisions are loaded
 so replay has real history immediately.
 
 ---
@@ -71,7 +71,7 @@ one fails by looking empty.
 
 ```bash
 npm install
-npm test        # 82 tests over the checks, hashing, replay and concurrency
+npm test        # 84 tests over the checks, hashing, replay and concurrency
 npm run dev
 ```
 
