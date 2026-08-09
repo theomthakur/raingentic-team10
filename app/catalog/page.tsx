@@ -12,6 +12,7 @@ import { getAgent } from "@/lib/agents";
 import { Badge, Button, Panel } from "@/components/ui";
 import { TaskLoop, type LoopState } from "@/components/console/TaskLoop";
 import { Autopilot } from "@/components/console/Autopilot";
+import { NegotiationPanel } from "@/components/console/NegotiationPanel";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
@@ -253,6 +254,56 @@ function ResultPanel({ result, error }: { result: RunResult | null; error: strin
         </Link>
       </p>
     </Panel>
+  );
+}
+
+/**
+ * Keep the thing that makes a sourced purchase different from a normal checkout in the
+ * main flow. The quote competition is not supporting evidence: it is where the PO that
+ * gets verified below comes from.
+ */
+function SupplierCompetition({ result }: { result: RunResult | null }) {
+  const negotiation = result?.decision.negotiation;
+
+  if (!negotiation) {
+    return (
+      <Panel className="mt-6 border-rain-200">
+        <div className="border-b border-edge bg-rain-50/50 px-5 py-3.5">
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">
+            Supplier competition
+          </p>
+          <p className="mt-1 text-[13px] text-ink-700">
+            Choose a sourcing request and the agent will invite suppliers to bid before it
+            is allowed to create a payment.
+          </p>
+        </div>
+        <div className="px-5 py-4 text-[12.5px] leading-relaxed text-muted">
+          The selected quote becomes the purchase order. Mandate then verifies that exact
+          supplier, SKU, quantity, price, budget, and delegated authority.
+        </div>
+      </Panel>
+    );
+  }
+
+  return (
+    <section className="mt-6">
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">
+            Supplier competition
+          </p>
+          <p className="mt-1 text-[13px] text-ink-700">
+            The agent obtained competing quotes before declaring the order it will spend against.
+          </p>
+        </div>
+        <Badge tone="rain">source → verify → pay</Badge>
+      </div>
+      <NegotiationPanel
+        negotiation={negotiation}
+        poNumber={result.decision.po.poNumber}
+        totalCents={result.decision.po.unitPrice * result.decision.po.quantity}
+      />
+    </section>
   );
 }
 
@@ -534,6 +585,8 @@ export default function CatalogPage() {
               loop={loop}
               onDelegate={delegate}
             />
+
+            <SupplierCompetition result={result} />
 
             <div className="mt-6">
               <Autopilot
