@@ -14,7 +14,7 @@ import { GithubIcon, LinkedinIcon } from "../icons";
  * judge is already looking at the real thing, and every claim on a slide is one click from
  * the screen that backs it.
  *
- * Every number here is read off the build, not rounded up for the stage: 44 tests, seven
+ * Every number here is read off the build, not rounded up for the stage: 84 tests, eleven
  * rules, $25,000 delegated limit, $43,500 capital purchase. If a claim is only partly true,
  * the slide says which part.
  */
@@ -66,6 +66,26 @@ const CHECKS: { id: string; label: string; basis: string; star?: boolean }[] = [
     id: "requires-approval",
     label: "Above $25,000, a named person must release it",
     basis: "Delegation of authority",
+  },
+  {
+    id: "no-structuring",
+    label: "Not a large purchase split in two to duck approval",
+    basis: "Structuring detection",
+  },
+  {
+    id: "agent-authority",
+    label: "Inside this particular agent's own limit",
+    basis: "Role-based delegation",
+  },
+  {
+    id: "known-vendor",
+    label: "A supplier we have paid before",
+    basis: "New-payee verification",
+  },
+  {
+    id: "velocity",
+    label: "Not spending faster than this agent should",
+    basis: "Velocity limiting",
   },
 ];
 
@@ -139,7 +159,7 @@ const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[
     tone: "pass",
     state: "built and tested",
     items: [
-      "Seven checks, rule versioning, dual-control activation",
+      "Eleven checks, rule versioning, dual-control activation",
       "Replay across the entire decision log",
       "Append-only log with per-decision provenance",
       "The deterministic negotiation engine, and the run-it-twice refusal",
@@ -230,8 +250,8 @@ const SLIDES: Slide[] = [
         <div className="mt-7 flex flex-wrap items-center gap-2">
           <Badge tone="rain">rain</Badge>
           <Badge tone="monad">monad</Badge>
-          <Badge tone="pass">44 tests passing</Badge>
-          <Badge tone="neutral">7 rules, all data</Badge>
+          <Badge tone="pass">84 tests passing</Badge>
+          <Badge tone="neutral">11 checks, all data</Badge>
         </div>
       </div>
     ),
@@ -349,12 +369,12 @@ const SLIDES: Slide[] = [
   },
   {
     id: "checks",
-    label: "The seven rules",
+    label: "The eleven checks",
     eyebrow: "The checks that decide it",
     body: (
       <div>
         <Title>
-          Seven rules. <Accent>None of them invented here.</Accent>
+          Eleven checks. <Accent>None of them invented here.</Accent>
         </Title>
         <Lede>
           Each returns a sentence a human can act on, never &ldquo;validation failed&rdquo;.
@@ -385,6 +405,85 @@ const SLIDES: Slide[] = [
           Rule 4 is the one no card network can express at any granularity — an issuer has no
           idea your order system exists, so it cannot tell you that you bought the wrong item
           from the right shop at the right price.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "replay",
+    label: "Replay",
+    eyebrow: "What four design decisions compose into",
+    body: (
+      <div>
+        <Title>
+          Change a rule, and re-run <Accent>all of history</Accent> against it.
+        </Title>
+        <Panel className="mt-6">
+          <p className="px-6 py-6 font-display text-[22px] font-medium leading-[1.4] text-ink-900 md:text-[26px]">
+            Across 47 recorded decisions, 8 that were approved would now be refused. 0
+            refusals would now pass. 39 unchanged.
+          </p>
+        </Panel>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-edge bg-white px-4 py-3.5">
+            <p className="text-[13.5px] font-semibold text-ink-900">Why it works</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+              Rules are versioned data, checks are pure functions, and every decision saved a
+              photograph of the records as they looked at that moment — not a link to records
+              that have since changed.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-edge bg-white px-4 py-3.5">
+            <p className="text-[13.5px] font-semibold text-ink-900">Why a pointer wouldn&apos;t</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+              Replaying a link would judge today&apos;s facts against yesterday&apos;s
+              decision and tell you nothing. This is the difference between an audit trail and
+              a log.
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
+          Built in from the start, because a previous hackathon was lost to a team whose only
+          real edge was an editable rules config and an instant re-run.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "demo",
+    label: "The demo",
+    eyebrow: "Three steps live, the rest on standby",
+    body: (
+      <div>
+        <Title>
+          The failure isn&apos;t staged. It&apos;s caused by the{" "}
+          <Accent>first half of our own demo</Accent>.
+        </Title>
+        <Panel className="mt-5">
+          <ol className="divide-y divide-edge">
+            {DEMO.map((d) => (
+              <li
+                key={d.n}
+                className={`flex items-start gap-3.5 px-5 py-2.5 ${d.key ? "bg-rain-50/40" : ""}`}
+              >
+                <span
+                  className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-bold ${
+                    d.key ? "border-rain-500 text-rain-600" : "border-edge text-ink-400"
+                  }`}
+                >
+                  {d.n}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13.5px] font-semibold text-ink-900">{d.what}</p>
+                  <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{d.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </Panel>
+        <p className="mt-3 text-[13px] leading-relaxed text-muted">
+          Steps 2 and 4 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
+          they answer it by being refused and held on stage, not by being asserted.
         </p>
       </div>
     ),
@@ -475,85 +574,6 @@ const SLIDES: Slide[] = [
           <Badge tone="monad">rule versions anchored on monad</Badge>
           <Badge tone="neutral">policy is data, not a deploy</Badge>
         </div>
-      </div>
-    ),
-  },
-  {
-    id: "replay",
-    label: "Replay",
-    eyebrow: "What four design decisions compose into",
-    body: (
-      <div>
-        <Title>
-          Change a rule, and re-run <Accent>all of history</Accent> against it.
-        </Title>
-        <Panel className="mt-6">
-          <p className="px-6 py-6 font-display text-[22px] font-medium leading-[1.4] text-ink-900 md:text-[26px]">
-            Across 47 recorded decisions, 8 that were approved would now be refused. 0
-            refusals would now pass. 39 unchanged.
-          </p>
-        </Panel>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-edge bg-white px-4 py-3.5">
-            <p className="text-[13.5px] font-semibold text-ink-900">Why it works</p>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
-              Rules are versioned data, checks are pure functions, and every decision saved a
-              photograph of the records as they looked at that moment — not a link to records
-              that have since changed.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-edge bg-white px-4 py-3.5">
-            <p className="text-[13.5px] font-semibold text-ink-900">Why a pointer wouldn&apos;t</p>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
-              Replaying a link would judge today&apos;s facts against yesterday&apos;s
-              decision and tell you nothing. This is the difference between an audit trail and
-              a log.
-            </p>
-          </div>
-        </div>
-        <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
-          Built in from the start, because a previous hackathon was lost to a team whose only
-          real edge was an editable rules config and an instant re-run.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: "demo",
-    label: "The demo",
-    eyebrow: "Seven steps, live",
-    body: (
-      <div>
-        <Title>
-          The failure isn&apos;t staged. It&apos;s caused by the{" "}
-          <Accent>first half of our own demo</Accent>.
-        </Title>
-        <Panel className="mt-5">
-          <ol className="divide-y divide-edge">
-            {DEMO.map((d) => (
-              <li
-                key={d.n}
-                className={`flex items-start gap-3.5 px-5 py-2.5 ${d.key ? "bg-rain-50/40" : ""}`}
-              >
-                <span
-                  className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-bold ${
-                    d.key ? "border-rain-500 text-rain-600" : "border-edge text-ink-400"
-                  }`}
-                >
-                  {d.n}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13.5px] font-semibold text-ink-900">{d.what}</p>
-                  <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{d.detail}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Panel>
-        <p className="mt-3 text-[13px] leading-relaxed text-muted">
-          Steps 2 and 4 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
-          they answer it by being refused and held on stage, not by being asserted.
-        </p>
       </div>
     ),
   },

@@ -48,9 +48,13 @@ const RAIN_DIMENSIONS: Dimension[] = [
     note: "Rain's control. We do not duplicate it.",
   },
   {
+    // Was listed as Rain's alone, on the reasoning that single-purpose cards make frequency
+    // moot. That stopped being true the moment check 11 shipped: a velocity limit is a
+    // frequency control. Claiming otherwise, in the panel built to prove we don't duplicate
+    // Rain, was the one false statement on the site.
     name: "Transaction frequency",
-    stance: "rain-only",
-    note: "Rain's control. Our cards are single-purpose, so frequency is moot by construction.",
+    stance: "overlap",
+    note: "Rain limits how often a card can be used. We limit how fast an agent buys across every card it holds — a looping agent's purchases are each individually perfect, so only a rate sees it. Related controls, different subject.",
   },
   {
     name: "Card expiry",

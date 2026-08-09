@@ -4,6 +4,30 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · The deck catches up with the product, and one false claim goes
+
+A pitch-alignment review found three things the last two commits had missed.
+
+- 🔴 **The one false statement on the site.** `ControlCoverage` listed transaction
+  frequency as *"Rain's control — our cards are single-purpose, so frequency is moot by
+  construction."* That stopped being true the moment check 11 shipped: a velocity limit is
+  a frequency control. In the panel built to prove we do not duplicate Rain, that was the
+  worst possible place for it. It now reads as an **overlap**, honestly: Rain limits how
+  often a card can be used; we limit how fast an agent buys across every card it holds.
+  Related controls, different subject.
+- **The deck was quoting half the build** — 44 tests and 7 rules against 84 and 11 — in
+  the one file whose docstring promises every number is read off the build rather than
+  rounded up for the stage. Checks 8 to 11 were missing from its list entirely.
+- **The deck never got the autonomy reframe.** Two commits demoted human approval to an
+  exception across the header, diagrams, architecture page and docs, and the pitch surface
+  still opened the human path at slide 6 — front-loading exactly what the product calls an
+  exception. Replay and the demo now come before it, and the human path and dual control
+  sit next to the objections slide, which is what they are: answers.
+
+Slide order is now: problem → what we built → the flow → the eleven checks → replay → the
+demo → the human → changing rules → objections.
+
+
 ## 2026-08-08 · Three corrections from a review, two of them about honesty
 
 - 🔴 **A JSX escape rendered literally.** `title="Exception — above an agent\u2019s
