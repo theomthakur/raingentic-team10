@@ -1,4 +1,5 @@
 import { getAgent } from "@/lib/agents";
+import Image from "next/image";
 import { AGENT_FACES } from "./AgentFaces";
 
 export function AgentAvatar({
@@ -15,7 +16,7 @@ export function AgentAvatar({
 
   return (
     <span
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-full ${className}`}
+      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full ${className}`}
       style={{
         width: size,
         height: size,
@@ -24,8 +25,18 @@ export function AgentAvatar({
       }}
       title={`${agent.name} — ${agent.role}`}
     >
-      <span className="absolute inset-0 rounded-full" style={{ boxShadow: `inset 0 0 0 1.5px ${agent.color}55` }} />
-      <Face hair={agent.color} width={size} height={size} className="relative" />
+      <span className="absolute inset-0 z-10 rounded-full" style={{ boxShadow: `inset 0 0 0 1.5px ${agent.color}55` }} />
+      {agent.portrait ? (
+        <Image
+          src={agent.portrait}
+          alt={`${agent.name}, ${agent.role}`}
+          fill
+          sizes={`${size}px`}
+          className="object-cover"
+        />
+      ) : (
+        <Face hair={agent.color} width={size} height={size} className="relative" />
+      )}
     </span>
   );
 }

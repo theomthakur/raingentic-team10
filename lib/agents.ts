@@ -26,6 +26,10 @@ export interface AgentPersona {
   color: string;
   face: AgentFaceKey;
   description: string;
+  /** The customer-facing promise shown wherever this agent is assigned work. */
+  assurance: string;
+  /** Original visual identity for the agent roster; absent only for the human catalog path. */
+  portrait?: string;
 }
 
 export const AGENTS: Record<string, AgentPersona> = {
@@ -39,6 +43,8 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#0891b2",
     face: "rae",
     description: "Declares purchase orders against quotes already on file — desks, chairs, building services. No negotiation stage; Rae's job is to get the declaration exactly right, not to find the price.",
+    assurance: "I keep facilities moving without letting a supplier or line-item swap slip through.",
+    portrait: "/agents/rae.png",
   },
   "procurement-01": {
     id: "procurement-01",
@@ -50,6 +56,8 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#7c3aed",
     face: "mona",
     description: "Runs general procurement against standing quotes — freight lanes, components, logistics. Mid-sized spend, usually under the delegated limit, so most of Mona's purchases clear without a person.",
+    assurance: "I keep procurement on course, so your team does not have to chase suppliers or second-guess the spend.",
+    portrait: "/agents/mona.png",
   },
   "procurement-02": {
     id: "procurement-02",
@@ -60,6 +68,8 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#c2410c",
     face: "prue",
     description: "Handles the purchases everyone else's rules were sized for — equipment, capital orders, the ones that clear every check and still land above $25,000. Prue's PO doesn't get refused; it gets held for a person.",
+    assurance: "I move capital purchases forward and surface only the commitments that genuinely need your judgment.",
+    portrait: "/agents/prue.png",
   },
   "office-supplies": {
     id: "office-supplies",
@@ -70,6 +80,8 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#0f9d58",
     face: "luca",
     description: "Runs the office-supplies negotiation: four sellers, one counter-offer round, cheapest qualifying bid wins. Luca never sees a price the negotiation didn't already settle.",
+    assurance: "I make suppliers compete for your everyday spend, so your team never has to chase a quote.",
+    portrait: "/agents/luca.png",
   },
   // Purchases a person made by hand from the catalogue, rather than an agent raising them.
   // Worth naming: a controller scanning the log should be able to tell at a glance which
@@ -83,6 +95,7 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#4b5160",
     face: "generic",
     description: "A purchase raised by a person on the catalogue page instead of by an agent. It runs the identical pipeline, so nothing is trusted more for having come from a human.",
+    assurance: "I keep the same controls around every manual request.",
   },
   "cloud-compute": {
     id: "cloud-compute",
@@ -94,6 +107,8 @@ export const AGENTS: Record<string, AgentPersona> = {
     color: "#b30f7c",
     face: "cody",
     description: "Negotiates GPU capacity for training runs across three compute vendors in a tighter, faster-expiring market. Same negotiation engine as Luca's, different sellers and a shorter quote window.",
+    assurance: "I secure the compute your engineers need, within the limits you set, without creating procurement drag.",
+    portrait: "/agents/cody.png",
   },
 };
 
@@ -116,6 +131,7 @@ export function getAgent(id: string): AgentPersona {
       color: FALLBACK_COLORS[hashOf(id) % FALLBACK_COLORS.length],
       face: "generic",
       description: "No persona on file yet for this id.",
+      assurance: "I handle this category within the mandate you set.",
     }
   );
 }

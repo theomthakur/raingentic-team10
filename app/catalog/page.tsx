@@ -131,6 +131,7 @@ function ProductCard({
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: agent.color }} />
             Delegated to <span className="font-medium text-ink-700">{agent.name}</span>, {agent.role.toLowerCase()}
           </p>
+          <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-600">“{agent.assurance}”</p>
 
           {product.alreadyFulfilled && (
             <p className="mt-2 text-[12px] text-warn">

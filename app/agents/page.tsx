@@ -42,6 +42,9 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
           <p className="text-[12.5px] font-medium" style={{ color: agent.color }}>
             {agent.role} — deals with {agent.dealsWith}
           </p>
+          <p className="mt-2 rounded-xl bg-ink-50 px-3 py-2.5 text-[13px] font-medium leading-relaxed text-ink-700">
+            “{agent.assurance}”
+          </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-700">{agent.description}</p>
 
           <p
