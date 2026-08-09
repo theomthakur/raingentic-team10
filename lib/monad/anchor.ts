@@ -33,11 +33,20 @@ import { privateKeyToAccount } from "viem/accounts";
  */
 const DEFAULT_TESTNET_RPC = "https://testnet-rpc.monad.xyz";
 
+/**
+ * Environment dashboards can leave an optional variable present but empty. An empty URL
+ * is not an RPC override; treating it as one makes every autonomous purchase stop at the
+ * policy-proof gate even though Monad's public testnet endpoint is available.
+ */
+function configuredRpcUrl(): string {
+  return process.env.MONAD_RPC_URL?.trim() || DEFAULT_TESTNET_RPC;
+}
+
 export const monadTestnet = defineChain({
   id: 10143,
   name: "Monad Testnet",
   nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
-  rpcUrls: { default: { http: [process.env.MONAD_RPC_URL ?? DEFAULT_TESTNET_RPC] } },
+  rpcUrls: { default: { http: [configuredRpcUrl()] } },
   blockExplorers: {
     default: { name: "Monad Explorer", url: "https://testnet.monadexplorer.com" },
   },
@@ -68,7 +77,7 @@ export function anchoringEnabled(): boolean {
 
 /** Whichever endpoint is in play, so the UI can say where an anchor was sent. */
 export function anchorRpcUrl(): string {
-  return process.env.MONAD_RPC_URL ?? DEFAULT_TESTNET_RPC;
+  return configuredRpcUrl();
 }
 
 function normalisePrivateKey(raw: string): Hex {

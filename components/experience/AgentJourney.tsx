@@ -119,12 +119,17 @@ export function AgentJourney({
       // evidence in its causal order rather than seeing a receipt appear from nowhere.
       await new Promise((resolve) => setTimeout(resolve, 650));
       const successful = nextDecision.outcome === "approved";
+      const policyPassed = nextDecision.checks
+        .filter((check) => !check.skipped)
+        .every((check) => check.passed);
       setPhase(successful ? "paid" : "stopped");
       setStatus(
         successful
           ? "Done. The agent created a payment authority only for this verified order."
           : nextDecision.outcome === "held"
             ? "The agent stopped at its authority limit and escalated this order."
+            : policyPassed
+              ? "The order passed its mandate, but payment authority stopped because its Monad policy proof was unavailable. No card was issued."
             : "The agent stopped the purchase because the order did not satisfy the mandate."
       );
     } catch (caught) {
@@ -196,6 +201,7 @@ export function AgentJourney({
   const agent = product ? getAgent(product.agent) : null;
   const passed = decision?.checks.filter((check) => check.passed && !check.skipped).length ?? 0;
   const answered = decision?.checks.filter((check) => !check.skipped).length ?? 0;
+  const policyPassed = Boolean(decision) && answered > 0 && passed === answered;
 
   return (
     <section aria-label="Mandate agent journey" className="mx-auto max-w-5xl">
@@ -365,7 +371,13 @@ export function AgentJourney({
               <div>
                 <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">{decision.negotiation ? "3" : "2"} · Your order</p>
                 <p className="mt-1 text-[15px] font-semibold text-ink-900">
-                  {decision.outcome === "approved" ? "Payment is ready for this order" : decision.outcome === "held" ? "This order needs someone with more authority" : "This order was stopped before payment"}
+                  {decision.outcome === "approved"
+                    ? "Payment is ready for this order"
+                    : decision.outcome === "held"
+                      ? "This order needs someone with more authority"
+                      : policyPassed
+                        ? "Policy proof was unavailable before payment"
+                        : "This order was stopped before payment"}
                 </p>
                 {decision.card && <p className="mt-1 text-[12.5px] text-mint-700">Rain card ••••{decision.card.last4} · capped at {money(decision.card.limitCents)}</p>}
                 {decision.card?.rainSettlement && <p className="mt-1 font-mono text-[11.5px] text-mint-700">Rain sandbox settled · {decision.card.rainSettlement.transactionId}</p>}
