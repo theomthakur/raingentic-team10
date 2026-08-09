@@ -89,53 +89,29 @@ const CHECKS: { id: string; label: string; basis: string; star?: boolean }[] = [
   },
 ];
 
-const DEMO: { n: string; what: string; detail: string; key?: boolean }[] = [
+const DEMO: { n: string; outcome: string; what: string; detail: string; key?: boolean }[] = [
   {
     n: "1",
-    what: "Run a purchasing task.",
+    outcome: "Autonomous when safe",
+    what: "Ask for two boxes of A4 paper.",
     detail:
-      "Four suppliers bid, the buyer counters once, one wins. A card is created for exactly that total, expiring with the quote.",
+      "Luca invites four modeled suppliers to compete, negotiates the winning quote, checks the purchase order, then requests a Rain sandbox card for that exact amount.",
+    key: true,
   },
   {
     n: "2",
-    what: "Press the same button again.",
+    outcome: "Stops itself when unsafe",
+    what: "Run the exact same request again.",
     detail:
-      "No second scenario, no bad agent written to fail. Refused — by the record the first run itself wrote. Rain is never contacted.",
+      "Mandate finds the earlier card decision for that purchase order and refuses a duplicate before Rain is contacted. The stop is caused by the first run—not a staged bad example.",
     key: true,
   },
   {
     n: "3",
-    what: "Click the refusal.",
+    outcome: "Escalates when it should",
+    what: "Ask for the $43,500 conveyor line.",
     detail:
-      "Four fields: which rule failed, what it expected, what it got, and exactly which record it read.",
-  },
-  {
-    n: "4",
-    what: "Run the $43,500 conveyor line.",
-    detail:
-      "Everything checks out, and it is held — not refused. No card exists while it waits. Typing a name is what creates it.",
-    key: true,
-  },
-  {
-    n: "5",
-    what: "Tighten a rule, then hit replay.",
-    detail:
-      "Every past decision re-runs against the new policy, each flip showing what the rule expected before and after.",
-  },
-  {
-    n: "6",
-    what: "Try to approve your own rule change.",
-    detail:
-      "Propose under one name, activate under the same name. Refused. Someone else has to type theirs.",
-  },
-  {
-    // The last thing they see should be their own hands on it, not ours. A judge who
-    // attacks something and fails believes it in a way no slide achieves — so this beat
-    // ends with the room typing and the presenter quiet.
-    n: "7",
-    what: "Scan the QR. Stop talking.",
-    detail:
-      "Everyone attacks the same deployment from their own phone; the counter on screen moves as they do. Change the supplier, skim the price, split a purchase to duck approval. Attempts climb, defeats stay at zero. Let the silence do it.",
+      "The purchase passes the same checks, but exceeds delegated authority. It is held for a named approver; no card exists while it waits.",
     key: true,
   },
 ];
@@ -285,8 +261,8 @@ const SLIDES: Slide[] = [
         <div className="mt-7 flex flex-wrap items-center gap-2">
           <Badge tone="rain">Rain sandbox cards</Badge>
           <Badge tone="monad">Monad testnet anchor</Badge>
-          <Badge tone="pass">103 tests passing</Badge>
-          <Badge tone="neutral">11 checks, all data</Badge>
+          <Badge tone="pass">159 tests passing</Badge>
+          <Badge tone="neutral">11 deterministic checks</Badge>
         </div>
       </div>
     ),
@@ -350,7 +326,7 @@ const SLIDES: Slide[] = [
         <Lede>
           Before any card exists, the agent hands over the purchase order it negotiated.
           Ordinary TypeScript — no model — compares that declaration against the company&apos;s
-          real records.
+          purchase-order records.
         </Lede>
         <div className="mt-6 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Panel title="What the agent must declare">
@@ -487,13 +463,16 @@ const SLIDES: Slide[] = [
   {
     id: "demo",
     label: "The demo",
-    eyebrow: "Seven steps — the first four live, the rest on standby",
+    eyebrow: "Three outcomes, one clear boundary",
     body: (
       <div>
         <Title>
-          The failure isn&apos;t staged. It&apos;s caused by the{" "}
-          <Accent>first half of our own demo</Accent>.
+          Give an agent a job. Mandate either <Accent>spends, stops, or escalates</Accent>.
         </Title>
+        <Lede>
+          This is the whole product in three deliberate outcomes—not seven features a judge
+          has to remember. Each outcome leaves a decision record that can be inspected later.
+        </Lede>
         <Panel className="mt-5">
           <ol className="divide-y divide-edge">
             {DEMO.map((d) => (
@@ -509,7 +488,10 @@ const SLIDES: Slide[] = [
                   {d.n}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13.5px] font-semibold text-ink-900">{d.what}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-rain-600">
+                    {d.outcome}
+                  </p>
+                  <p className="mt-0.5 text-[14px] font-semibold text-ink-900">{d.what}</p>
                   <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{d.detail}</p>
                 </div>
               </li>
@@ -517,8 +499,8 @@ const SLIDES: Slide[] = [
           </ol>
         </Panel>
         <p className="mt-3 text-[13px] leading-relaxed text-muted">
-          Steps 2 and 7 are the ones that answer &ldquo;why would I trust this?&rdquo; — and
-          they answer it by being refused and held on stage, not by being asserted.
+          The point is not that the agent always buys. The point is that it makes the right
+          decision inside the mandate it was given—and makes the reason provable.
         </p>
       </div>
     ),
