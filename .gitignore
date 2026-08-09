@@ -16,3 +16,4 @@ CLAUDE.md
 .idea/
 .kiro/
 tsconfig.tsbuildinfo
+.env*
