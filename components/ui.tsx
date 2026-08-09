@@ -83,7 +83,7 @@ export function Button({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${variants[variant]}`}
+      className={`rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-100 ${variants[variant]} ${variant === "primary" ? "disabled:border-rain-100 disabled:bg-rain-100 disabled:text-rain-400" : "disabled:opacity-40"}`}
     >
       {children}
     </button>

@@ -11,7 +11,6 @@ import { Avatar } from "@/components/identity/Avatar";
 import { getAgent } from "@/lib/agents";
 import { Badge, Button, Panel } from "@/components/ui";
 import { TaskLoop, type LoopState } from "@/components/console/TaskLoop";
-import { Autopilot } from "@/components/console/Autopilot";
 import { NegotiationPanel } from "@/components/console/NegotiationPanel";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
@@ -266,23 +265,7 @@ function SupplierCompetition({ result }: { result: RunResult | null }) {
   const negotiation = result?.decision.negotiation;
 
   if (!negotiation) {
-    return (
-      <Panel className="mt-6 border-rain-200">
-        <div className="border-b border-edge bg-rain-50/50 px-5 py-3.5">
-          <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">
-            Supplier competition
-          </p>
-          <p className="mt-1 text-[13px] text-ink-700">
-            Choose a sourcing request and the agent will invite suppliers to bid before it
-            is allowed to create a payment.
-          </p>
-        </div>
-        <div className="px-5 py-4 text-[12.5px] leading-relaxed text-muted">
-          The selected quote becomes the purchase order. Mandate then verifies that exact
-          supplier, SKU, quantity, price, budget, and delegated authority.
-        </div>
-      </Panel>
-    );
+    return null;
   }
 
   return (
@@ -569,34 +552,17 @@ export default function CatalogPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <section>
             <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              Agent sourcing desk
+              Sourcing
             </p>
             <h1 className="mt-3 max-w-3xl font-display text-[32px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              Tell us what you need. Your purchasing agent takes it from there.
+              Watch suppliers compete for your order.
             </h1>
             <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-muted">
-              Choose an item and quantity. Mandate routes it to the agent for that category;
-              the agent either sources competing offers or buys from an approved supplier,
-              and controls verify every dollar before a card can exist.
+              Choose a category below. For sourcing requests, Mandate invites suppliers to
+              quote, picks the best qualifying offer, then checks the exact order before paying.
             </p>
-            <RequestChat
-              catalog={catalog}
-              busy={busyId !== null}
-              loop={loop}
-              onDelegate={delegate}
-            />
 
             <SupplierCompetition result={result} />
-
-            <div className="mt-6">
-              <Autopilot
-                catalog={catalog}
-                onResult={(next) => {
-                  setError(null);
-                  setResult(next);
-                }}
-              />
-            </div>
           </section>
 
           <aside className="lg:sticky lg:top-6 lg:self-start">
@@ -623,7 +589,10 @@ export default function CatalogPage() {
                 product={p}
                 qty={qty[p.id]}
                 setQty={(n) => setQty((q) => ({ ...q, [p.id]: n }))}
-                onBuy={() => buy(p)}
+                onBuy={() => {
+                  setSelectedProductId(p.id);
+                  buy(p);
+                }}
                 busy={busyId === p.id}
                 selected={selectedProductId === p.id}
               />

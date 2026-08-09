@@ -175,16 +175,12 @@ export function AgentJourney({
   return (
     <section aria-label="Mandate agent journey" className="mx-auto max-w-5xl">
       <div className="text-center">
-        <Badge tone="rain">Mandate · infrastructure for safe AI spending</Badge>
         <h2 className="mt-4 font-display text-[38px] font-medium leading-[1.05] tracking-[-0.03em] text-ink-900 sm:text-[50px]">
           Tell us what you need.<br />Mandate handles the rest.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
           Your purchasing agent finds suppliers, checks what is safe to spend, makes the
           payment, and sends you the receipt. You set the goal; Mandate does the chasing.
-        </p>
-        <p className="mx-auto mt-3 max-w-2xl text-[12.5px] leading-relaxed text-ink-600">
-          <strong>What Mandate is:</strong> the infrastructure layer between an AI agent and your company money.
         </p>
         <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-2 text-left sm:grid-cols-4">
           {["Tell Mandate", "Compare suppliers", "Pay safely", "Get your receipt"].map((step, index) => (
@@ -208,8 +204,9 @@ export function AgentJourney({
         </div>
 
         <div className="bg-ink-50/40 px-5 py-6 sm:px-7">
-          <div className="max-w-3xl rounded-2xl rounded-tl-sm border border-edge bg-white px-4 py-3 text-[14px] leading-relaxed text-ink-700 shadow-sm">
-            {status}
+          <div className="flex max-w-3xl items-start gap-2.5 rounded-2xl rounded-tl-sm border border-rain-100 bg-rain-50/70 px-4 py-3 text-[14px] leading-relaxed text-ink-700">
+            <AgentAvatar id={agent?.id ?? "procurement-01"} size={22} />
+            <p>{status}</p>
           </div>
 
           {phase === "idle" && (
@@ -338,6 +335,11 @@ export function AgentJourney({
           </div>
         )}
       </Panel>
+      <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11.5px] text-ink-500">
+        <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-rain-500" />Real Rain card payments</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-monad-500" />Policy anchored on Monad</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-mint-500" />Orders saved in Postgres</span>
+      </div>
     </section>
   );
 }
