@@ -337,7 +337,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen mandate-canvas">
       <Header
         storage={state.storage}
         rain={state.rain}

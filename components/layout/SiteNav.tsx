@@ -74,7 +74,7 @@ export function NavBrand() {
  */
 export function NavBar({ current }: { current: string }) {
   return (
-    <div className="border-b border-edge bg-white">
+    <div className="border-b border-edge bg-white/80 backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3 md:px-10">
         <NavBrand />
         <SiteNav current={current} />

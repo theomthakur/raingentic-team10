@@ -16,7 +16,7 @@ export function Header({
   errorBadge?: ReactNode;
 }) {
   return (
-    <header className="border-b border-edge bg-white">
+    <header className="border-b border-edge bg-white/80 backdrop-blur-sm">
       {/* Identical to every other page. The hero below is the only thing that differs. */}
       <NavBar current="/" />
       <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-6 py-7 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-6 md:px-10">

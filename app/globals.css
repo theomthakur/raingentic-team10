@@ -22,6 +22,17 @@ body {
   background-repeat: no-repeat;
 }
 
+/* The customer-facing surface is intentionally not pure paper white. A very light cool
+   base lets Mandate's rain-pink and violet accents feel part of the environment, while
+   the cards above it remain true white for legibility and hierarchy. */
+.mandate-canvas {
+  background-color: #fcfbff;
+  background-image:
+    radial-gradient(52rem 28rem at 92% -8%, rgba(255, 47, 182, 0.11), transparent 62%),
+    radial-gradient(44rem 24rem at -8% 22%, rgba(110, 84, 255, 0.07), transparent 66%);
+  background-repeat: no-repeat;
+}
+
 /* Numbers in the feed and the provenance panel must line up column to column, or a judge
    scanning amounts has to read rather than glance. */
 .tabular {
