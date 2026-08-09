@@ -4,6 +4,7 @@ import { SystemDiagram } from "@/components/explain/SystemDiagram";
 import { TechStack } from "@/components/explain/TechStack";
 import { ControlCoverage } from "@/components/explain/ControlCoverage";
 import { PaymentRailPanel } from "@/components/explain/PaymentRailPanel";
+import { ArchitectureMap } from "@/components/explain/ArchitectureMap";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
 
@@ -14,27 +15,6 @@ const FLOW = [
   { n: "02", title: "Agents compete", text: "A specialist sources the request and compares the modeled supplier offers." },
   { n: "03", title: "Mandate verifies", text: "Eleven deterministic checks compare the exact PO with budget, authority, and records." },
   { n: "04", title: "Spend or stop", text: "A scoped Rain sandbox card is issued only for an approved PO. Large or wrong orders stop." },
-];
-
-const INTEGRATIONS = [
-  {
-    name: "Rain",
-    tone: "rain" as const,
-    feature: "Scoped virtual cards + sandbox settlement",
-    text: "After Mandate approves a purchase order, Rain issues a card capped to that order. The sandbox flow authorizes and settles it.",
-  },
-  {
-    name: "Monad",
-    tone: "monad" as const,
-    feature: "Policy-version anchor on testnet",
-    text: "Mandate hashes each active policy version and writes that hash in a real Monad testnet transaction, so policy cannot be quietly backdated.",
-  },
-  {
-    name: "Postgres",
-    tone: "pass" as const,
-    feature: "Append-only order and decision log",
-    text: "Every proposal, check, hold, card outcome, and receipt is saved as evidence the customer can inspect later.",
-  },
 ];
 
 /**
@@ -61,9 +41,14 @@ export default function ArchitecturePage() {
 
         <section className="mt-10">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">The flow in 30 seconds</p>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">The architecture, in one screen</p>
             <Link href="/" className="text-[12.5px] font-medium text-rain-600 hover:text-rain-700">Try it live →</Link>
           </div>
+          <ArchitectureMap />
+        </section>
+
+        <section className="mt-8">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">The flow in 30 seconds</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {FLOW.map((step) => (
               <Panel key={step.n} className="p-4">
@@ -73,22 +58,6 @@ export default function ArchitecturePage() {
               </Panel>
             ))}
           </div>
-        </section>
-
-        <section className="mt-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">What is integrated, exactly</p>
-          <div className="grid gap-3 md:grid-cols-3">
-            {INTEGRATIONS.map((integration) => (
-              <Panel key={integration.name} className="p-5">
-                <Badge tone={integration.tone}>{integration.name}</Badge>
-                <h2 className="mt-3 text-[15px] font-semibold text-ink-900">{integration.feature}</h2>
-                <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{integration.text}</p>
-              </Panel>
-            ))}
-          </div>
-          <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
-            Supplier profiles are modeled for the demo. Rain and Monad integrations run against their respective sandboxes/testnet; no real funds move.
-          </p>
         </section>
 
         <section className="mt-10 rounded-2xl border border-rain-100 bg-rain-50/50 px-5 py-5 sm:px-6">
@@ -114,7 +83,7 @@ export default function ArchitecturePage() {
               <PaymentRailPanel />
             </section>
             <section>
-              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">System diagram</p>
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">Execution detail</p>
               <SystemDiagram />
             </section>
             <section>
