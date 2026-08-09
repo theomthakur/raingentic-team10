@@ -1,22 +1,21 @@
 import type { SVGProps } from "react";
 
 /**
- * Five faces, not five icons. Same neutral skin tone and features across all of them —
- * the only thing that differs is the hair silhouette and each agent's own color, which is
- * enough to make five bots read as five different people at 20px, without drawing anyone
- * who looks like a specific real person.
+ * Five compact operator glyphs, not people. The shared visor makes them feel like one
+ * team of agents; each colored crest gives the roster a distinct personality at 20px.
  */
 
-const SKIN = "#f0c8a0";
-const FEATURE = "#3a2a20";
+const SHELL = "#172033";
+const FEATURE = "#dff8ff";
 
 function Head({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <circle cx="12" cy="13.5" r="7" fill={SKIN} />
-      <circle cx="9.1" cy="13" r="0.9" fill={FEATURE} />
-      <circle cx="14.9" cy="13" r="0.9" fill={FEATURE} />
-      <path d="M9.3 16.2q2.7 2 5.4 0" stroke={FEATURE} strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      <rect x="4.6" y="6.4" width="14.8" height="12.4" rx="5.5" fill={SHELL} />
+      <path d="M7.1 12h9.8" stroke={FEATURE} strokeWidth="1.35" strokeLinecap="round" />
+      <circle cx="9" cy="12" r="1.1" fill={FEATURE} />
+      <circle cx="15" cy="12" r="1.1" fill={FEATURE} />
+      <path d="M12 18.8v2.1" stroke={SHELL} strokeWidth="1.5" strokeLinecap="round" />
       {children}
     </>
   );
