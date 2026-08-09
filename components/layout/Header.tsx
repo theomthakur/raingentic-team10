@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SiteNav } from "./SiteNav";
+import { NavBar } from "./SiteNav";
 import { Badge } from "../ui";
 
 /**
@@ -27,14 +27,13 @@ export function Header({
   }[rain.mode];
   return (
     <header className="border-b border-edge bg-white">
+      {/* Identical to every other page. The hero below is the only thing that differs. */}
+      <NavBar current="/" />
       <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-6 py-7 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-6 md:px-10">
         <div className="flex min-w-0 items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rain-500 text-xl font-bold text-white shadow-sm shadow-rain-500/20">
-            M
-          </div>
           <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              Mandate
+              The guardrail an agent cannot talk its way past
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
               Agents can already reason and negotiate, and Rain lets them move money. The
@@ -76,12 +75,6 @@ export function Header({
         </div>
       </div>
 
-      {/* The console is where a judge lands, and it used to be the one page with no way
-          out — SiteNav was imported here and never rendered, so every other page was
-          unreachable from the front door. */}
-      <div className="mx-auto max-w-[1600px] px-6 pb-3 md:px-10">
-        <SiteNav current="/" />
-      </div>
     </header>
   );
 }

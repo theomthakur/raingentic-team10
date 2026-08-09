@@ -65,13 +65,30 @@ export function NavBrand() {
 }
 
 /** The whole bar, for every page except the console (which has the full header). */
-export function SubPageHeader({ current }: { current: string }) {
+/**
+ * The bar every page wears, identically.
+ *
+ * It used to differ by page — the console put the brand and a tagline on one row and the
+ * nav underneath, sub-pages put brand and nav together on a shorter row. Same links, but a
+ * different shape and height on every page, so moving around felt like moving between
+ * three different products. This is now the single top bar; the console adds its hero
+ * *below* it rather than instead of it.
+ */
+export function NavBar({ current }: { current: string }) {
   return (
-    <header className="border-b border-edge bg-white">
-      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-4 md:px-10">
+    <div className="border-b border-edge bg-white">
+      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3 md:px-10">
         <NavBrand />
         <SiteNav current={current} />
       </div>
+    </div>
+  );
+}
+
+export function SubPageHeader({ current }: { current: string }) {
+  return (
+    <header>
+      <NavBar current={current} />
     </header>
   );
 }
