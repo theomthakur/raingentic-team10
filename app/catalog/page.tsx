@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getCatalog, type CatalogProduct } from "@/lib/catalog";
 import type { Decision } from "@/lib/types";
 import type { Stage } from "@/lib/pipeline";
 import { money } from "@/lib/format";
-import { ProductGlyph } from "@/components/identity/ProductGlyph";
 import { Avatar } from "@/components/identity/Avatar";
+import { getAgent } from "@/lib/agents";
 import { Badge, Button, Panel } from "@/components/ui";
 import { Footer } from "@/components/layout/Footer";
 import { SubPageHeader } from "@/components/layout/SiteNav";
@@ -69,21 +70,30 @@ function ProductCard({
   busy: boolean;
 }) {
   const estimate = product.fromCents * qty;
+  const agent = getAgent(product.agent);
   const offQuote =
     product.kind === "contract" && product.quotedQuantity != null && qty !== product.quotedQuantity;
 
   return (
     <Panel className="flex h-full flex-col">
-      <div className="flex flex-1 items-start gap-3.5 p-5">
-        <ProductGlyph glyph={product.glyph} />
+      <div className="relative aspect-[16/9] overflow-hidden rounded-t-2xl bg-ink-50">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(min-width: 1024px) 360px, 100vw"
+          className="object-cover"
+        />
+        <div className="absolute left-4 top-4">
+          <Badge tone={product.kind === "negotiated" ? "rain" : "neutral"}>
+            {product.kind === "negotiated" ? "agent sources this" : "approved supplier"}
+          </Badge>
+        </div>
+      </div>
+      <div className="flex flex-1 p-5">
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <p className="text-[14.5px] font-semibold leading-snug text-ink-900">{product.name}</p>
-            {product.kind === "negotiated" ? (
-              <Badge tone="rain">negotiated</Badge>
-            ) : (
-              <Badge tone="neutral">on contract</Badge>
-            )}
           </div>
 
           <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{product.blurb}</p>
@@ -117,6 +127,11 @@ function ProductCard({
             )}
           </div>
 
+          <p className="mt-3 flex items-center gap-1.5 text-[12px] text-ink-500">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: agent.color }} />
+            Delegated to <span className="font-medium text-ink-700">{agent.name}</span>, {agent.role.toLowerCase()}
+          </p>
+
           {product.alreadyFulfilled && (
             <p className="mt-2 text-[12px] text-warn">
               This line is already fulfilled — buying it is the duplicate-spend demo.
@@ -148,7 +163,11 @@ function ProductCard({
 
       <div className="border-t border-edge px-5 py-3">
         <Button variant="primary" onClick={onBuy} disabled={busy}>
-          {busy ? "Working…" : "Request purchase"}
+          {busy
+            ? "Agent is working…"
+            : product.kind === "negotiated"
+              ? "Have agent source this"
+              : "Have agent purchase this"}
         </Button>
       </div>
     </Panel>
@@ -167,9 +186,9 @@ function ResultPanel({ result, error }: { result: RunResult | null; error: strin
     return (
       <Panel title="Result">
         <p className="px-5 py-4 text-[13px] text-muted">
-          Pick a quantity and request a purchase. It runs the same pipeline the console
-          does — negotiate if there is no quote, then verify, then a card only if the
-          reason holds.
+          Choose an item and delegate it to the relevant agent. It will source a quote when
+          needed, verify the exact order against the mandate, then create a card only if
+          the record supports it.
         </p>
       </Panel>
     );
@@ -221,7 +240,7 @@ function ResultPanel({ result, error }: { result: RunResult | null; error: strin
       <p className="border-t border-edge px-5 py-3 text-[12px] text-muted">
         Recorded in the log.{" "}
         <Link href="/" className="text-rain-600 underline-offset-2 hover:underline">
-          Open the console to audit it →
+          Open the full audit trail →
         </Link>
       </p>
     </Panel>
@@ -266,7 +285,7 @@ export default function CatalogPage() {
                 quoteExpiry: new Date(Date.now() + 3 * 864e5).toISOString(),
                 costCentre: product.costCentre,
               },
-              agent: "catalog",
+              agent: product.agent,
             };
 
       const res = await fetch(url, {
@@ -294,25 +313,23 @@ export default function CatalogPage() {
       <main className="mx-auto max-w-[1400px] px-6 py-10 md:px-10">
         <section className="mb-8">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            What the agents are buying
+            Agent purchasing catalog
           </p>
           <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Real products, real quantities, the same eleven checks
+            Choose what your business needs. The agent handles the purchase.
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
-            Buying from this page posts to the same endpoints the console does — there is no
-            catalogue-only path past the checks. Two kinds of line:{" "}
-            <b className="text-ink-800">negotiated</b> lines have no quote yet, so sellers
-            compete and the winner becomes the purchase order.{" "}
-            <b className="text-ink-800">Contract</b> lines already have an accepted quote, so
-            the declared total has to match it — change the quantity and watch it get refused.
+            Select an item and set the quantity. Mandate routes the request to the agent for
+            that category. The agent either finds the best qualifying supplier or spends
+            against an approved supplier, then the same controls verify every dollar before
+            a card can exist.
           </p>
         </section>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div>
             <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              Negotiated — sellers compete
+              Source with competition
             </p>
             <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
               {negotiated.map((p) => (
@@ -328,7 +345,7 @@ export default function CatalogPage() {
             </div>
 
             <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              On contract — quote already accepted
+              Purchase from approved suppliers
             </p>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {contract.map((p) => (

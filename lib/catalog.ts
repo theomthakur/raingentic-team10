@@ -29,6 +29,10 @@ export interface CatalogProduct {
   blurb: string;
   unit: string;
   glyph: GlyphKey;
+  /** Original, unbranded commercial product photography used in the catalog. */
+  image: string;
+  /** The delegated agent that owns this category of spend. */
+  agent: string;
   kind: ProductKind;
   /** Cheapest list price across competing sellers, or the quoted unit price. */
   fromCents: Cents;
@@ -58,13 +62,14 @@ export type GlyphKey =
 /** Copy for the negotiated lines, keyed by the task the negotiation engine knows. */
 const NEGOTIATED_META: Record<
   string,
-  { name: string; blurb: string; unit: string; glyph: GlyphKey; costCentre: string }
+  { name: string; blurb: string; unit: string; glyph: GlyphKey; image: string; costCentre: string }
 > = {
   "office-supplies": {
     name: "A4 paper, 5-ream box",
     blurb: "Four suppliers quote against each other, one counter-offer round, cheapest qualifying bid wins.",
     unit: "box",
     glyph: "paper",
+    image: "/catalog/a4-paper.png",
     costCentre: "CC-OPS",
   },
   "cloud-compute": {
@@ -72,47 +77,60 @@ const NEGOTIATED_META: Record<
     blurb: "Three compute vendors in a tighter market with a shorter quote window.",
     unit: "GPU-hour",
     glyph: "gpu",
+    image: "/catalog/gpu.png",
     costCentre: "CC-ENG",
   },
 };
 
 /** Copy for the lines that already sit on the record as accepted quotes. */
-const CONTRACT_META: Record<string, { name: string; blurb: string; unit: string; glyph: GlyphKey }> = {
+const CONTRACT_META: Record<string, { name: string; blurb: string; unit: string; glyph: GlyphKey; image: string; agent: string }> = {
   "PO-4417": {
     name: "Steel mounting bracket",
     blurb: "Standing order line, quote accepted and open.",
     unit: "bracket",
     glyph: "bracket",
+    image: "/catalog/bracket.png",
+    agent: "procurement-01",
   },
   "PO-4418": {
     name: "Industrial proximity sensor",
     blurb: "Engineering stock line, quote accepted and open.",
     unit: "sensor",
     glyph: "sensor",
+    image: "/catalog/sensor.png",
+    agent: "procurement-01",
   },
   "PO-4419": {
     name: "Alloy stock, grade 7",
     blurb: "Already delivered and paid. Buying it again is a duplicate — the record says so.",
     unit: "billet",
     glyph: "alloy",
+    image: "/catalog/alloy.png",
+    agent: "procurement-01",
   },
   "PO-4421": {
     name: "Task chair, M4",
     blurb: "Facilities line, quote accepted and open.",
     unit: "chair",
     glyph: "chair",
+    image: "/catalog/chair.png",
+    agent: "facilities-01",
   },
   "PO-4422": {
     name: "EU freight lane booking",
     blurb: "Logistics line, quote accepted and open.",
     unit: "booking",
     glyph: "freight",
+    image: "/catalog/freight.png",
+    agent: "procurement-01",
   },
   "PO-4423": {
     name: "Conveyor section, 90cm",
     blurb: "Capital equipment. Large enough that a person has to release it.",
     unit: "section",
     glyph: "conveyor",
+    image: "/catalog/conveyor.png",
+    agent: "procurement-02",
   },
 };
 
@@ -129,6 +147,8 @@ function negotiatedProducts(): CatalogProduct[] {
         blurb: meta.blurb,
         unit: meta.unit,
         glyph: meta.glyph,
+        image: meta.image,
+        agent: taskKey,
         costCentre: meta.costCentre,
         fromCents: Math.min(...sellers.map((s) => s.listPrice)),
         sellerCount: sellers.length,
@@ -150,6 +170,8 @@ function contractProducts(): CatalogProduct[] {
       blurb: meta.blurb,
       unit: meta.unit,
       glyph: meta.glyph,
+      image: meta.image,
+      agent: meta.agent,
       costCentre: PO_COST_CENTRE[q.poNumber] ?? "CC-OPS",
       fromCents: q.unitPrice,
       quotedQuantity: q.quantity,
