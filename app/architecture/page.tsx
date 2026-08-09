@@ -11,10 +11,10 @@ import { SubPageHeader } from "@/components/layout/SiteNav";
 export const metadata = { title: "Mandate — proof" };
 
 const FLOW = [
-  { n: "01", title: "Set a goal", text: "A customer asks Mandate to keep a team supplied or source a specific item." },
-  { n: "02", title: "Agents compete", text: "A specialist sources the request and compares the modeled supplier offers." },
-  { n: "03", title: "Mandate verifies", text: "Eleven deterministic checks compare the exact PO with budget, authority, and records." },
-  { n: "04", title: "Spend or stop", text: "A scoped Rain sandbox card is issued only for an approved PO. Large or wrong orders stop." },
+  { n: "01", title: "Goal → specialist", text: "Mandate uses the intake API to route a goal to the buyer responsible for that category." },
+  { n: "02", title: "Quote → exact PO", text: "The specialist compares modeled suppliers, then declares one vendor, SKU, quantity, and price." },
+  { n: "03", title: "Policy → Monad proof", text: "Eleven deterministic checks pass first; Mandate then verifies the active rule hash and receipt on Monad testnet." },
+  { n: "04", title: "Rain API → record", text: "Only then does Rain issue a scoped sandbox card. The outcome, receipt, and policy version are saved to Postgres." },
 ];
 
 /**
@@ -45,6 +45,27 @@ export default function ArchitecturePage() {
             <Link href="/" className="text-[12.5px] font-medium text-rain-600 hover:text-rain-700">Try it live →</Link>
           </div>
           <ArchitectureMap />
+        </section>
+
+        <section className="mt-5 grid gap-3 md:grid-cols-3" aria-label="Live integration summary">
+          <Panel className="border-rain-200 bg-rain-50/50 p-4">
+            <Badge tone="rain">Rain API</Badge>
+            <h2 className="mt-2 text-[15px] font-semibold text-ink-900">Programmable payment authority</h2>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-700">Mandate calls Rain&apos;s scoped-card endpoint only after approval, then reads the card back and records the sandbox transaction lifecycle.</p>
+            <p className="mt-3 font-mono text-[10px] text-rain-700">POST /issuing/users/&#123;userId&#125;/cards/scoped</p>
+          </Panel>
+          <Panel className="border-monad-200 bg-monad-50/50 p-4">
+            <Badge tone="monad">Monad RPC</Badge>
+            <h2 className="mt-2 text-[15px] font-semibold text-ink-900">Policy proof before spend</h2>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-700">Each policy version is committed on Monad testnet. Mandate checks the exact transaction payload and receipt before it unlocks Rain issuance.</p>
+            <p className="mt-3 font-mono text-[10px] text-monad-700">eth_getTransaction + receipt check</p>
+          </Panel>
+          <Panel className="border-mint-200 bg-mint-50/50 p-4">
+            <Badge tone="pass">Postgres</Badge>
+            <h2 className="mt-2 text-[15px] font-semibold text-ink-900">Replayable decision evidence</h2>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-700">The purchase order, rule version, check evidence, Rain card reference, and outcome share one append-only decision log.</p>
+            <p className="mt-3 font-mono text-[10px] text-mint-700">decision + policy snapshot</p>
+          </Panel>
         </section>
 
         <section className="mt-8">

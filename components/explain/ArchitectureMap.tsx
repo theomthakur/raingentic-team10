@@ -101,11 +101,11 @@ export function ArchitectureMap() {
           <Arrow label="approved PO only" />
           <Node
             number="04"
-            title="Scoped payment"
-            description="Only an approved PO reaches Rain. A card is capped to that order, then sandbox-authorized and settled."
-            api="Rain API → /cards/scoped → /authorize → /settle"
+            title="Rain scoped-card API"
+            description="Only an approved PO reaches Rain. Mandate creates a card capped to that exact order; Rain sandbox authorizes, settles, and then the card is retired."
+            api="Rain API → POST /issuing/users/{userId}/cards/scoped"
             tone="rain"
-            badge="Rain"
+            badge="live sandbox call"
           />
         </div>
 
@@ -122,11 +122,11 @@ export function ArchitectureMap() {
           </div>
           <Node
             number="05"
-            title="Tamper-evident policy"
-            description="Rain issuance is blocked until Monad confirms the active policy's exact hash. New versions anchor on first autonomous use."
-            api="Monad RPC → eth_sendRawTransaction → receipt verified"
+            title="Monad policy proof"
+            description="Before Rain issuance, Mandate verifies that Monad testnet finalized the active policy's exact hash. No receipt, no card."
+            api="Monad RPC → eth_getTransaction + receipt verification"
             tone="monad"
-            badge="Monad"
+            badge="spend gate"
           />
           <Node
             number="06"

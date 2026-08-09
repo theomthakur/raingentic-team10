@@ -3,12 +3,11 @@
  *
  * Colors carry meaning, not decoration: black/white boxes are the agent's own logic,
  * green is the one deterministic gate everything passes through, red is the dead end
- * (no card, ever), pink is every touchpoint that belongs to Rain, and the purple tag is
- * the one thing Monad's brand actually explains here — a rule version anchored as a real
- * transaction, not a decorative accent reused everywhere.
+ * (no card, ever), pink is every touchpoint that belongs to Rain, and purple is the
+ * Monad receipt that has to verify before the Rain call can happen.
  */
 
-type Owner = "agent" | "check" | "refuse" | "rain" | "record" | "rules";
+type Owner = "agent" | "check" | "refuse" | "rain" | "monad" | "record" | "rules";
 
 interface Node {
   id: string;
@@ -26,6 +25,7 @@ const COLORS: Record<Owner, { stroke: string; fill: string; text: string }> = {
   check: { stroke: "#21bd4b", fill: "#ecfdf1", text: "#117932" },
   refuse: { stroke: "#e0193f", fill: "#fef2f2", text: "#e0193f" },
   rain: { stroke: "#ff2fb6", fill: "#fff0fa", text: "#b30f7c" },
+  monad: { stroke: "#6e54ff", fill: "#f1efff", text: "#4c37cc" },
   record: { stroke: "#333844", fill: "#ffffff", text: "#121212" },
   rules: { stroke: "#9aa1ad", fill: "#f2f3f5", text: "#4b5160" },
 };
@@ -40,13 +40,12 @@ const NODES: Node[] = [
   { id: "propose", n: "2", title: "Propose", caption: "agent declares the PO", x: 410, y: 92, owner: "agent" },
   { id: "verify", n: "3", title: "Verify", caption: "11 deterministic checks", x: 640, y: 92, owner: "check" },
   { id: "refuse", n: "4a", title: "Refuse", caption: "no card, ever", x: 860, y: 92, owner: "refuse" },
-  { id: "issue", n: "4b", title: "Issue", caption: "Rain issues scoped card", x: 10, y: 234, owner: "rain" },
-  { id: "settle", n: "5", title: "Settle", caption: "purchase happens", x: 210, y: 234, owner: "rain" },
-  { id: "record", n: "6", title: "Record", caption: "append-only log", x: 410, y: 234, owner: "record" },
-  { id: "revoke", n: "7", title: "Revoke", caption: "card deactivated", x: 640, y: 234, owner: "rain" },
+  { id: "anchor", n: "4b", title: "Monad proof", caption: "hash + receipt verified", x: 10, y: 234, owner: "monad" },
+  { id: "issue", n: "5", title: "Rain API", caption: "scoped card issued", x: 210, y: 234, owner: "rain" },
+  { id: "settle", n: "6", title: "Settle", caption: "sandbox purchase", x: 410, y: 234, owner: "rain" },
+  { id: "record", n: "7", title: "Record", caption: "append-only log", x: 610, y: 234, owner: "record" },
+  { id: "revoke", n: "8", title: "Revoke", caption: "card deactivated", x: 810, y: 234, owner: "rain" },
 ];
-
-const MONAD_TAG = { x: 410, y: 314, w: 200, h: 34 };
 
 function NodeBox({ node }: { node: Node }) {
   const c = COLORS[node.owner];
@@ -88,7 +87,7 @@ export function FlowDiagram() {
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-edge bg-white p-4 shadow-sm shadow-ink-900/[0.03]">
-      <svg viewBox="0 0 1040 366" className="h-auto w-full min-w-[860px]" role="img" aria-label="Mandate architecture: task, quote, propose, verify, then either refuse or issue, settle, record, revoke — with rule versions anchored on Monad.">
+      <svg viewBox="0 0 1040 330" className="h-auto w-full min-w-[860px]" role="img" aria-label="Mandate architecture: task, quote, propose, verify, then either refuse or verify Monad policy proof before issuing, settling, recording, and revoking through Rain.">
         <defs>
           <marker id="arrow-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="#c3c8d1" />
@@ -118,9 +117,9 @@ export function FlowDiagram() {
           any fails
         </text>
 
-        {/* verify -> issue (pass branch), elbow down then left then down */}
+        {/* verify -> Monad proof (pass branch), then and only then the Rain API */}
         <path
-          d={`M ${cx(byId.verify)} ${byId.verify.y + H} V 194 H ${cx(byId.issue)} V ${byId.issue.y}`}
+          d={`M ${cx(byId.verify)} ${byId.verify.y + H} V 194 H ${cx(byId.anchor)} V ${byId.anchor.y}`}
           fill="none"
           stroke="#21bd4b"
           strokeWidth={1.5}
@@ -130,23 +129,15 @@ export function FlowDiagram() {
           all 11 pass
         </text>
 
-        {/* bottom row chain */}
+        {/* proof -> Rain -> settlement -> durable evidence -> revoke */}
+        <line x1={cx(byId.anchor) + W / 2} y1={cy(byId.anchor)} x2={byId.issue.x} y2={cy(byId.issue)} stroke="#6e54ff" strokeWidth={1.5} markerEnd="url(#arrow-purple)" />
         <line x1={cx(byId.issue) + W / 2} y1={cy(byId.issue)} x2={byId.settle.x} y2={cy(byId.settle)} stroke="#c3c8d1" strokeWidth={1.5} markerEnd="url(#arrow-gray)" />
         <line x1={cx(byId.settle) + W / 2} y1={cy(byId.settle)} x2={byId.record.x} y2={cy(byId.record)} stroke="#c3c8d1" strokeWidth={1.5} markerEnd="url(#arrow-gray)" />
         <line x1={cx(byId.record) + W / 2} y1={cy(byId.record)} x2={byId.revoke.x} y2={cy(byId.revoke)} stroke="#c3c8d1" strokeWidth={1.5} markerEnd="url(#arrow-gray)" />
 
-        {/* record -> monad anchor tag */}
-        <line x1={cx(byId.record)} y1={byId.record.y + H} x2={MONAD_TAG.x + MONAD_TAG.w / 2} y2={MONAD_TAG.y} stroke="#6e54ff" strokeWidth={1.5} markerEnd="url(#arrow-purple)" />
-
         {NODES.map((n) => (
           <NodeBox key={n.id} node={n} />
         ))}
-
-        {/* monad anchor tag */}
-        <rect x={MONAD_TAG.x} y={MONAD_TAG.y} width={MONAD_TAG.w} height={MONAD_TAG.h} rx={17} fill="#f1efff" stroke="#6e54ff" strokeWidth={1.5} />
-        <text x={MONAD_TAG.x + MONAD_TAG.w / 2} y={MONAD_TAG.y + 22} textAnchor="middle" fontSize={11.5} fontWeight={600} fill="#4c37cc">
-          rule hash → anchored on Monad
-        </text>
       </svg>
     </div>
   );

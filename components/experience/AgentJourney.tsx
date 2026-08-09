@@ -20,28 +20,23 @@ type Phase = "idle" | "understanding" | "sourcing" | "checking" | "paid" | "stop
  */
 const SUGGESTIONS = [
   {
-    agent: "Luca",
-    role: "Supplies buyer",
+    agentId: "office-supplies",
     text: "I need two boxes of A4 paper. Find the best deal and handle it.",
   },
   {
-    agent: "Cody",
-    role: "Infra buyer",
+    agentId: "cloud-compute",
     text: "Source four GPU-hours of A100 capacity for the training team.",
   },
   {
-    agent: "Mona",
-    role: "Procurement agent",
+    agentId: "procurement-01",
     text: "Book one EU freight lane for our next shipment.",
   },
   {
-    agent: "Rae",
-    role: "Facilities agent",
+    agentId: "facilities-01",
     text: "Order eight task chairs for the new workspace.",
   },
   {
-    agent: "Prue",
-    role: "Capital procurement",
+    agentId: "procurement-02",
     text: "Order 30 conveyor sections for the new bay.",
   },
 ];
@@ -253,20 +248,29 @@ export function AgentJourney({
               </form>
               <div className="mt-4 border-t border-edge pt-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Meet the specialists</p>
-                  <p className="text-[11.5px] text-muted">Choose one to prefill a request.</p>
+                  <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Try a request</p>
+                  <p className="text-[11.5px] text-muted">Mandate routes each goal to the right specialist.</p>
                 </div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {SUGGESTIONS.map((suggestion) => (
-                  <button
-                    key={suggestion.agent}
-                    type="button"
-                    onClick={() => setMessage(suggestion.text)}
-                    className="rounded-xl border border-edge bg-white px-3 py-2.5 text-left transition hover:border-rain-200 hover:bg-rain-50/40"
-                  >
-                    <span className="block text-[12px] font-semibold text-ink-800">{suggestion.agent}</span>
-                    <span className="mt-0.5 block text-[11px] text-muted">{suggestion.role}</span>
-                  </button>
+                  (() => {
+                    const specialist = getAgent(suggestion.agentId);
+                    return (
+                      <button
+                        key={suggestion.agentId}
+                        type="button"
+                        onClick={() => setMessage(suggestion.text)}
+                        className="group rounded-xl border border-edge bg-white px-3 py-3 text-left transition hover:border-rain-200 hover:bg-rain-50/40 hover:shadow-sm"
+                      >
+                        <span className="block text-[12.5px] font-medium leading-relaxed text-ink-800">“{suggestion.text}”</span>
+                        <span className="mt-2 flex items-center gap-1.5 text-[11px] text-muted">
+                          <AgentAvatar id={suggestion.agentId} size={18} />
+                          Routes to <strong className="font-semibold text-ink-700 group-hover:text-rain-700">{specialist.name}</strong>
+                          <span aria-hidden="true">·</span>{specialist.role}
+                        </span>
+                      </button>
+                    );
+                  })()
                 ))}
                 </div>
               </div>

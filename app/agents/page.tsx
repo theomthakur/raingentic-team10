@@ -26,35 +26,36 @@ function AgentCard({ id, decisions }: { id: string; decisions: Decision[] }) {
   const totalSpend = mine.filter((d) => d.outcome === "approved").reduce((sum, d) => sum + poTotal(d.po), 0);
 
   return (
-    <Panel>
-      <div className="flex items-start gap-3.5 p-5">
-        <AgentAvatar id={id} size={44} />
+    <Panel className="group relative overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-ink-900/[0.06]">
+      <div className="h-1" style={{ backgroundColor: agent.color }} />
+      <div className="flex items-start gap-4 p-5">
+        <AgentAvatar id={id} size={48} className="ring-4 ring-white" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="text-[15px] font-semibold text-ink-900">
-              This is {agent.name}
-            </p>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="text-[16px] font-semibold tracking-tight text-ink-900">{agent.name}</p>
+              <p className="mt-0.5 text-[12.5px] font-medium" style={{ color: agent.color }}>
+                {agent.role}
+              </p>
+            </div>
             <span className="flex shrink-0 items-center gap-1.5">
               {agent.host && <Badge tone="rain">for {agent.host}</Badge>}
-              <span className="font-mono text-[10.5px] text-ink-400">{agent.id}</span>
             </span>
           </div>
-          <p className="text-[12.5px] font-medium" style={{ color: agent.color }}>
-            {agent.role} — deals with {agent.dealsWith}
-          </p>
-          <p className="mt-2 rounded-xl bg-ink-50 px-3 py-2.5 text-[13px] font-medium leading-relaxed text-ink-700">
+          <p className="mt-2 text-[12px] font-medium text-ink-500">Owns {agent.dealsWith}</p>
+          <p className="mt-3 rounded-xl border border-edge bg-ink-50/70 px-3 py-2.5 text-[13px] font-medium leading-relaxed text-ink-700">
             “{agent.assurance}”
           </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-700">{agent.description}</p>
 
           <p
-            className="mt-2.5 border-l-2 pl-3 text-[12.5px] italic leading-relaxed text-muted"
+            className="mt-3 border-l-2 pl-3 text-[12px] italic leading-relaxed text-muted"
             style={{ borderColor: `${agent.color}55` }}
           >
             Named for — {agent.why}
           </p>
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
+          <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-edge pt-3.5">
             <Badge tone="neutral">{mine.length} decisions</Badge>
             {approved > 0 && <Badge tone="pass">{approved} approved</Badge>}
             {held > 0 && <Badge tone="warn">{held} held</Badge>}
@@ -107,12 +108,9 @@ export default function AgentsPage() {
             Five agents, five roles — the same eleven checks
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
-            Every purchase order in the log was declared by one of these. The id is what
-            the system actually keys on; the name is just so the feed reads like a team
-            doing work rather than a service account making requests. Three are named for
-            the people hosting this — Rain, Monad and Encode — and two for the history of
-            financial control, which is the same argument the rules make: none of this was
-            invented here. Stats are counted live off the decision log, not written by hand.
+            Each specialist owns a category and can act without a person clicking through
+            supplier pages. Every order still runs through the same eleven Mandate checks.
+            The activity shown below is counted from the shared decision log, not written by hand.
           </p>
         </section>
 
