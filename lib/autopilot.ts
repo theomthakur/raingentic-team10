@@ -77,11 +77,17 @@ export async function decideNextPurchase({
   const apiKey = groqKey();
   if (!apiKey) return chooseWithoutModel(catalog, budgets, alreadyBought);
 
-  const menu = catalog
-    .filter((p) => !alreadyBought.includes(p.id) && !p.alreadyFulfilled)
+  // One list, used for both the prompt and the validation. They used to differ: the model
+  // was shown a filtered menu but its answer was looked up in the full catalogue, so an id
+  // it had already bought still resolved and the agent repeated itself mid-run.
+  const eligible = catalog.filter((p) => !alreadyBought.includes(p.id) && !p.alreadyFulfilled);
+
+  const menu = eligible
     .map(
       (p) =>
-        `${p.id} = ${p.name}, ${(p.fromCents / 100).toFixed(2)} per ${p.unit}, paid from ${p.costCentre}`
+        `${p.id} = ${p.name}, ${(p.fromCents / 100).toFixed(2)} per ${p.unit}, paid from ${p.costCentre}` +
+        (p.maxAvailable ? `, at most ${p.maxAvailable} in stock` : "") +
+        (p.quotedQuantity ? `, quoted for exactly ${p.quotedQuantity}` : "")
     )
     .join("\n");
 
@@ -117,7 +123,10 @@ export async function decideNextPurchase({
               "productId MUST be one of the listed ids. Never invent one.\n" +
               "quantity is a positive integer. Keep it proportionate to the budget remaining.\n" +
               "reasoning is one sentence, under 20 words, explaining why this and why now.\n" +
-              'If nothing is worth buying, reply {"productId": "none", "quantity": 0, "reasoning": "..."}.',
+              "Always choose something if any listed item has budget headroom — you are " +
+              "restocking, so there is nearly always a sensible next purchase.\n" +
+              'Only if every listed item would exceed its remaining budget, reply ' +
+              '{"productId": "none", "quantity": 0, "reasoning": "..."}.',
           },
           {
             role: "user",
@@ -133,16 +142,27 @@ export async function decideNextPurchase({
     if (!raw) return chooseWithoutModel(catalog, budgets, alreadyBought);
 
     const parsed = JSON.parse(raw) as Partial<AutopilotChoice>;
-    const product = catalog.find((p) => p.id === parsed.productId);
+    const product = eligible.find((p) => p.id === parsed.productId);
     const quantity = Number(parsed.quantity);
-    if (!product || !Number.isFinite(quantity) || quantity <= 0) return null;
+
+    // The model declining is not the same as there being nothing to buy, and an 8B model
+    // takes the "none" escape far too readily — it did so on the very first tick, with an
+    // empty basket and five figures of headroom, which silently killed the whole demo.
+    // So a decline falls through to the arithmetic chooser, and the run only ends when
+    // *that* also finds nothing affordable and unbought.
+    if (!product || !Number.isFinite(quantity) || quantity <= 0) {
+      return chooseWithoutModel(catalog, budgets, alreadyBought);
+    }
 
     return {
       productId: product.id,
-      // An agent may choose which approved line to buy, but an accepted supplier quote
-      // already fixes its quantity. Letting the model alter that quantity would create a
-      // made-up PO that the amount check quite rightly refuses; it is not useful autonomy.
-      quantity: product.quotedQuantity ?? Math.floor(quantity),
+      // Two ceilings, for different reasons. An accepted quote already fixes its own
+      // quantity, so altering it would invent a PO the amount check rightly refuses. And
+      // no supplier can ship more than it holds — the model asked for 670 GPU-hours out of
+      // 8, which throws instead of deciding, and an error demos far worse than a refusal.
+      quantity:
+        product.quotedQuantity ??
+        Math.max(1, Math.min(Math.floor(quantity), product.maxAvailable ?? Math.floor(quantity))),
       reasoning:
         typeof parsed.reasoning === "string" && parsed.reasoning.trim()
           ? parsed.reasoning.trim()

@@ -40,6 +40,12 @@ export interface CatalogProduct {
   /** negotiated only */
   taskKey?: string;
   sellerCount?: number;
+  /**
+   * The most any single supplier can actually ship. Negotiation drops sellers who cannot
+   * meet the quantity, so asking for more than this throws rather than producing a
+   * decision — an error is a far worse demo than a refusal.
+   */
+  maxAvailable?: number;
   /** contract only */
   poNumber?: string;
   vendor?: string;
@@ -152,6 +158,7 @@ function negotiatedProducts(): CatalogProduct[] {
         costCentre: meta.costCentre,
         fromCents: Math.min(...sellers.map((s) => s.listPrice)),
         sellerCount: sellers.length,
+        maxAvailable: Math.max(...sellers.map((seller) => seller.available)),
       },
     ];
   });
