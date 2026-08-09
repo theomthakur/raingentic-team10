@@ -289,7 +289,32 @@ export default function Page() {
     setBusy(true);
     setError(null);
     try {
-      await post("/api/reset");
+      // Reset is the only destructive route, so production gates it behind a token. Ask
+      // the presenter once and remember it — a judge never needs this button, and nobody
+      // who merely found the URL should be able to wipe the demo mid-judging.
+      let token = typeof window === "undefined" ? null : window.localStorage.getItem("demoToken");
+      const res = await fetch("/api/reset", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(token ? { "x-demo-token": token } : {}),
+        },
+      });
+      if (res.status === 401) {
+        token = window.prompt("Demo token, to reset the demo state:");
+        if (!token) throw new Error("Reset cancelled.");
+        window.localStorage.setItem("demoToken", token);
+        const retry = await fetch("/api/reset", {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-demo-token": token },
+        });
+        if (!retry.ok) {
+          window.localStorage.removeItem("demoToken");
+          throw new Error("That token was not accepted.");
+        }
+      } else if (!res.ok) {
+        throw new Error(((await res.json()) as { error?: string }).error ?? "Reset failed.");
+      }
       const data = await load();
       setDraftRules(latest(data.ruleSets).rules);
       setStages([]);
