@@ -47,6 +47,26 @@ export function CustomerWorkspace() {
     load().catch((err) => setError((err as Error).message));
   }, [load]);
 
+  // Mandate, Sourcing, and Activity share the same server-side decision log. Refresh the
+  // calm customer view when someone returns to it (and periodically while it is visible),
+  // so an autonomous purchase does not look disconnected just because it happened on a
+  // different screen.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible") {
+        load().catch((err) => setError((err as Error).message));
+      }
+    };
+    const interval = window.setInterval(refresh, 12_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [load]);
+
   const released = useMemo(
     () => new Set(state?.decisions.map((decision) => decision.releases).filter(Boolean) as string[]),
     [state]
