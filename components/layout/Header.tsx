@@ -23,11 +23,11 @@ export function Header({
         <div className="flex min-w-0 items-start gap-4">
           <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
-              Your purchasing agent
+              The safe spending layer for AI agents
             </h1>
             <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
-              Tell Mandate what needs doing. It finds the supplier, takes care of the
-              purchase, and keeps the spend inside the rules you set.
+              Mandate lets an agent source and pay for what it needs—without handing it
+              an unlimited company card.
             </p>
           </div>
         </div>

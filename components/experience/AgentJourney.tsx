@@ -175,7 +175,7 @@ export function AgentJourney({
   return (
     <section aria-label="Mandate agent journey" className="mx-auto max-w-5xl">
       <div className="text-center">
-        <Badge tone="rain">Mandate</Badge>
+        <Badge tone="rain">Mandate · safe spending for AI agents</Badge>
         <h2 className="mt-4 font-display text-[38px] font-medium leading-[1.05] tracking-[-0.03em] text-ink-900 sm:text-[50px]">
           Tell us what you need.<br />Mandate handles the rest.
         </h2>
@@ -238,9 +238,10 @@ export function AgentJourney({
               <div className="mt-5 border-t border-edge pt-4">
                 <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Or let Mandate decide</p>
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rain-100 bg-rain-50/60 px-3.5 py-3">
-                  <p className="max-w-xl text-[12.5px] leading-relaxed text-ink-700">
-                    <strong>Weekly sourcing mandate:</strong> Keep office and engineering teams supplied through competitively sourced orders without exhausting a budget.
-                  </p>
+                  <div className="max-w-xl text-[12.5px] leading-relaxed text-ink-700">
+                    <p><strong>Give it a standing goal.</strong> Mandate chooses the next purchase itself, inside the limits you set.</p>
+                    <p className="mt-1 text-muted">This week: keep office and engineering teams supplied without exhausting a budget.</p>
+                  </div>
                   <Button variant="default" onClick={runWeeklyRoutine}>Take care of it</Button>
                 </div>
               </div>
