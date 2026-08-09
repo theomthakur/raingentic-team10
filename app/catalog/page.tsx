@@ -311,61 +311,52 @@ export default function CatalogPage() {
     <div className="min-h-screen bg-white">
       <SubPageHeader current="/catalog" />
 
-      <main className="mx-auto max-w-[1400px] px-6 py-10 md:px-10">
-        <section className="mb-8">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Agent purchasing catalog
-          </p>
-          <h1 className="mt-3 font-display text-[30px] font-medium leading-tight tracking-[-0.01em] text-ink-900">
-            Choose what your business needs. The agent handles the purchase.
-          </h1>
-          <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
-            Select an item and set the quantity. Mandate routes the request to the agent for
-            that category. The agent either finds the best qualifying supplier or spends
-            against an approved supplier, then the same controls verify every dollar before
-            a card can exist.
-          </p>
-        </section>
-
+      <main className="mx-auto max-w-[1600px] px-6 py-10 md:px-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <div>
-            <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              Source with competition
+          <section>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+              Agent sourcing desk
             </p>
-            <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {negotiated.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  qty={qty[p.id]}
-                  setQty={(n) => setQty((q) => ({ ...q, [p.id]: n }))}
-                  onBuy={() => buy(p)}
-                  busy={busyId === p.id}
-                />
-              ))}
-            </div>
-
-            <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-              Purchase from approved suppliers
+            <h1 className="mt-3 max-w-3xl font-display text-[32px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
+              Tell us what you need. Your purchasing agent takes it from there.
+            </h1>
+            <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-muted">
+              Choose an item and quantity. Mandate routes it to the agent for that category;
+              the agent either sources competing offers or buys from an approved supplier,
+              and controls verify every dollar before a card can exist.
             </p>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {contract.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  qty={qty[p.id]}
-                  setQty={(n) => setQty((q) => ({ ...q, [p.id]: n }))}
-                  onBuy={() => buy(p)}
-                  busy={busyId === p.id}
-                />
-              ))}
-            </div>
-          </div>
+          </section>
 
-          <div className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
             <ResultPanel result={result} error={error} />
-          </div>
+          </aside>
         </div>
+
+        <section className="mt-10">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+                Available requests
+              </p>
+              <p className="mt-1 text-[12.5px] text-muted">
+                {negotiated.length} categories source competitively · {contract.length} use approved supplier records
+              </p>
+            </div>
+            <p className="font-mono text-[12px] text-ink-400">{catalog.length} items</p>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {catalog.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                qty={qty[p.id]}
+                setQty={(n) => setQty((q) => ({ ...q, [p.id]: n }))}
+                onBuy={() => buy(p)}
+                busy={busyId === p.id}
+              />
+            ))}
+          </div>
+        </section>
       </main>
 
       <Footer />
