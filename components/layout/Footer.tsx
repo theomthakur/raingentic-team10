@@ -2,8 +2,8 @@ import { GithubIcon, LinkedinIcon } from "../icons";
 
 const LINKS = [
   { href: "https://github.com/theomthakur/raingentic-team10", label: "View source", icon: GithubIcon },
-  { href: "https://www.linkedin.com/in/theomthakur/", label: "Om Thakur", icon: LinkedinIcon },
   { href: "https://www.linkedin.com/in/princy-doshi-071b581b3/", label: "Princy Doshi", icon: LinkedinIcon },
+  { href: "https://www.linkedin.com/in/theomthakur/", label: "Om Thakur", icon: LinkedinIcon },
 ];
 
 export function Footer() {

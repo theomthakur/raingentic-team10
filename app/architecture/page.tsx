@@ -1,311 +1,128 @@
 import Link from "next/link";
 import { Badge, Panel } from "@/components/ui";
 import { SystemDiagram } from "@/components/explain/SystemDiagram";
-import { FlowDiagram } from "@/components/explain/FlowDiagram";
 import { TechStack } from "@/components/explain/TechStack";
 import { ControlCoverage } from "@/components/explain/ControlCoverage";
 import { PaymentRailPanel } from "@/components/explain/PaymentRailPanel";
 import { Footer } from "@/components/layout/Footer";
-import { PAGES, SubPageHeader } from "@/components/layout/SiteNav";
+import { SubPageHeader } from "@/components/layout/SiteNav";
 
-export const metadata = {
-  title: "Mandate — system design",
-};
+export const metadata = { title: "Mandate — proof" };
 
-const CHECKS = [
-  { id: "po-exists", label: "PO exists and is accepted", detail: "The declared purchase order has to be on record, and the quote behind it has to actually be accepted — not just sent." },
-  { id: "po-open", label: "PO still open and the quote has not expired", detail: "A quote is a promise with a deadline. Past it, the price is not guaranteed to still be true." },
-  { id: "amount-matches", label: "Amount matches the accepted quote", detail: "The requested total has to match what was quoted, within a small tolerance — not whatever the agent now claims." },
-  { id: "line-matches", label: "Vendor and SKU match the accepted quote", detail: "Right price, wrong item, is still wrong. Catches an agent that quietly substitutes what it's buying." },
-  { id: "within-budget", label: "Within the cost centre's remaining budget", detail: "Checked against the real remaining balance at the moment of the request, not a cached figure." },
-  { id: "no-existing-card", label: "No card already issued for this PO", detail: "Idempotency. Submit the same PO twice and the second run is refused by the record the first run itself wrote." },
-  { id: "requires-approval", label: "Above the delegated limit, a person must release it", detail: "Over $25,000 the purchase is held rather than refused. Nothing is wrong with it — it is simply larger than any agent's unattended authority." },
-  { id: "no-structuring", label: "Not a large purchase split to duck approval", detail: "The obvious way to beat the limit above is to buy twice, just under it each time. So the ceiling applies to the running total on one supplier and cost centre, not to a single line in isolation." },
-  { id: "agent-authority", label: "Inside this particular agent's own limit", detail: "A single global ceiling would give the agent buying stationery the same authority as the one buying capital equipment. Limits are per-agent, exactly as a delegation matrix is per-role." },
-  { id: "known-vendor", label: "A supplier we have paid before", detail: "A first payment to a new supplier is ordinary business, and it is also what invoice fraud looks like. Held once, not refused." },
-  { id: "velocity", label: "Not spending faster than this agent should", detail: "An agent stuck in a loop makes purchases that are each individually perfect. Nothing is wrong with any one of them; only the rate is wrong, so only a rate limit sees it." },
+const FLOW = [
+  { n: "01", title: "Set a goal", text: "A customer asks Mandate to keep a team supplied or source a specific item." },
+  { n: "02", title: "Agents compete", text: "A specialist sources the request and compares the modeled supplier offers." },
+  { n: "03", title: "Mandate verifies", text: "Eleven deterministic checks compare the exact PO with budget, authority, and records." },
+  { n: "04", title: "Spend or stop", text: "A scoped Rain sandbox card is issued only for an approved PO. Large or wrong orders stop." },
 ];
 
-const CATEGORIES = [
-  { cat: "Best use of Rain", how: "Card issuance is the enforcement point — matching Rain's own published principle of enforcing \"at issuance, rather than applied after the fact.\"" },
-  { cat: "General track — agents that move money", how: "An agent runs a task end to end: negotiate, propose, verify, issue, settle. Every decision is filed." },
-  { cat: "Agent negotiation", how: "Competing sellers with distinct strategies and one counter-offer round produce the accepted PO the card is bound to — negotiation causes what gets verified, not something staged beside it." },
-  { cat: "Monad bounty", how: "Every rule version is hashed and anchored on testnet, which is what proves the rules were not quietly rewritten to fit a history after the fact." },
+const INTEGRATIONS = [
+  {
+    name: "Rain",
+    tone: "rain" as const,
+    feature: "Scoped virtual cards + sandbox settlement",
+    text: "After Mandate approves a purchase order, Rain issues a card capped to that order. The sandbox flow authorizes and settles it.",
+  },
+  {
+    name: "Monad",
+    tone: "monad" as const,
+    feature: "Policy-version anchor on testnet",
+    text: "Mandate hashes each active policy version and writes that hash in a real Monad testnet transaction, so policy cannot be quietly backdated.",
+  },
+  {
+    name: "Postgres",
+    tone: "pass" as const,
+    feature: "Append-only order and decision log",
+    text: "Every proposal, check, hold, card outcome, and receipt is saved as evidence the customer can inspect later.",
+  },
 ];
 
-const NOT_BUILT = [
-  { name: "Delegated budget trees", why: "Sits too close to Rain's own program-level caps — would read as rebuilding their product rather than extending it." },
-  { name: "A second collateral pool (\"agent underwriting\")", why: "Needs a Rain identity the team was not issued for this event." },
-  { name: "Live streaming spend limits", why: "Needs an unconfirmed Rain capability plus a Monad contract written from scratch — two coupled unknowns in one afternoon." },
-  { name: "Multi-agent consensus voting on a decision", why: "Rejected on principle: LLM agents voting reintroduces a model into the verify path, which is exactly what makes replay meaningless." },
-];
-
+/**
+ * Proof is deliberately a landing page, not the project documentation. A judge should
+ * grasp the product and the sponsor integrations in one screen; implementation detail is
+ * retained behind one optional disclosure for the person who wants to inspect it.
+ */
 export default function ArchitecturePage() {
   return (
     <div className="min-h-screen bg-white">
       <SubPageHeader current="/architecture" />
 
       <main className="mx-auto max-w-[1100px] px-6 py-10 md:px-10">
-        <section className="mb-10">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            What this is
-          </p>
-          <h1 className="mt-3 font-display text-[32px] font-medium leading-[1.25] tracking-[-0.01em] text-ink-900 md:text-[38px]">
-            Rain bounds <em className="not-italic text-rain-600">how much</em> an agent
-            spends and <em className="not-italic text-rain-600">where</em>. Mandate checks{" "}
-            <em className="not-italic text-rain-600">why</em> — one step earlier, before the
-            card exists.
+        <section className="mx-auto max-w-3xl text-center">
+          <Badge tone="rain">How Mandate works</Badge>
+          <h1 className="mt-4 font-display text-[36px] font-medium leading-[1.08] tracking-[-0.035em] text-ink-900 md:text-[50px]">
+            An agent can buy. Mandate makes sure it should.
           </h1>
-          <p className="mt-4 max-w-2xl text-[14.5px] leading-relaxed text-muted">
-            An agent gets a scoped virtual Rain card bound to the exact purchase order it
-            negotiated. Deterministic code checks the declared order against the real record
-            before the card is ever created. Any mismatch means no card, not a decline —
-            an instrument that never comes into existence in the first place.
+          <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
+            Mandate is the control layer between an autonomous purchasing agent and company money.
+            It turns a goal into a verified order - then spends only inside the limits you set.
           </p>
         </section>
 
-        {/* Three parties, one sentence each. This is the frame the whole project should
-            be read through: Rain moves the money, Mandate verifies the intent, Monad
-            proves which rules were in force. Everything else is detail underneath it. */}
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Three parts, one sentence each
-          </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              {
-                name: "Rain",
-                role: "moves the money",
-                dot: "bg-rain-500",
-                text: "text-rain-700",
-                body: "An agent transacts on a real scoped card. No human sits in the loop for a normal purchase.",
-              },
-              {
-                name: "Mandate",
-                role: "verifies the intent",
-                dot: "bg-mint-500",
-                text: "text-mint-700",
-                body: "Eleven deterministic checks confirm the purchase is the one the agent was authorised to make — before any instrument exists.",
-              },
-              {
-                name: "Monad",
-                role: "proves the policy",
-                dot: "bg-monad-500",
-                text: "text-monad-700",
-                body: "Each rule version's hash is anchored, so nobody can claim the rules were rewritten after the decisions they governed.",
-              },
-            ].map((p) => (
-              <div key={p.name} className="rounded-xl border border-edge bg-white p-4">
-                <p className={`flex items-center gap-2 text-[14px] font-semibold ${p.text}`}>
-                  <span className={`h-2 w-2 rounded-full ${p.dot}`} />
-                  {p.name}
-                </p>
-                <p className="mt-0.5 text-[12px] uppercase tracking-wider text-ink-400">
-                  {p.role}
-                </p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{p.body}</p>
-              </div>
+        <section className="mt-10">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-400">The flow in 30 seconds</p>
+            <Link href="/" className="text-[12.5px] font-medium text-rain-600 hover:text-rain-700">Try it live →</Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {FLOW.map((step) => (
+              <Panel key={step.n} className="p-4">
+                <p className="font-mono text-[11px] text-rain-600">{step.n}</p>
+                <h2 className="mt-2 text-[15px] font-semibold text-ink-900">{step.title}</h2>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{step.text}</p>
+              </Panel>
             ))}
           </div>
-          <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-muted">
-            Rain asks <em>can this agent spend this much, here?</em> Mandate asks{" "}
-            <em>is this the exact purchase it was supposed to spend on?</em> Only when both
-            hold does a payment instrument come into existence. Human approval is not part
-            of this path — it exists solely as an escalation for spending above an agent&apos;s
-            delegated authority.
-          </p>
         </section>
 
-        {/* The site grew a page at a time and it was no longer obvious what any of them
-            were for, or which one you were meant to start on. Driven off the same PAGES
-            array the nav uses, so the two can never drift apart. */}
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            The six pages, and what each one is for
-          </p>
-          <Panel>
-            <ol className="divide-y divide-edge">
-              {PAGES.map((page, i) => (
-                <li key={page.href} className="flex items-baseline gap-4 px-5 py-3">
-                  <span className="w-4 shrink-0 font-mono text-[11px] text-ink-400">
-                    {i + 1}
-                  </span>
-                  <Link
-                    href={page.href}
-                    className="w-32 shrink-0 text-[14px] font-medium text-rain-600 hover:text-rain-700"
-                  >
-                    {page.label}
-                  </Link>
-                  <span className="flex-1 text-[13.5px] text-muted">{page.blurb}</span>
-                  <code className="hidden shrink-0 font-mono text-[11px] text-ink-300 sm:block">
-                    {page.href}
-                  </code>
-                </li>
-              ))}
-            </ol>
-          </Panel>
-          <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-muted">
-            Two of these are the product and the rest explain it.{" "}
-            <strong className="font-medium text-ink-900">Workspace</strong> is what someone
-            who buys this would use day to day — plain language, approvals, budgets.{" "}
-            <strong className="font-medium text-ink-900">Console</strong> is the same system
-            with its working shown: every check, every record it read, and the controls to
-            change policy and re-judge history. Same data, same API, same decisions.
-          </p>
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            The whole system, one diagram
-          </p>
-          <FlowDiagram />
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Step by step
-          </p>
-          <SystemDiagram />
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            What it is built with
-          </p>
-          <TechStack />
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            The eleven checks that decide step 3
-          </p>
-          {/* The framing that makes the last four checks make sense. Without it they look
-              like extra validation; with it they are the answer to a player who is trying
-              to win rather than trying to lie. */}
-          <p className="mb-3 max-w-2xl text-[14px] leading-relaxed text-ink-700">
-            Every check here assumes the agent is playing to win. Splitting a purchase to
-            duck an approval limit isn&apos;t a lie — every individual line is true — it&apos;s a
-            strategy. So the last four check the{" "}
-            <strong className="font-semibold text-ink-900">pattern</strong>, not the move.
-          </p>
-          <Panel>
-            <ul className="divide-y divide-edge">
-              {CHECKS.map((c, i) => (
-                <li key={c.id} className="px-5 py-3.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[13.5px] font-medium text-ink-900">
-                      <span className="mr-1.5 font-mono text-[11px] text-ink-400">{i + 1}</span>
-                      {c.label}
-                    </p>
-                    <code className="shrink-0 font-mono text-[10.5px] text-ink-400">{c.id}</code>
-                  </div>
-                  <p className="mt-1 text-[13px] leading-relaxed text-muted">{c.detail}</p>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Why Rain, specifically
-          </p>
-          <Panel>
-            <div className="space-y-3 px-5 py-4 text-[14px] leading-relaxed text-ink-700">
-              <p>
-                Rain is a Visa and Mastercard Principal Member — it issues cards directly
-                rather than reselling someone else's licence — live across 175 million
-                merchant locations in 220+ countries. Its newest product, the{" "}
-                <b className="text-ink-900">Agent Control Layer</b>, enforces amount limits,
-                merchant allowlists, and spend intervals{" "}
-                <b className="text-ink-900">
-                  "at card issuance and transfer initiation, rather than applied after the
-                  fact."
-                </b>
-              </p>
-              <p>
-                That phrase is Mandate's whole thesis, carried one layer higher: from{" "}
-                <i>can this agent spend this much, here</i>, to{" "}
-                <i>is this specific declared reason for spending actually true</i>. Mandate
-                does not compete with the Agent Control Layer — it sits on top of it, using
-                the same collateral-backed issue → settle → revoke flow shown in Rain's own
-                reference demo.
-              </p>
-            </div>
-          </Panel>
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Where Mandate ends and Rain begins
-          </p>
-          <ControlCoverage />
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Beyond a card: programmable money rails
-          </p>
-          <PaymentRailPanel />
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            How it covers the submission tracks
-          </p>
-          <Panel>
-            <ul className="divide-y divide-edge">
-              {CATEGORIES.map((c) => (
-                <li key={c.cat} className="px-5 py-3.5">
-                  <p className="text-[13.5px] font-semibold text-rain-700">{c.cat}</p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-ink-700">{c.how}</p>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        </section>
-
-        <section className="mb-10">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            What we deliberately didn't build
-          </p>
-          <Panel>
-            <ul className="divide-y divide-edge">
-              {NOT_BUILT.map((n) => (
-                <li key={n.name} className="px-5 py-3.5">
-                  <p className="text-[13.5px] font-medium text-ink-900">{n.name}</p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-muted">{n.why}</p>
-                </li>
-              ))}
-            </ul>
-          </Panel>
+        <section className="mt-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">What is integrated, exactly</p>
+          <div className="grid gap-3 md:grid-cols-3">
+            {INTEGRATIONS.map((integration) => (
+              <Panel key={integration.name} className="p-5">
+                <Badge tone={integration.tone}>{integration.name}</Badge>
+                <h2 className="mt-3 text-[15px] font-semibold text-ink-900">{integration.feature}</h2>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{integration.text}</p>
+              </Panel>
+            ))}
+          </div>
           <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
-            This scoping follows from a prior hackathon loss: the team once built roughly
-            85% of a winning system's substance and still lost, to a team whose actual edge
-            was a versioned, editable rules config and an instant re-run. The replay feature
-            here is that same idea, built from the start rather than bolted on after losing
-            to it once.
+            Supplier profiles are modeled for the demo. Rain and Monad integrations run against their respective sandboxes/testnet; no real funds move.
           </p>
         </section>
 
-        <section>
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
-            Status, stated plainly
+        <section className="mt-10 rounded-2xl border border-rain-100 bg-rain-50/50 px-5 py-5 sm:px-6">
+          <p className="text-[13px] font-semibold text-ink-900">The one-line thesis</p>
+          <p className="mt-1 text-[15px] leading-relaxed text-ink-700">
+            Any agent can find something to buy. Mandate binds its chosen purchase to an exact PO, checks it before money moves, and leaves proof of why it was allowed.
           </p>
-          <Panel>
-            <p className="px-5 py-4 text-[13.5px] leading-relaxed text-ink-700">
-              The checks, rule versioning, replay, the append-only log, the negotiation
-              engine, and the run-it-twice refusal are all built and tested (84 passing
-              tests). Card issuance currently returns a{" "}
-              <Badge tone="warn">simulated</Badge> card, labelled as such in the console,
-              because the Rain endpoint paths are still being confirmed on site — the client
-              is written and wired, so switching it on is one function swap once confirmed.
-              The Monad anchor transaction is{" "}
-              <Badge tone="neutral">not yet written</Badge>; the hash and the storage for its
-              reference already exist.
-            </p>
-          </Panel>
         </section>
+
+        <details className="group mt-10 rounded-2xl border border-edge bg-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-[13.5px] font-semibold text-ink-800 marker:hidden">
+            Technical evidence and implementation detail
+            <span className="font-mono text-[12px] text-rain-600 group-open:hidden">open +</span>
+            <span className="hidden font-mono text-[12px] text-rain-600 group-open:inline">close −</span>
+          </summary>
+          <div className="space-y-8 border-t border-edge px-5 py-6">
+            <section>
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">Control coverage</p>
+              <ControlCoverage />
+            </section>
+            <section>
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">Programmable money rail</p>
+              <PaymentRailPanel />
+            </section>
+            <section>
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">System diagram</p>
+              <SystemDiagram />
+            </section>
+            <section>
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">Stack</p>
+              <TechStack />
+            </section>
+          </div>
+        </details>
       </main>
 
       <Footer />

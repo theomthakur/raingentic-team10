@@ -6,7 +6,7 @@ import { FlowDiagram } from "./FlowDiagram";
 import { GithubIcon, LinkedinIcon } from "../icons";
 
 /**
- * The deck. Fourteen slides, keyboard-driven, in the same type and palette as the console.
+ * The deck. Seven slides, keyboard-driven, in the same type and palette as the console.
  *
  * A hackathon is judged in five minutes standing up, and the thing that loses those five
  * minutes is switching windows — a PDF in one app, the running product in another, the
@@ -191,9 +191,20 @@ const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[
 ];
 
 const TEAM: { name: string; linkedin: string }[] = [
-  { name: "Om Thakur", linkedin: "https://www.linkedin.com/in/theomthakur/" },
   { name: "Princy Doshi", linkedin: "https://www.linkedin.com/in/princy-doshi-071b581b3/" },
+  { name: "Om Thakur", linkedin: "https://www.linkedin.com/in/theomthakur/" },
 ];
+
+/** The short judge-facing story. The remaining slides remain in source as a deep-dive. */
+const PRESENTATION_SLIDE_IDS = new Set([
+  "cover",
+  "problem",
+  "solution",
+  "flow",
+  "demo",
+  "rules-integrity",
+  "thanks",
+]);
 
 /** The hosts, as the event's own page lists them. */
 const HOSTS: { name: string; role: string }[] = [
@@ -256,27 +267,25 @@ const SLIDES: Slide[] = [
           all — not a decline, an instrument that never comes into existence.
         </p>
 
-        {/* The strongest fact in the deck, and it used to be on slide 12. Most submissions
-            this weekend will demo something simulated; this is a real card from Rain's own
-            API with a limit Rain enforces. It belongs in the first twenty seconds. */}
+        {/* State the boundary plainly: Rain is real infrastructure exercised in its sandbox,
+            not a claim that the demo moved production money. */}
         <div className="mt-6 max-w-2xl rounded-xl border border-rain-200 bg-rain-50/70 px-4 py-3">
           <p className="text-[14px] leading-relaxed text-ink-900">
-            <strong className="font-semibold">These are real Rain cards.</strong> Issued
+            <strong className="font-semibold">Rain issues the scoped cards in its sandbox.</strong> Issued
             through <span className="font-mono text-[12.5px]">/issuing/users/:id/cards/scoped</span>,
-            limited to the exact purchase-order total, and retired after settlement. Not a
-            mock — the limit is Rain&apos;s to enforce, and it does.
+            limited to the exact purchase-order total, then authorized and settled through
+            Rain&apos;s sandbox lifecycle.
           </p>
           <p className="mt-1.5 text-[12.5px] text-muted">
-            No collateral is linked to our contract yet, so a card will not authorise a
-            purchase. That is a funding step, not a code one — and we would rather say it
-            than have you find it.
+            It proves the integration without claiming production settlement: no real money
+            moves in this hackathon sandbox.
           </p>
         </div>
 
         <div className="mt-7 flex flex-wrap items-center gap-2">
-          <Badge tone="rain">real rain cards</Badge>
-          <Badge tone="monad">monad</Badge>
-          <Badge tone="pass">84 tests passing</Badge>
+          <Badge tone="rain">Rain sandbox cards</Badge>
+          <Badge tone="monad">Monad testnet anchor</Badge>
+          <Badge tone="pass">103 tests passing</Badge>
           <Badge tone="neutral">11 checks, all data</Badge>
         </div>
       </div>
@@ -787,8 +796,9 @@ export function Deck() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
 
-  const total = SLIDES.length;
-  const slide = SLIDES[index];
+  const slides = SLIDES.filter((slide) => PRESENTATION_SLIDE_IDS.has(slide.id));
+  const total = slides.length;
+  const slide = slides[index];
 
   const next = useCallback(() => setIndex((i) => Math.min(total - 1, i + 1)), [total]);
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
@@ -886,7 +896,7 @@ export function Deck() {
 
         {/* Progress rail. Segments, not a bar, so you can see how much deck is left. */}
         <div className="mt-4 flex gap-1" role="tablist" aria-label="Slides">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <button
               key={s.id}
               type="button"
