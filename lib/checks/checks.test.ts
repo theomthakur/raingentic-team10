@@ -23,6 +23,7 @@ import {
 import { RULE_BASIS, basisFor } from "@/lib/rules/basis";
 import { proposePurchase } from "@/lib/agent";
 import { hashRules } from "@/lib/rules/hash";
+import { anchorPayload } from "@/lib/monad/anchor";
 import { replay } from "@/lib/replay";
 import { diffRules } from "@/lib/rules/diff";
 import seeded from "@/lib/seed/decisions.json";
@@ -301,6 +302,13 @@ test("changing a single parameter changes the hash", () => {
     rule.id === "amount-matches" ? { ...rule, params: { toleranceBps: 0 } } : rule
   );
   assert.notEqual(hashRules(edited), hashRules(RULES.rules));
+});
+
+test("a Monad anchor payload commits both the policy version and its exact hash", () => {
+  const payload = anchorPayload(1, RULES.hash);
+  assert.equal(payload, `0x00000001${RULES.hash}`);
+  assert.throws(() => anchorPayload(0, RULES.hash), /positive integer/);
+  assert.throws(() => anchorPayload(1, "not-a-hash"), /sha256/);
 });
 
 test("a new version never mutates the one it came from", () => {

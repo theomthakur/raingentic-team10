@@ -11,6 +11,7 @@ import { verify } from "@/lib/checks";
 import { issueCard, revokeCard } from "@/lib/rain/issuer";
 import { authorizeAndSettleSandboxCard, sandboxSettlementEnabled } from "@/lib/rain-client";
 import { getStore, snapshot } from "@/lib/store";
+import { anchorRuleVersion, confirmRuleAnchor } from "@/lib/monad/anchor";
 
 /**
  * The stages, in order, as one function.
@@ -27,6 +28,7 @@ export type StageName =
   | "HOLD"
   | "APPROVE"
   | "REFUSE"
+  | "ANCHOR"
   | "ISSUE"
   | "SETTLE"
   | "REVOKE"
@@ -202,6 +204,36 @@ export async function runPipeline(
       // Record what actually decided it, not the stale check that passed a moment ago.
       checks: base.checks.map((c) => (c.ruleId === clash.ruleId ? clash : c)),
     };
+    await store.appendDecision(decision);
+    stages.push({ name: "RECORD", detail: `Refusal written to the log as ${decision.id}`, ok: true });
+    return { decision, stages };
+  }
+
+  // A policy is not merely described on Monad: it is a spend gate. Before this approved
+  // order can reach Rain, Mandate confirms that the *exact* active version/hash has a
+  // successful Monad receipt. A newly activated version is anchored on first autonomous
+  // use; if Monad cannot confirm it, the order stops before an instrument exists.
+  try {
+    let txHash = ruleSet.anchorTxHash;
+    let created = false;
+    if (!txHash) {
+      const anchor = await anchorRuleVersion(ruleSet.version, ruleSet.hash);
+      txHash = anchor.txHash;
+      created = true;
+    }
+    const confirmed = await confirmRuleAnchor(ruleSet.version, ruleSet.hash, txHash);
+    if (created) await store.setAnchor(ruleSet.version, confirmed.txHash);
+    stages.push({
+      name: "ANCHOR",
+      detail: `Policy v${ruleSet.version} confirmed on Monad testnet in block ${confirmed.blockNumber.toString()} before Rain issuance`,
+      ok: true,
+    });
+  } catch (err) {
+    await store.releaseOrderLine(po.poNumber);
+    const reason = `No funds moved: Mandate could not confirm policy v${ruleSet.version} on Monad before issuing a card. ${(err as Error).message}`;
+    stages.push({ name: "ANCHOR", detail: reason, ok: false });
+    stages.push({ name: "REFUSE", detail: "Autonomous spend stopped because its policy proof was unavailable.", ok: false });
+    const decision: Decision = { ...base, outcome: "refused", card: null };
     await store.appendDecision(decision);
     stages.push({ name: "RECORD", detail: `Refusal written to the log as ${decision.id}`, ok: true });
     return { decision, stages };

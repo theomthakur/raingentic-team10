@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
-import { anchorRuleVersion, anchoringEnabled } from "@/lib/monad/anchor";
+import { anchorRuleVersion, anchoringEnabled, confirmRuleAnchor } from "@/lib/monad/anchor";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,9 +54,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { txHash, explorerUrl } = await anchorRuleVersion(ruleSet.version, ruleSet.hash);
-    await store.setAnchor(ruleSet.version, txHash);
-    return NextResponse.json({ version: ruleSet.version, txHash, explorerUrl });
+    const anchor = await anchorRuleVersion(ruleSet.version, ruleSet.hash);
+    const confirmed = await confirmRuleAnchor(ruleSet.version, ruleSet.hash, anchor.txHash);
+    await store.setAnchor(ruleSet.version, confirmed.txHash);
+    return NextResponse.json({ version: ruleSet.version, ...confirmed });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 502 });
   }

@@ -1,4 +1,4 @@
-import { createWalletClient, defineChain, http, type Hex } from "viem";
+import { createPublicClient, createWalletClient, defineChain, http, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 /**
@@ -49,6 +49,11 @@ export interface AnchorResult {
   explorerUrl: string;
 }
 
+export interface ConfirmedAnchor extends AnchorResult {
+  /** The Monad block that finalized the exact version/hash commitment. */
+  blockNumber: bigint;
+}
+
 /**
  * Enabled as soon as a key exists. The RPC falls back to Monad's public testnet endpoint,
  * which is rate-limited but ample for a handful of rule-version writes — so requiring it
@@ -71,12 +76,24 @@ function normalisePrivateKey(raw: string): Hex {
   return (trimmed.startsWith("0x") ? trimmed : `0x${trimmed}`) as Hex;
 }
 
+/** The self-describing calldata committed by an anchor transaction. Exported so the
+ * runtime verifier and the tests share one exact encoding. */
+export function anchorPayload(version: number, ruleHash: string): Hex {
+  if (!Number.isInteger(version) || version < 1) {
+    throw new Error(`Policy version must be a positive integer: ${version}`);
+  }
+  const clean = ruleHash.startsWith("0x") ? ruleHash.slice(2) : ruleHash;
+  if (!/^[0-9a-f]{64}$/i.test(clean)) {
+    throw new Error(`Not a sha256 hash: ${ruleHash}`);
+  }
+  return `0x${version.toString(16).padStart(8, "0")}${clean}` as Hex;
+}
+
 /**
  * Write `ruleHash` to the chain and return the transaction hash.
  *
- * Throws if anchoring is not configured — callers decide whether that is fatal. Nothing
- * in the decision path depends on this succeeding: a rule version works exactly the same
- * unanchored, it simply carries a weaker claim.
+ * Throws if anchoring is not configured. Autonomous spend treats that as a hard stop:
+ * Rain card issuance is allowed only after the active policy commitment is confirmed.
  */
 export async function anchorRuleVersion(
   version: number,
@@ -96,11 +113,6 @@ export async function anchorRuleVersion(
     transport: http(anchorRpcUrl()),
   });
 
-  const clean = ruleHash.startsWith("0x") ? ruleHash.slice(2) : ruleHash;
-  if (!/^[0-9a-f]{64}$/i.test(clean)) {
-    throw new Error(`Not a sha256 hash: ${ruleHash}`);
-  }
-
   const txHash = await client.sendTransaction({
     to: account.address,
     // BigInt(0) rather than 0n: the literal form needs an ES2020 target, and this file
@@ -108,11 +120,45 @@ export async function anchorRuleVersion(
     value: BigInt(0),
     // The payload is the whole point: version number then the hash, so the transaction
     // is self-describing to anyone reading it off the chain later.
-    data: `0x${version.toString(16).padStart(8, "0")}${clean}` as Hex,
+    data: anchorPayload(version, ruleHash),
   });
 
   return {
     txHash,
     explorerUrl: `https://testnet.monadexplorer.com/tx/${txHash}`,
+  };
+}
+
+/**
+ * Read Monad independently before a policy can unlock a Rain card. We verify both the
+ * successful receipt and the calldata, rather than treating possession of any tx hash as
+ * proof that this exact policy version was anchored.
+ */
+export async function confirmRuleAnchor(
+  version: number,
+  ruleHash: string,
+  txHash: string
+): Promise<ConfirmedAnchor> {
+  const client = createPublicClient({
+    chain: monadTestnet,
+    transport: http(anchorRpcUrl()),
+  });
+  const hash = txHash as Hex;
+  const [transaction, receipt] = await Promise.all([
+    client.getTransaction({ hash }),
+    client.getTransactionReceipt({ hash }),
+  ]);
+
+  if (receipt.status !== "success") {
+    throw new Error(`Monad anchor ${txHash} did not succeed.`);
+  }
+  if (transaction.input.toLowerCase() !== anchorPayload(version, ruleHash).toLowerCase()) {
+    throw new Error(`Monad anchor ${txHash} does not commit policy v${version}'s exact hash.`);
+  }
+
+  return {
+    txHash,
+    explorerUrl: `https://testnet.monadexplorer.com/tx/${txHash}`,
+    blockNumber: receipt.blockNumber,
   };
 }

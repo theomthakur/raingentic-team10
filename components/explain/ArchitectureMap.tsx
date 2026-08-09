@@ -123,8 +123,8 @@ export function ArchitectureMap() {
           <Node
             number="05"
             title="Tamper-evident policy"
-            description="The active policy hash is written to Monad before it can be used as historical proof."
-            api="Monad RPC → eth_sendRawTransaction"
+            description="Rain issuance is blocked until Monad confirms the active policy's exact hash. New versions anchor on first autonomous use."
+            api="Monad RPC → eth_sendRawTransaction → receipt verified"
             tone="monad"
             badge="Monad"
           />

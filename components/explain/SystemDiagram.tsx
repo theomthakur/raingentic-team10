@@ -22,9 +22,9 @@ const STEPS: Step[] = [
   { n: "2", name: "Propose", owner: "agent", detail: "The agent declares the purchase order it wants: vendor, SKU, unit price, quantity, quote expiry." },
   { n: "3", name: "Verify", owner: "check", detail: "Eleven pure functions check the declared PO against the record — no model, no I/O, no wall clock. Rules are versioned data, not code." },
   { n: "4a", name: "Refuse", owner: "refuse", detail: "Any check fails → no card is ever created. A plain-English reason is logged, not a decline on an instrument that already exists." },
-  { n: "4b", name: "Issue", owner: "rain", detail: "All checks pass → Rain issues a scoped virtual card bound to exactly this PO: this vendor, this amount, this expiry. No human is involved in this path, and it is the path almost every purchase takes." },
+  { n: "4b", name: "Anchor + issue", owner: "rain", detail: "All checks pass → Mandate confirms the active policy's exact hash on Monad testnet, then Rain issues a scoped virtual card bound to exactly this PO: this vendor, this amount, this expiry. If Monad proof is unavailable, no card is created." },
   { n: "5", name: "Settle", owner: "rain", detail: "The purchase happens on that card. The cost centre's budget is charged and the PO is marked fulfilled." },
-  { n: "6", name: "Record", owner: "record", detail: "PO, checks, rule version, card, and outcome are appended to the log — never edited in place. Each rule version's hash is anchored on Monad testnet, so the rules provably weren't rewritten after the fact." },
+  { n: "6", name: "Record", owner: "record", detail: "PO, checks, rule version, card, and outcome are appended to the log — never edited in place. The Monad receipt linked to the active policy makes the spend gate independently verifiable." },
   { n: "7", name: "Revoke", owner: "rain", detail: "The card is deactivated once the job is done, closing the window it was ever usable in." },
   { n: "—", name: "Hold", owner: "hold", detail: "The one exception, off the main path. If a purchase passes every check but is above the delegated authority of the agent that asked, it waits for a named person instead of being issued or refused. Autonomy has boundaries, exactly as it does for an employee — and no card exists while it waits." },
 ];
