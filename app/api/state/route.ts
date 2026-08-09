@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
 import { anchoringEnabled } from "@/lib/monad/anchor";
-import { challengeStats } from "@/lib/challenge";
+import { challengeStats, realCardsIssued } from "@/lib/challenge";
 import { rainIssuanceStatus } from "@/lib/rain/issuer";
 import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
@@ -24,7 +24,9 @@ export async function GET() {
     storage: store.kind,
     // Not "is a key configured" — "can this actually issue a card". A key in the
     // environment says nothing about whether Rain accepts the call.
-    rain: rainIssuanceStatus(),
+    // Counted from the log, not from this instance's memory — a cold serverless
+    // start knows nothing, and reported 'simulated' on a system that had issued fifty.
+    rain: rainIssuanceStatus(realCardsIssued(decisions)),
     anchoringEnabled: anchoringEnabled(),
     // Whether the negotiation dialogue is model-written. A boolean, never the key — this
     // exists because "is Groq actually configured on this deployment" was otherwise only

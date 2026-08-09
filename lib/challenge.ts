@@ -58,3 +58,22 @@ export function challengeStats(decisions: Decision[]): ChallengeStats {
     rulesTriggered: [...triggered],
   };
 }
+
+
+/**
+ * How many real Rain cards this system has actually issued.
+ *
+ * The live badge used to read off an in-process flag, which meant a serverless instance
+ * that had just woken up reported "simulated" while fifty real Rain cards sat in the
+ * database. On a project whose whole argument is that it does not overstate, understating
+ * on the first screen is its own kind of dishonesty — and this is the one number worth
+ * being loud about.
+ *
+ * Counted from the log for the same reason the challenge scoreboard is: a number derived
+ * from the record can be opened and checked, and cannot drift from what it counts.
+ * Simulated cards carry a `sim_` id, so the two are told apart by what was actually
+ * written rather than by what a flag remembers.
+ */
+export function realCardsIssued(decisions: Decision[]): number {
+  return decisions.filter((d) => d.card && !d.card.cardId.startsWith("sim_")).length;
+}

@@ -109,11 +109,20 @@ function liveIssuanceEnabled(): boolean {
   return process.env.RAIN_LIVE_ISSUANCE === "true";
 }
 
-export function rainIssuanceStatus(): { mode: RainMode; reason?: string } {
+/**
+ * `realCardsEverIssued` comes from the decision log rather than this process's memory.
+ * A cold serverless instance has no memory of anything, so the badge used to read
+ * "simulated" on a system that had issued fifty real cards — the log knows better.
+ */
+export function rainIssuanceStatus(
+  realCardsEverIssued = 0
+): { mode: RainMode; reason?: string; realCards?: number } {
   if (!process.env.RAIN_API_KEY) {
     return { mode: "off", reason: "No RAIN_API_KEY set." };
   }
-  if (lastRealIssuance?.ok) return { mode: "live" };
+  if (lastRealIssuance?.ok || realCardsEverIssued > 0) {
+    return { mode: "live", realCards: realCardsEverIssued };
+  }
   if (!liveIssuanceEnabled()) {
     return {
       mode: "simulated",
