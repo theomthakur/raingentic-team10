@@ -119,8 +119,8 @@ function TaskRow({
   onRun: () => void;
 }) {
   return (
-    <li className="flex items-start gap-3 px-4 py-3">
-      <div className="min-w-0 flex-1">
+    <li className="flex flex-wrap items-start gap-x-3 gap-y-2.5 px-4 py-3">
+      <div className="min-w-[190px] flex-1">
         <p className="text-[13.5px] font-medium text-ink-900">{label}</p>
         <p className="mt-0.5 text-[12px] text-muted">{note}</p>
         <div className="mt-1.5">

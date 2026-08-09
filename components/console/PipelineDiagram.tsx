@@ -46,7 +46,7 @@ function NodeBubble({ node, state }: { node: Node; state: NodeState }) {
     skipped: "border-edge bg-ink-50 text-ink-300",
   };
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
+    <div className="flex w-[84px] shrink-0 flex-col items-center gap-1.5 text-center sm:w-auto">
       <div
         className={`flex h-11 w-11 items-center justify-center rounded-full border-2 font-mono text-[13px] font-bold transition-all duration-300 ${styles[state]}`}
       >
@@ -68,14 +68,14 @@ function NodeBubble({ node, state }: { node: Node; state: NodeState }) {
 
 function Arrow({ dim = false }: { dim?: boolean }) {
   return (
-    <div className={`mb-6 h-px w-6 shrink-0 sm:w-10 ${dim ? "bg-edge" : "bg-rain-300"}`} />
+    <div className={`mt-5 h-px w-3 shrink-0 sm:mb-6 sm:mt-0 sm:w-10 ${dim ? "bg-edge" : "bg-rain-300"}`} />
   );
 }
 
 /** The pulsing marker sitting on whichever leg of the race hasn't finished yet. */
 function ThinkingBubble() {
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
+    <div className="flex w-[84px] shrink-0 flex-col items-center gap-1.5 text-center sm:w-auto">
       <div className="relative flex h-11 w-11 items-center justify-center rounded-full border-2 border-rain-300 bg-rain-50">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rain-300 opacity-60" />
         <span className="relative flex gap-0.5">
@@ -122,7 +122,7 @@ export function PipelineDiagram({ stages, racing = false }: { stages: Stage[]; r
         {stillRacing && <p className="text-[12px] font-medium text-rain-600">Working through it…</p>}
       </div>
 
-      <div className="flex flex-wrap items-start gap-x-1 gap-y-4 sm:flex-nowrap sm:overflow-x-auto">
+      <div className="flex max-w-full flex-wrap items-start justify-center gap-x-1 gap-y-4 overflow-x-auto sm:flex-nowrap sm:justify-start">
         <NodeBubble node={PROPOSE} state={stateFor(stages, "PROPOSE")} />
         <Arrow dim={running} />
         {stillRacing && revealedTo === order.indexOf("VERIFY") - 1 ? (

@@ -27,16 +27,16 @@ export function Header({
   }[rain.mode];
   return (
     <header className="border-b border-edge bg-white">
-      <div className="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-6 px-6 py-7 md:px-10">
-        <div className="flex items-start gap-4">
+      <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-6 py-7 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-6 md:px-10">
+        <div className="flex min-w-0 items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rain-500 text-xl font-bold text-white shadow-sm shadow-rain-500/20">
             M
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="font-display text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-900">
               Mandate
             </h1>
-            <p className="mt-1.5 max-w-xl text-[14.5px] leading-relaxed text-muted">
+            <p className="mt-1.5 max-w-xl text-[13.5px] leading-relaxed text-muted sm:text-[14.5px]">
               Agents can already reason and negotiate, and Rain lets them move money. The
               missing piece is proving the transaction is the one they were authorised to
               make — so Mandate verifies that intent, and no payment instrument exists
@@ -45,7 +45,7 @@ export function Header({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-col items-start gap-3 sm:items-end">
           <div className="flex flex-wrap items-center justify-end gap-2">
             {errorBadge}
             <Badge tone={storage === "postgres" ? "pass" : "warn"}>

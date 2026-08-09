@@ -6,6 +6,15 @@
   color-scheme: light;
 }
 
+/* A phone is the primary surface for the challenge QR, and a page that scrolls sideways
+   reads as broken before anyone reads a word of it. Children that are legitimately wide
+   (diagrams, tables) scroll inside their own overflow-x-auto boxes; this stops any of
+   them widening the document. `clip` rather than `hidden` so it does not create a
+   scroll container and break `position: sticky` inside. */
+html {
+  overflow-x: clip;
+}
+
 body {
   @apply bg-white text-ink-900 antialiased;
   font-feature-settings: "tnum" 1;
