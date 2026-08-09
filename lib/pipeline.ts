@@ -9,6 +9,7 @@ import type {
 import { poTotal } from "@/lib/types";
 import { verify } from "@/lib/checks";
 import { issueCard, revokeCard } from "@/lib/rain/issuer";
+import { authorizeAndSettleSandboxCard, sandboxSettlementEnabled } from "@/lib/rain-client";
 import { getStore, snapshot } from "@/lib/store";
 
 /**
@@ -63,6 +64,16 @@ export interface ReleaseContext {
    * the facts have not moved.
    */
   liftedRules: RuleId[];
+}
+
+/** MCCs make the sandbox merchant look like the kind of vendor the PO names. They are
+ * evidence for Rain's transaction simulator, not a Mandate policy input. */
+function merchantCategoryCode(po: PurchaseOrder): string {
+  if (po.costCentre === "CC-OPS") return "5943"; // office, school, and stationery stores
+  if (po.costCentre === "CC-ENG") return "7372"; // programming and data processing
+  if (po.costCentre === "CC-FAC") return "5712"; // furniture and furnishings
+  if (po.costCentre === "CC-MKT") return "7311"; // advertising services
+  return "7399"; // business services, not elsewhere classified
 }
 
 export async function runPipeline(
@@ -211,7 +222,31 @@ export async function runPipeline(
     ok: true,
   });
 
-  // 5 SETTLE — and the write-back that makes the second run of this task fail on its own.
+  // 5 SETTLE — exercise the actual scoped card in Rain's sandbox when opted in. A failed
+  // simulator call is recorded as evidence rather than silently reported as settled; the
+  // card has already been issued, so Mandate still writes the approved decision and makes
+  // the discrepancy visible to an operator.
+  let rainSettlement: NonNullable<Decision["card"]>["rainSettlement"] | undefined;
+  let settlementDetail = "";
+  if (!card.simulated && sandboxSettlementEnabled()) {
+    try {
+      rainSettlement = await authorizeAndSettleSandboxCard({
+        cardId: card.cardId,
+        amountCents: total,
+        merchantName: po.vendor,
+        merchantCategoryCode: merchantCategoryCode(po),
+      });
+      settlementDetail = `Rain sandbox transaction ${rainSettlement.transactionId} authorized and settled`;
+    } catch (err) {
+      settlementDetail = `Rain sandbox settlement was not completed: ${(err as Error).message.slice(0, 180)}`;
+    }
+  } else if (card.simulated) {
+    settlementDetail = "Local simulated card; no Rain sandbox transaction created";
+  } else {
+    settlementDetail = "Rain sandbox settlement disabled (set RAIN_SIMULATE_SETTLEMENT=true to exercise this card)";
+  }
+
+  // Mandate's own atomic write-back makes the second run of this task fail on its own.
   await store.recordIssuedCard({
     cardId: card.cardId,
     poNumber: po.poNumber,
@@ -221,8 +256,8 @@ export async function runPipeline(
   await store.markFulfilled(po.poNumber);
   stages.push({
     name: "SETTLE",
-    detail: `${po.costCentre} charged, ${po.poNumber} marked fulfilled`,
-    ok: true,
+    detail: `${settlementDetail}; ${po.costCentre} charged, ${po.poNumber} marked fulfilled`,
+    ok: Boolean(rainSettlement) || card.simulated || !sandboxSettlementEnabled(),
   });
 
   // 7 REVOKE — the obligation is discharged, so the instrument stops existing as a live
@@ -255,6 +290,7 @@ export async function runPipeline(
       last4: card.last4,
       limitCents: card.limitCents,
       expiresAt: card.expiresAt,
+      ...(rainSettlement ? { rainSettlement } : {}),
     },
   };
   await store.appendDecision(decision);

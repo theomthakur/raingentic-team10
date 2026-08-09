@@ -75,6 +75,14 @@ export async function generateReceipt(decision: Decision) {
       margin,
       y
     );
+    if (card.rainSettlement) {
+      y += 14;
+      doc.text(
+        `Rain sandbox settlement: ${card.rainSettlement.transactionId}  ·  ${card.rainSettlement.merchantName}`,
+        margin,
+        y
+      );
+    }
   }
 
   y += 28;

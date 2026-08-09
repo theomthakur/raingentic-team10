@@ -219,6 +219,88 @@ export async function issueScopedCard(params: IssueCardParams): Promise<ScopedCa
   };
 }
 
+export interface SandboxCardSettlement {
+  transactionId: string;
+  status: "settled";
+  amountCents: number;
+  merchantName: string;
+  merchantCategoryCode: string;
+}
+
+/**
+ * Opt-in because this creates a real transaction in Rain's sandbox, not merely an
+ * application record. Keeping it separate from card issuance lets a team demonstrate
+ * the control plane without filling the sandbox transaction history on every UI test.
+ */
+export function sandboxSettlementEnabled(): boolean {
+  return process.env.RAIN_SIMULATE_SETTLEMENT === "true";
+}
+
+/**
+ * Exercise a real scoped sandbox card exactly as a merchant would: authorize its exact
+ * PO amount, then capture it. A policy refusal never reaches this function because the
+ * pipeline calls it only after verification and issuance have both succeeded.
+ */
+export async function authorizeAndSettleSandboxCard({
+  cardId,
+  amountCents,
+  merchantName,
+  merchantCategoryCode,
+}: {
+  cardId: string;
+  amountCents: number;
+  merchantName: string;
+  merchantCategoryCode: string;
+}): Promise<SandboxCardSettlement> {
+  if (!Number.isSafeInteger(amountCents) || amountCents <= 0) {
+    throw new Error(`Sandbox settlement amount must be a positive integer, got ${amountCents}.`);
+  }
+
+  const authorization = await rainFetch<{
+    transactionId: string;
+    status: "authorized" | "declined" | "settled";
+    declinedReason?: string;
+  }>("/simulate/transactions/authorize", {
+    method: "POST",
+    body: JSON.stringify({
+      cardId,
+      amount: amountCents,
+      currency: "USD",
+      merchantName,
+      merchantCategoryCode,
+    }),
+  });
+
+  if (authorization.status !== "authorized") {
+    throw new Error(
+      `Rain sandbox authorization did not approve the scoped card: ${authorization.declinedReason ?? authorization.status}.`
+    );
+  }
+
+  const settlement = await rainFetch<{
+    transactionId: string;
+    status: "authorized" | "declined" | "settled";
+  }>(`/simulate/transactions/${authorization.transactionId}/settle`, {
+    method: "POST",
+    body: JSON.stringify({ amount: amountCents }),
+  });
+
+  if (settlement.status !== "settled") {
+    throw new Error(`Rain sandbox capture did not settle: ${settlement.status}.`);
+  }
+  if (settlement.transactionId !== authorization.transactionId) {
+    throw new Error("Rain sandbox returned a different transaction id at settlement.");
+  }
+
+  return {
+    transactionId: settlement.transactionId,
+    status: "settled",
+    amountCents,
+    merchantName,
+    merchantCategoryCode,
+  };
+}
+
 /** Design decision from RETHINK.md: deactivate once the job is done. Confirm the endpoint
  * exists before relying on it in the demo; if it doesn't, this stage is simply skipped. */
 /**

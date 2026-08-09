@@ -328,6 +328,7 @@ export function AgentJourney({
                   {decision.outcome === "approved" ? "Payment is ready for this order" : decision.outcome === "held" ? "This order needs someone with more authority" : "This order was stopped before payment"}
                 </p>
                 {decision.card && <p className="mt-1 text-[12.5px] text-mint-700">Rain card ••••{decision.card.last4} · capped at {money(decision.card.limitCents)}</p>}
+                {decision.card?.rainSettlement && <p className="mt-1 font-mono text-[11.5px] text-mint-700">Rain sandbox settled · {decision.card.rainSettlement.transactionId}</p>}
               </div>
               <Button variant="default" onClick={() => generateReceipt(decision)}>Download purchase receipt</Button>
             </div>
