@@ -4,6 +4,32 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Scan to attack — the room becomes the demo
+
+The challenge panel was the strongest thing here and it was passive: a judge had to find
+it and work out what it was for. Now it is the pitch.
+
+A QR on screen. *"Don't take our word for it — scan it and try to get money out, from your
+seat, right now."* Their phones hit the live deployment, and the counter behind you moves
+while you are still talking, because everyone is attacking the same log.
+
+- **The scoreboard is derived from the append-only log, not incremented alongside it.** A
+  counter that ticks separately from the decisions it counts can drift, and the one number
+  this project cannot afford to have doubted is the one saying nobody has beaten it.
+  Computed from the record, every attempt is a row a judge can open.
+- **A refusal is not a defeat.** Only a card issued for an order the record does not
+  support counts, compared against the snapshot the decision itself stored. Three tests
+  cover it, including one that forges a defeat to prove the counter cannot hide one.
+- The QR encodes `window.location.origin`, never a hardcoded URL, so it is right on
+  localhost, on a preview and in production without anyone remembering to change it — and
+  it says so on screen when it would only point at a laptop.
+- Attempts are tagged `challenger`, so a judge's attack is never confused with a demo task.
+
+It accumulates across every pitch. By the last one the number is real and it is theirs.
+
+Also removed `scripts/probe-tmp.ts`, a debug script that was committed by accident.
+
+
 ## 2026-08-08 · Stale counts, fixed as a class rather than a list
 
 Fourth time correcting numbers that were true three commits ago, so this time the fix is a

@@ -5,6 +5,8 @@ import type { CheckResult, Decision, PurchaseOrder, Rule } from "@/lib/types";
 import { poTotal } from "@/lib/types";
 import { money } from "@/lib/format";
 import { Badge, Button, Panel } from "../ui";
+import { ScanToAttack } from "./ScanToAttack";
+import { CHALLENGER, type ChallengeStats } from "@/lib/challenge";
 
 /**
  * Beat the checks — hand the judge the attack.
@@ -125,11 +127,14 @@ function ScoreTile({ value, label, tone }: { value: string; label: string; tone:
 export function ChallengePanel({
   blankPO,
   rules,
+  stats,
   busy,
   onAttempt,
 }: {
   blankPO: PurchaseOrder;
   rules: Rule[];
+  /** Shared across everyone hitting this deployment, derived from the decision log. */
+  stats: ChallengeStats;
   busy: boolean;
   onAttempt: (po: PurchaseOrder, agent?: string) => Promise<Decision>;
 }) {
@@ -148,7 +153,7 @@ export function ChallengePanel({
 
   const defeats = attempts.filter((a) => a.defeat).length;
 
-  async function fire(po: PurchaseOrder, label: string, agent?: string) {
+  async function fire(po: PurchaseOrder, label: string, agent = CHALLENGER) {
     const decision = await onAttempt(po, agent);
     const caughtBy = decision.checks.filter((c) => !c.passed);
 
@@ -199,8 +204,12 @@ export function ChallengePanel({
         being refused means it worked.
       </p>
 
+      <div className="border-b border-edge px-4 py-4">
+        <ScanToAttack stats={stats} />
+      </div>
+
       <div className="flex gap-2 px-4 py-3">
-        <ScoreTile value={String(defeats)} label="checks defeated" tone="zero" />
+        <ScoreTile value={String(defeats)} label="defeated in this tab" tone="zero" />
         <ScoreTile
           value={`${triggered.size}/${enabledRules.length}`}
           label="checks you've run into"

@@ -26,11 +26,13 @@ import { Footer } from "@/components/layout/Footer";
 import { LoadingRain } from "@/components/layout/LoadingRain";
 import { Badge } from "@/components/ui";
 import { diffRules } from "@/lib/rules/diff";
+import type { ChallengeStats } from "@/lib/challenge";
 
 interface State {
   storage: "memory" | "postgres";
   rain: { mode: "off" | "simulated" | "live"; reason?: string };
   anchoringEnabled: boolean;
+  challenge: ChallengeStats;
   ephemeralInProduction: boolean;
   decisions: Decision[];
   ruleSets: RuleSet[];
@@ -485,6 +487,7 @@ export default function Page() {
           <ChallengePanel
             blankPO={state.blankPO}
             rules={currentRuleSet.rules}
+            stats={state.challenge}
             busy={busy}
             onAttempt={attempt}
           />

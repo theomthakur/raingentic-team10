@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
 import { anchoringEnabled } from "@/lib/monad/anchor";
+import { challengeStats } from "@/lib/challenge";
 import { rainIssuanceStatus } from "@/lib/rain/issuer";
 import { BLANK_PO, NEGOTIATED_TASKS, TASKS } from "@/lib/fixtures/tasks";
 import { COST_CENTRES } from "@/lib/fixtures/records";
@@ -25,6 +26,9 @@ export async function GET() {
     // environment says nothing about whether Rain accepts the call.
     rain: rainIssuanceStatus(),
     anchoringEnabled: anchoringEnabled(),
+    // Shared across everyone hitting this URL, so a judge attacking from their phone
+    // moves the same number the projector is showing.
+    challenge: challengeStats(decisions),
     // Deployed with no database: the log lives in serverless memory and empties on the
     // next cold start, so replay silently breaks on the exact URL we submit. It works
     // perfectly on a laptop either way, which is what makes it dangerous — so say it

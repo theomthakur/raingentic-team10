@@ -749,6 +749,44 @@ asyncTest("a released line can be claimed again, so a failure is not a permanent
   assert.equal(await store.claimOrderLine("PO-RETRY"), true);
 });
 
+// --- the shared challenge scoreboard ----------------------------------------
+
+test("the scoreboard counts only tagged attempts, not demo tasks", () => {
+  const { challengeStats, CHALLENGER } = require("@/lib/challenge");
+  const mixed = [
+    { ...history[0], agent: CHALLENGER },
+    { ...history[1], agent: "procurement-01" },
+    { ...history[2], agent: CHALLENGER },
+  ] as Decision[];
+  assert.equal(challengeStats(mixed).attempts, 2);
+});
+
+test("a refusal is not a defeat — only a card the record cannot support is", () => {
+  const { challengeStats, CHALLENGER, deviatesFromRecord } = require("@/lib/challenge");
+
+  // Refused, and deviating: the check worked. Not a defeat.
+  const refused = history.find((d) => d.outcome === "refused" && deviatesFromRecord(d));
+  assert.ok(refused, "no refused, deviating decision in the seeded history");
+  assert.equal(challengeStats([{ ...refused, agent: CHALLENGER }] as Decision[]).defeats, 0);
+
+  // Approved and matching the record: an honest purchase. Also not a defeat.
+  const honest = history.find((d) => d.outcome === "approved" && !deviatesFromRecord(d));
+  assert.ok(honest, "no honest approval in the seeded history");
+  assert.equal(challengeStats([{ ...honest, agent: CHALLENGER }] as Decision[]).defeats, 0);
+});
+
+test("an approved purchase that deviates from the record IS a defeat", () => {
+  const { challengeStats, CHALLENGER } = require("@/lib/challenge");
+  const base = history.find((d) => d.outcome === "approved" && d.record.quote)!;
+  // Force the shape a defeat would take: a card issued against a mismatched line.
+  const forged = {
+    ...base,
+    agent: CHALLENGER,
+    po: { ...base.po, vendor: "Halloway Trading" },
+  } as Decision;
+  assert.equal(challengeStats([forged]).defeats, 1, "the counter must not hide a real defeat");
+});
+
 // --- no stale numbers on any surface ----------------------------------------
 
 asyncTest("no page or document quotes a count from an older build", async () => {
