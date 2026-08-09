@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { getCatalog, type CatalogProduct } from "@/lib/catalog";
 import type { Decision } from "@/lib/types";
 import { money } from "@/lib/format";
@@ -18,6 +18,90 @@ const SUGGESTIONS = [
 ];
 
 const WEEKLY_OBJECTIVE = "Keep office and engineering teams supplied through competitively sourced orders without exhausting any budget.";
+
+type BrowserSpeechRecognition = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+};
+
+type SpeechConstructor = new () => BrowserSpeechRecognition;
+
+/**
+ * Voice is an alternate way to express intent, not a second agent or a payment bypass.
+ * The resulting words go into the same text input and take the exact same intake,
+ * negotiation, mandate, and card route as a typed request.
+ */
+function VoiceRequestButton({
+  disabled,
+  onTranscript,
+}: {
+  disabled: boolean;
+  onTranscript: (text: string) => void;
+}) {
+  const recognition = useRef<BrowserSpeechRecognition | null>(null);
+  const [supported, setSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const browserWindow = window as Window & {
+      SpeechRecognition?: SpeechConstructor;
+      webkitSpeechRecognition?: SpeechConstructor;
+    };
+    const Constructor = browserWindow.SpeechRecognition ?? browserWindow.webkitSpeechRecognition;
+    setSupported(Boolean(Constructor));
+    if (!Constructor) return;
+
+    const next = new Constructor();
+    next.continuous = false;
+    next.interimResults = false;
+    next.lang = "en-US";
+    next.onresult = (event) => {
+      const text = Array.from(event.results)
+        .map((result) => result[0]?.transcript ?? "")
+        .join(" ")
+        .trim();
+      if (text) onTranscript(text);
+    };
+    next.onerror = (event) => {
+      // Permission denial and recognition failures should never block typed input.
+      setError(event.error === "not-allowed" ? "Microphone access was not allowed." : "I could not hear that. Try again or type your request.");
+      setListening(false);
+    };
+    next.onend = () => setListening(false);
+    recognition.current = next;
+
+    return () => recognition.current?.stop();
+  }, [onTranscript]);
+
+  if (!supported) return null;
+
+  function toggle() {
+    if (disabled || !recognition.current) return;
+    setError(null);
+    if (listening) {
+      recognition.current.stop();
+      return;
+    }
+    setListening(true);
+    recognition.current.start();
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <Button variant="default" onClick={toggle} disabled={disabled} title="Speak a purchasing request">
+        <span className="inline-flex items-center gap-1.5"><span className={`h-2 w-2 rounded-full ${listening ? "animate-pulse bg-red-500" : "bg-rain-500"}`} />{listening ? "Listening…" : "Speak request"}</span>
+      </Button>
+      {error && <p className="text-[11px] text-fail">{error}</p>}
+    </div>
+  );
+}
 
 /**
  * The customer-facing orchestration surface.
@@ -40,6 +124,9 @@ export function AgentJourney({
   const [decision, setDecision] = useState<Decision | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [autonomous, setAutonomous] = useState(false);
+  const appendTranscript = useCallback((transcript: string) => {
+    setMessage((current) => (current ? `${current} ${transcript}` : transcript));
+  }, []);
 
   async function runProduct(nextProduct: CatalogProduct, quantity: number, autonomousRun: boolean) {
     setProduct(nextProduct);
@@ -214,7 +301,12 @@ export function AgentJourney({
                 <Button type="submit" variant="primary" disabled={!message.trim()}>
                   Delegate to agent
                 </Button>
+                <VoiceRequestButton
+                  disabled={busy}
+                  onTranscript={appendTranscript}
+                />
               </form>
+              <p className="mt-2 text-[11.5px] text-ink-400">Speak a request, review the words, then delegate it to your agent.</p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="text-[11.5px] text-ink-400">Try:</span>
                 {SUGGESTIONS.map((suggestion) => (
