@@ -4,6 +4,30 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Reset did not reset the headline demo
+
+The first beat of the pitch — run a negotiated task, get a card — was returning a refusal
+on the live deployment, and **resetting would not have fixed it.**
+
+A negotiated task writes its own accepted quote (`PO-71DDF45D`) and marks it fulfilled on
+settlement. Reset restored only the seven *seeded* quotes, so that row survived with
+`fulfilled: true` and every later run was refused as a duplicate spend. The demo could be
+run exactly once per deployment, and the only way back was a redeploy.
+
+The memory driver never had this because it rebuilds state from scratch; Postgres — the one
+in production — restored a subset. Reset now clears quotes that are not seeded, so the
+negotiation recreates its own on the next run.
+
+Verified by running the whole cycle twice: issued → refused → **reset** → issued → refused.
+A test covers the invariant, including that seeded quotes still survive.
+
+**Also fixed:** `/api/rain/ping` returned 403 on a working connection. It called the
+collateral endpoint that our tenant is not permitted to use, which says nothing about
+whether the credentials work. It now probes `/issuing/users/{id}` and distinguishes
+"credentials broken" from "no collateral linked" — two different problems that were being
+reported as one.
+
+
 ## 2026-08-08 · The pitch leads with the real card, and ends on their hands
 
 Real scoped Rain cards are now being issued on the live deployment — verified from
