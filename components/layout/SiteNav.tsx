@@ -15,11 +15,11 @@ import Link from "next/link";
  */
 
 export const PAGES = [
-  { href: "/", label: "Mandate", blurb: "give the agent a goal" },
-  { href: "/workspace", label: "Activity", blurb: "orders, budgets, and approvals" },
-  { href: "/catalog", label: "Sourcing", blurb: "catalogue and supplier competition" },
+  { href: "/", label: "Start", blurb: "give Mandate a goal" },
+  { href: "/workspace", label: "Orders", blurb: "orders, budgets, and approvals" },
+  { href: "/catalog", label: "Suppliers", blurb: "catalogue and supplier competition" },
   { href: "/agents", label: "Agents", blurb: "who is allowed to spend" },
-  { href: "/architecture", label: "Proof", blurb: "controls, Rain, and Monad" },
+  { href: "/architecture", label: "How it works", blurb: "controls, Rain, and Monad" },
   { href: "/presentation", label: "Deck", blurb: "the pitch" },
 ] as const;
 
