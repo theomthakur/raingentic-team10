@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { getCatalog, type CatalogProduct } from "@/lib/catalog";
 import type { Decision } from "@/lib/types";
 import { money } from "@/lib/format";
@@ -19,90 +19,6 @@ const SUGGESTIONS = [
 
 const WEEKLY_OBJECTIVE = "Keep office and engineering teams supplied through competitively sourced orders without exhausting any budget.";
 
-type BrowserSpeechRecognition = {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: ((event: { error?: string }) => void) | null;
-  onend: (() => void) | null;
-};
-
-type SpeechConstructor = new () => BrowserSpeechRecognition;
-
-/**
- * Voice is an alternate way to express intent, not a second agent or a payment bypass.
- * The resulting words go into the same text input and take the exact same intake,
- * negotiation, mandate, and card route as a typed request.
- */
-function VoiceRequestButton({
-  disabled,
-  onTranscript,
-}: {
-  disabled: boolean;
-  onTranscript: (text: string) => void;
-}) {
-  const recognition = useRef<BrowserSpeechRecognition | null>(null);
-  const [supported, setSupported] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const browserWindow = window as Window & {
-      SpeechRecognition?: SpeechConstructor;
-      webkitSpeechRecognition?: SpeechConstructor;
-    };
-    const Constructor = browserWindow.SpeechRecognition ?? browserWindow.webkitSpeechRecognition;
-    setSupported(Boolean(Constructor));
-    if (!Constructor) return;
-
-    const next = new Constructor();
-    next.continuous = false;
-    next.interimResults = false;
-    next.lang = "en-US";
-    next.onresult = (event) => {
-      const text = Array.from(event.results)
-        .map((result) => result[0]?.transcript ?? "")
-        .join(" ")
-        .trim();
-      if (text) onTranscript(text);
-    };
-    next.onerror = (event) => {
-      // Permission denial and recognition failures should never block typed input.
-      setError(event.error === "not-allowed" ? "Microphone access was not allowed." : "I could not hear that. Try again or type your request.");
-      setListening(false);
-    };
-    next.onend = () => setListening(false);
-    recognition.current = next;
-
-    return () => recognition.current?.stop();
-  }, [onTranscript]);
-
-  if (!supported) return null;
-
-  function toggle() {
-    if (disabled || !recognition.current) return;
-    setError(null);
-    if (listening) {
-      recognition.current.stop();
-      return;
-    }
-    setListening(true);
-    recognition.current.start();
-  }
-
-  return (
-    <div className="flex flex-col items-start gap-1">
-      <Button variant="default" onClick={toggle} disabled={disabled} title="Speak a purchasing request">
-        <span className="inline-flex items-center gap-1.5"><span className={`h-2 w-2 rounded-full ${listening ? "animate-pulse bg-red-500" : "bg-rain-500"}`} />{listening ? "Listening…" : "Speak request"}</span>
-      </Button>
-      {error && <p className="text-[11px] text-fail">{error}</p>}
-    </div>
-  );
-}
-
 /**
  * The customer-facing orchestration surface.
  *
@@ -119,14 +35,11 @@ export function AgentJourney({
   const catalog = useMemo(() => getCatalog(), []);
   const [message, setMessage] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [status, setStatus] = useState("Tell Mandate what needs to happen. Then step back.");
+  const [status, setStatus] = useState("Hi — what would you like me to buy or keep stocked?");
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [decision, setDecision] = useState<Decision | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [autonomous, setAutonomous] = useState(false);
-  const appendTranscript = useCallback((transcript: string) => {
-    setMessage((current) => (current ? `${current} ${transcript}` : transcript));
-  }, []);
 
   async function runProduct(nextProduct: CatalogProduct, quantity: number, autonomousRun: boolean) {
     setProduct(nextProduct);
@@ -262,14 +175,21 @@ export function AgentJourney({
   return (
     <section aria-label="Mandate agent journey" className="mx-auto max-w-5xl">
       <div className="text-center">
-        <Badge tone="rain">Autonomous purchasing, inside your mandate</Badge>
+        <Badge tone="rain">Mandate</Badge>
         <h2 className="mt-4 font-display text-[38px] font-medium leading-[1.05] tracking-[-0.03em] text-ink-900 sm:text-[50px]">
-          Give the goal. Your agent handles the work.
+          Tell us what you need.<br />Mandate handles the rest.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
-          Mandate sources the order, verifies the exact spend against your limits, and only
-          then creates a scoped payment authority. You see the result—not the busywork.
+          Your purchasing agent finds suppliers, checks what is safe to spend, makes the
+          payment, and sends you the receipt. You set the goal; Mandate does the chasing.
         </p>
+        <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-2 text-left sm:grid-cols-4">
+          {["Tell Mandate", "Compare suppliers", "Pay safely", "Get your receipt"].map((step, index) => (
+            <div key={step} className="rounded-xl border border-edge bg-white px-3 py-2.5 text-[12px] text-ink-700 shadow-sm">
+              <span className="mr-1.5 font-mono text-rain-600">{index + 1}.</span>{step}
+            </div>
+          ))}
+        </div>
       </div>
 
       <Panel className="mt-8 overflow-hidden border-rain-200 shadow-[0_16px_50px_rgba(91,71,196,0.08)]">
@@ -277,10 +197,10 @@ export function AgentJourney({
           <div className="flex items-center gap-3">
             <AgentAvatar id="procurement-01" size={36} />
             <div>
-              <p className="text-[14px] font-semibold text-ink-900">Mandate purchasing agent</p>
-              <p className="text-[12.5px] text-muted">I source, negotiate, verify, and pay within the mandate you set.</p>
+              <p className="text-[14px] font-semibold text-ink-900">Mandate, your purchasing agent</p>
+              <p className="text-[12.5px] text-muted">Tell me the outcome. I will take care of the order.</p>
             </div>
-            {autonomous && <span className="ml-auto"><Badge tone="rain">running unattended</Badge></span>}
+            {autonomous && <span className="ml-auto"><Badge tone="rain">handling this for you</Badge></span>}
           </div>
         </div>
 
@@ -299,16 +219,11 @@ export function AgentJourney({
                   className="min-w-0 flex-1 rounded-xl border border-edge bg-white px-4 py-3 text-[14px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
                 />
                 <Button type="submit" variant="primary" disabled={!message.trim()}>
-                  Delegate to agent
+                  Ask Mandate
                 </Button>
-                <VoiceRequestButton
-                  disabled={busy}
-                  onTranscript={appendTranscript}
-                />
               </form>
-              <p className="mt-2 text-[11.5px] text-ink-400">Speak a request, review the words, then delegate it to your agent.</p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-[11.5px] text-ink-400">Try:</span>
+                <span className="text-[11.5px] text-ink-400">Try one:</span>
                 {SUGGESTIONS.map((suggestion) => (
                   <button
                     key={suggestion}
@@ -321,12 +236,12 @@ export function AgentJourney({
                 ))}
               </div>
               <div className="mt-5 border-t border-edge pt-4">
-                <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Or let it run unattended</p>
+                <p className="text-[11.5px] font-medium uppercase tracking-wider text-ink-400">Or let Mandate decide</p>
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rain-100 bg-rain-50/60 px-3.5 py-3">
                   <p className="max-w-xl text-[12.5px] leading-relaxed text-ink-700">
                     <strong>Weekly sourcing mandate:</strong> Keep office and engineering teams supplied through competitively sourced orders without exhausting a budget.
                   </p>
-                  <Button variant="default" onClick={runWeeklyRoutine}>Run routine</Button>
+                  <Button variant="default" onClick={runWeeklyRoutine}>Take care of it</Button>
                 </div>
               </div>
             </>
@@ -335,7 +250,7 @@ export function AgentJourney({
           {busy && (
             <div className="mt-5 flex items-center gap-3 rounded-xl border border-rain-100 bg-white px-4 py-3 text-[13px] text-rain-700">
               <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-rain-500" />
-              {phase === "understanding" ? "Interpreting the goal and assigning the specialist" : phase === "sourcing" ? "Supplier competition in progress" : "Verifying the exact order against the mandate"}
+              {phase === "understanding" ? "Understanding what you need" : phase === "sourcing" ? "Comparing supplier quotes" : "Making sure this order is safe"}
             </div>
           )}
           {error && <p className="mt-4 text-[13px] text-fail">{error}</p>}
@@ -355,8 +270,8 @@ export function AgentJourney({
           <div className="border-t border-edge px-5 py-5 sm:px-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">1 · Suppliers competed</p>
-                <p className="mt-1 text-[13px] text-muted">Modeled supplier profiles; real negotiation logic. The winner becomes the PO.</p>
+                <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">1 · Supplier quotes</p>
+                <p className="mt-1 text-[13px] text-muted">Mandate compared the options and chose the best qualifying offer.</p>
               </div>
               <Badge tone="rain">{decision.negotiation.offers.length} bids</Badge>
             </div>
@@ -377,7 +292,7 @@ export function AgentJourney({
 
         {decision && (
           <div className="border-t border-edge px-5 py-5 sm:px-7">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">{decision.negotiation ? "2" : "1"} · Mandate verified the order</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">{decision.negotiation ? "2" : "1"} · Safety check</p>
             <div className="mt-3 flex flex-wrap items-start justify-between gap-4 rounded-xl border border-edge bg-white p-4">
               <div>
                 <p className="font-mono text-[13px] font-semibold text-ink-900">{decision.po.poNumber}</p>
@@ -388,7 +303,7 @@ export function AgentJourney({
             </div>
             <details className="group mt-3 rounded-xl border border-edge bg-ink-50/50">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-[12.5px] text-ink-700 marker:hidden">
-                <span><strong>{passed} controls passed.</strong> Review why this order was safe.</span>
+                <span><strong>{passed} checks passed.</strong> See why this order is safe.</span>
                 <span className="font-mono text-[11px] text-rain-600 group-open:hidden">show checks +</span>
                 <span className="hidden font-mono text-[11px] text-rain-600 group-open:inline">hide checks −</span>
               </summary>
@@ -407,15 +322,15 @@ export function AgentJourney({
           <div className="border-t border-edge bg-ink-50/40 px-5 py-5 sm:px-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">{decision.negotiation ? "3" : "2"} · Order outcome</p>
+                <p className="text-[12px] font-semibold uppercase tracking-wider text-rain-600">{decision.negotiation ? "3" : "2"} · Your order</p>
                 <p className="mt-1 text-[15px] font-semibold text-ink-900">
-                  {decision.outcome === "approved" ? "Scoped payment authority issued" : decision.outcome === "held" ? "Held for a person with more authority" : "Purchase refused before payment"}
+                  {decision.outcome === "approved" ? "Payment is ready for this order" : decision.outcome === "held" ? "This order needs someone with more authority" : "This order was stopped before payment"}
                 </p>
                 {decision.card && <p className="mt-1 text-[12.5px] text-mint-700">Rain card ••••{decision.card.last4} · capped at {money(decision.card.limitCents)}</p>}
               </div>
               <Button variant="default" onClick={() => generateReceipt(decision)}>Download purchase receipt</Button>
             </div>
-            <p className="mt-3 text-[12px] leading-relaxed text-muted">The receipt is generated from the decision record. The governing policy is anchored on Monad testnet; the full audit is available in Console.</p>
+            <p className="mt-3 text-[12px] leading-relaxed text-muted">Your receipt is saved with the order. Open the evidence section only if you want to inspect the details.</p>
           </div>
         )}
       </Panel>
