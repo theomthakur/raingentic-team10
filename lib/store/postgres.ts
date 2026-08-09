@@ -308,6 +308,16 @@ export function createPostgresStore(): Store {
       await sql`delete from line_claims`;
       await sql`delete from decisions where seeded = false`;
       await sql`delete from rule_sets where version > 1`;
+
+      // 🔴 Quotes a negotiation created must go too, or reset does not actually reset the
+      // demo. A negotiated task writes its own accepted quote (PO-71DDF45D and friends),
+      // and settlement marks it fulfilled. Restoring only the seeded quotes left that row
+      // behind with `fulfilled: true`, so the very first press of "Run task" after a reset
+      // was refused as a duplicate — the headline moment, broken, with no way back short
+      // of a redeploy. The memory driver never had this because it rebuilds from scratch.
+      const seededPoNumbers = SEED_QUOTES.map((q) => q.poNumber);
+      await sql`delete from quotes where po_number != ALL(${seededPoNumbers})`;
+
       await seedAll(sql);
       // Restore fixture quantities that live runs mutated.
       for (const q of SEED_QUOTES) {

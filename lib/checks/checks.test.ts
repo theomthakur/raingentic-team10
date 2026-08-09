@@ -787,6 +787,40 @@ test("an approved purchase that deviates from the record IS a defeat", () => {
   assert.equal(challengeStats([forged]).defeats, 1, "the counter must not hide a real defeat");
 });
 
+// --- reset actually resets the demo -----------------------------------------
+
+asyncTest("reset clears quotes a negotiation created, not just the seeded ones", async () => {
+  // The headline demo runs a negotiated task, which writes its own accepted quote and then
+  // marks it fulfilled on settlement. If reset restores only the seeded quotes, that row
+  // survives as fulfilled and the very next run is refused as a duplicate — the demo's
+  // first beat, broken, with no way back short of a redeploy.
+  const { createMemoryStore } = await import("@/lib/store/memory");
+  const store = createMemoryStore();
+  await store.reset();
+
+  await store.recordAcceptedQuote({
+    poNumber: "PO-NEGOTIATED",
+    status: "accepted",
+    fulfilled: false,
+    vendor: "Staples Business",
+    sku: "SKU-4471",
+    unitPrice: 4284,
+    quantity: 10,
+    quoteExpiry: "2026-09-01T00:00:00.000Z",
+  });
+  await store.markFulfilled("PO-NEGOTIATED");
+  assert.equal((await store.getQuote("PO-NEGOTIATED"))?.fulfilled, true);
+
+  await store.reset();
+  assert.equal(
+    await store.getQuote("PO-NEGOTIATED"),
+    null,
+    "a negotiated quote must not survive a reset, or the demo cannot be re-run"
+  );
+  // The seeded quotes must still be there — reset restores the demo, it does not empty it.
+  assert.ok(await store.getQuote("PO-4417"), "seeded quotes must survive a reset");
+});
+
 // --- no stale numbers on any surface ----------------------------------------
 
 asyncTest("no page or document quotes a count from an older build", async () => {
