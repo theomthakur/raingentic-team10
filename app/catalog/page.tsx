@@ -26,24 +26,6 @@ interface RunResult {
   stages: Stage[];
 }
 
-const PRODUCT_TERMS: Array<{ terms: string[]; id: string }> = [
-  { id: "office-supplies", terms: ["paper", "a4", "ream"] },
-  { id: "cloud-compute", terms: ["gpu", "compute", "a100", "training"] },
-  { id: "PO-4417", terms: ["bracket", "mounting"] },
-  { id: "PO-4418", terms: ["sensor", "proximity"] },
-  { id: "PO-4419", terms: ["alloy", "billet", "stock"] },
-  { id: "PO-4421", terms: ["chair", "chairs", "task chair"] },
-  { id: "PO-4422", terms: ["freight", "lane", "shipping"] },
-  { id: "PO-4423", terms: ["conveyor", "conveyer"] },
-];
-
-function interpretRequest(text: string, catalog: CatalogProduct[]) {
-  const normalized = text.toLowerCase();
-  const match = PRODUCT_TERMS.find(({ terms }) => terms.some((term) => normalized.includes(term)));
-  const product = match ? catalog.find((item) => item.id === match.id) : undefined;
-  const quantity = Number(normalized.match(/\b(\d+)\b/)?.[1] ?? product?.quotedQuantity ?? 1);
-  return product && Number.isFinite(quantity) && quantity > 0 ? { product, quantity } : null;
-}
 
 function Stepper({
   value,
@@ -282,22 +264,63 @@ function RequestChat({
 }) {
   const [request, setRequest] = useState("");
   const [match, setMatch] = useState<{ product: CatalogProduct; quantity: number } | null>(null);
+  const [thinking, setThinking] = useState(false);
+  // Which path read the request. Shown on screen, because implying a model ran when it
+  // did not is the exact overclaim this project argues against.
+  const [via, setVia] = useState<"model" | "keywords" | null>(null);
   const [reply, setReply] = useState(
     "Tell me what you need. I’ll route it to the right purchasing agent and keep the work inside your mandate."
   );
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  /**
+   * Read the request, then route it.
+   *
+   * The reading is the one place a model is allowed to interpret: /api/intake turns a
+   * sentence into { productId, quantity } and nothing more. Whether the purchase is
+   * *allowed* is still decided downstream by the same eleven deterministic checks, so a
+   * misreading produces a wrong request that gets judged exactly as harshly as any other,
+   * never a wrong decision.
+   */
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const next = interpretRequest(request, catalog);
-    if (!next) {
-      setMatch(null);
-      setReply("I couldn’t match that to an available request yet. Try A4 paper, GPU compute, brackets, sensors, chairs, freight, or conveyor equipment.");
-      return;
+    if (!request.trim() || thinking) return;
+
+    setThinking(true);
+    setMatch(null);
+    setReply("Reading that…");
+
+    try {
+      const res = await fetch("/api/intake", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: request }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setReply(data.error ?? "I could not match that to anything in the catalogue.");
+        return;
+      }
+
+      const product = catalog.find((item) => item.id === data.productId);
+      if (!product) {
+        setReply("I could not match that to anything in the catalogue.");
+        return;
+      }
+
+      const next = { product, quantity: data.quantity as number };
+      const agent = getAgent(product.agent);
+      onMatch(product, next.quantity);
+      setMatch(next);
+      setVia(data.via === "model" ? "model" : "keywords");
+      setReply(
+        `Got it — ${data.understood}. Routed to ${agent.name}. ${agent.assurance}`
+      );
+    } catch {
+      setReply("I could not reach the intake service. Try one of the cards below.");
+    } finally {
+      setThinking(false);
     }
-    const agent = getAgent(next.product.agent);
-    onMatch(next.product, next.quantity);
-    setMatch(next);
-    setReply(`Got it. I’ve routed ${next.quantity} ${next.product.unit}${next.quantity === 1 ? "" : "s"} of ${next.product.name} to ${agent.name}. ${agent.assurance}`);
   }
 
   return (
@@ -315,8 +338,20 @@ function RequestChat({
             placeholder="What do you need?"
             className="min-w-0 flex-1 rounded-xl border border-edge bg-white px-3.5 py-2.5 text-[13px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-rain-400 focus:ring-2 focus:ring-rain-100"
           />
-          <Button type="submit" variant="primary" disabled={!request.trim() || busy}>Find my agent</Button>
+          <Button type="submit" variant="primary" disabled={!request.trim() || busy || thinking}>
+            {thinking ? "Reading…" : "Find my agent"}
+          </Button>
         </form>
+
+        {/* Say which path read the request. A keyword fallback dressed up as a model is
+            precisely the kind of quiet overclaim this whole product argues against. */}
+        {via && (
+          <p className="text-[11.5px] text-ink-400">
+            {via === "model"
+              ? "Read by the model, then handed to the deterministic checks."
+              : "Model unavailable — read by keyword matching, then handed to the same checks."}
+          </p>
+        )}
         {match && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rain-200 bg-white px-3.5 py-3">
             <p className="text-[12.5px] text-ink-700">
