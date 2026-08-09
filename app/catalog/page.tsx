@@ -536,7 +536,13 @@ export default function CatalogPage() {
             />
 
             <div className="mt-6">
-              <Autopilot catalog={catalog} />
+              <Autopilot
+                catalog={catalog}
+                onResult={(next) => {
+                  setError(null);
+                  setResult(next);
+                }}
+              />
             </div>
           </section>
 

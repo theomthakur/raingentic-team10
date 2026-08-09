@@ -37,7 +37,13 @@ interface Attempt {
 
 const MAX_STEPS = 5;
 
-export function Autopilot({ catalog }: { catalog: CatalogProduct[] }) {
+export function Autopilot({
+  catalog,
+  onResult,
+}: {
+  catalog: CatalogProduct[];
+  onResult?: (result: { decision: Decision; stages: Stage[] }) => void;
+}) {
   const [objective, setObjective] = useState(
     "Keep the office and engineering teams supplied for the week without exhausting any budget."
   );
@@ -122,6 +128,9 @@ export function Autopilot({ catalog }: { catalog: CatalogProduct[] }) {
           } else {
             const d = data.decision as Decision;
             const stages = data.stages as Stage[];
+            // The run log proves the agent was unattended; the shared result panel proves
+            // exactly what the payment authority did. Keep both in sync.
+            onResult?.({ decision: d, stages });
             last.outcome = d.outcome;
             last.totalCents = d.po.unitPrice * d.po.quantity;
             const closing =
