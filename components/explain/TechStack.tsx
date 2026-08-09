@@ -62,7 +62,7 @@ const ROWS: Row[] = [
   },
   {
     layer: "Tests",
-    tech: "tsx, 44 passing",
+    tech: "tsx, 84 passing",
     why: "Every check has cases on both sides of its boundary, including the ones that caught a replay bug misclassifying held decisions as refused.",
   },
 ];

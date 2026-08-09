@@ -749,6 +749,45 @@ asyncTest("a released line can be claimed again, so a failure is not a permanent
   assert.equal(await store.claimOrderLine("PO-RETRY"), true);
 });
 
+// --- no stale numbers on any surface ----------------------------------------
+
+asyncTest("no page or document quotes a count from an older build", async () => {
+  // This class of bug has come back four times: a count is corrected where someone points,
+  // and survives three lines away. Each pass fixed instances rather than the class, so this
+  // is the grep, run every time the suite runs.
+  const { readdirSync, readFileSync, statSync } = await import("node:fs");
+  const { join } = await import("node:path");
+
+  const walk = (dir: string): string[] =>
+    readdirSync(dir).flatMap((f) => {
+      const p = join(dir, f);
+      if (f === "node_modules" || f === ".next" || f.startsWith(".")) return [];
+      return statSync(p).isDirectory() ? walk(p) : [p];
+    });
+
+  // Historical documents record what was true when written and are deliberately exempt.
+  const EXEMPT = /CHANGELOG|RETHINK|PLAN-|CONTEXT|IDEAS|THE-PLAN|THE-IDEA|ABI-LESSON|WHAT-WINS|BUILD-PLAN|ALTERNATIVE|checks\.test\.ts/;
+
+  const STALE = [
+    /\b(29|41|44|82) (passing|tests)\b/,
+    /\b(47|54) (recorded |past |seeded )?decisions\b/,
+    /\bseeded (47|54)\b/,
+    /\b(six|seven) (rules|checks)\b/i,
+  ];
+
+  const offenders: string[] = [];
+  for (const file of [...walk("components"), ...walk("app"), ...walk("docs"), "README.md"]) {
+    if (!/\.(tsx?|md)$/.test(file) || EXEMPT.test(file)) continue;
+    const text = readFileSync(file, "utf8");
+    for (const re of STALE) {
+      const m = re.exec(text);
+      if (m) offenders.push(`${file}: "${m[0]}"`);
+    }
+  }
+
+  assert.deepEqual(offenders, [], `stale counts still on a live surface:\n  ${offenders.join("\n  ")}`);
+});
+
 // --- report ----------------------------------------------------------------
 
 /**

@@ -109,4 +109,4 @@ decorative. The UI already shows `anchored` / `local` per version.
 - [ ] `DATABASE_URL` set on the deployed build — without it the log empties on a cold start
 - [ ] Run-it-twice works on the deployed URL, not just localhost
 - [ ] `git ls-files | grep -i env` returns only `.env.local.example`
-- [ ] Reset demo button restores the seeded 54 so it can be re-run for a second judge
+- [ ] Reset demo button restores the seeded 60 so it can be re-run for a second judge

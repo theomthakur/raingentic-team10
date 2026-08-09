@@ -6,7 +6,7 @@ import { Badge, Panel } from "../ui";
  * This panel exists because "we check *why*" is too vague to survive a follow-up question
  * from someone who works at Rain. Every dimension below is quoted from Rain's own
  * published material rather than inferred, and the overlap is stated rather than hidden —
- * three of the seven checks partly duplicate controls Rain already enforces, and
+ * three of the eleven checks partly duplicate controls Rain already enforces, and
  * pretending otherwise in front of the people who built it would be the fastest way to
  * lose the argument.
  *

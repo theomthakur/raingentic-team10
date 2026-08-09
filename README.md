@@ -58,7 +58,7 @@ idempotency keys on every write      |  rule simulation against history
 
 ---
 
-## The six rules
+## The eleven checks
 
 They live as **versioned data**, not as code. Every threshold on the policy screen is a row
 in a table; nothing in `lib/checks` hardcodes a number.
@@ -106,7 +106,7 @@ Edit a rule in the console. It saves as a new version. Re-run the entire decisio
 against it and see the diff:
 
 > *"Across 60 recorded decisions, 9 decisions would now be refused and 0 refusals would now
-> pass. 39 unchanged."*
+> pass. 51 unchanged."*
 
 You can also preview a change before saving it, so a finance team can see what a policy
 edit would do to history before committing to it.
@@ -155,7 +155,7 @@ survive a cold start, and the decision log is what replay reads.
 | `lib/rules/` | Versioned rule data and the sha256 that gets anchored |
 | `lib/replay/` | Re-judging stored decisions against another rule version |
 | `lib/store/` | Append-only log. Postgres when `DATABASE_URL` is set, memory otherwise |
-| `lib/pipeline.ts` | The six stages in order |
+| `lib/pipeline.ts` | The ten stages in order |
 | `lib/rain/issuer.ts` | 🔴 The join seam with the Rain integration |
 | `lib/seed/` | 60 committed historical decisions, deterministically generated |
 | `app/api/` | `state`, `run`, `rules`, `replay`, `reset` |

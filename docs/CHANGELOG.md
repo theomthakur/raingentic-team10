@@ -4,6 +4,36 @@ What changed, when, and why. Newest first. Times are local (EDT).
 
 ---
 
+## 2026-08-08 · Stale counts, fixed as a class rather than a list
+
+Fourth time correcting numbers that were true three commits ago, so this time the fix is a
+test rather than a sweep. A review found seven; a proper grep found **eleven**, including a
+`47` and a `29` older than anything anyone had spotted.
+
+- `Deck.tsx` said **44 passing** in the STACK and STATUS arrays — slides 11 and 12 — after
+  the last commit fixed only the cover badge and the docstring. Its replay example still
+  said *"Across 47 recorded decisions"*. `TechStack.tsx` and the architecture page carried
+  44 and 29.
+- **README's arithmetic did not add up.** *"9 refused, 0 passed, 39 unchanged"* out of 60 is
+  48. The previous sweep changed two numbers in the sentence and left the third. It is 51.
+- `SUBMISSION.md` still said 54 in one place and 60 in another — the same document, and the
+  primary judge-facing one. The regex sweep matched `54 decisions` but not `54 past
+  decisions`, which is exactly how a sweep fails.
+- **A slide I made incoherent.** Relabelling the demo "Three steps live" while it still
+  rendered seven numbered steps and closed by referring to steps 2 and 4 was worse than
+  what it replaced. The label now describes what is actually on the slide.
+- **The objections slide opened with "No human is involved"** — putting the human topic
+  back at the top of the surface the reframe existed to demote. The model question leads
+  now, and the human row answers with the proportion instead of conceding the premise.
+
+**The guard:** a test walks `components`, `app`, `docs` and the README and fails on any
+count from an older build. Verified by breaking it deliberately and watching it fail. The
+planning trail and this changelog are exempt — they record what was true when written.
+
+Every number verified against the **production bundle**, not the source, since the deck
+renders one slide at a time and that is how the last three survived. 85 tests.
+
+
 ## 2026-08-08 · The deck catches up with the product, and one false claim goes
 
 A pitch-alignment review found three things the last two commits had missed.

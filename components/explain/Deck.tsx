@@ -144,14 +144,18 @@ const STACK: { layer: string; tech: string }[] = [
   { layer: "Verify path", tech: "Plain TypeScript, no dependencies, no model" },
   { layer: "Money", tech: "Integer cents end to end, never a float" },
   { layer: "Negotiation", tech: "Deterministic strategy engine with price floors" },
-  { layer: "Tests", tech: "tsx, 44 passing" },
+  { layer: "Tests", tech: "tsx, 84 passing" },
 ];
 
+// Led with "no human is involved" until the reframe, which put the human topic back at the
+// top of the slide the reframe existed to demote. The trust question about the model is the
+// one that actually decides whether any of this is believable, so it goes first — and the
+// human row now answers with the proportion rather than conceding the premise.
 const OBJECTIONS: { worry: string; answer: string }[] = [
-  { worry: "No human is involved", answer: "There is, above a limit you set — $25,000 by default." },
   { worry: "The AI decides what's allowed", answer: "It decides nothing. It proposes; plain code rules." },
   { worry: "Your rules could be wrong", answer: "They're the three-way match your finance team already runs." },
   { worry: "You could just change the rules", answer: "Takes two people, and every version is kept and hashed." },
+  { worry: "Are humans approving these?", answer: "35 of 41 had none. Above $25,000 one signs off — a boundary, not the model." },
 ];
 
 const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[] }[] = [
@@ -163,7 +167,7 @@ const STATUS: { tone: "pass" | "warn" | "neutral"; state: string; items: string[
       "Replay across the entire decision log",
       "Append-only log with per-decision provenance",
       "The deterministic negotiation engine, and the run-it-twice refusal",
-      "44 passing tests, with cases either side of every boundary",
+      "84 passing tests, with cases either side of every boundary",
     ],
   },
   {
@@ -420,7 +424,7 @@ const SLIDES: Slide[] = [
         </Title>
         <Panel className="mt-6">
           <p className="px-6 py-6 font-display text-[22px] font-medium leading-[1.4] text-ink-900 md:text-[26px]">
-            Across 47 recorded decisions, 8 that were approved would now be refused. 0
+            Across 60 recorded decisions, 9 that were approved would now be refused. 0
             refusals would now pass. 39 unchanged.
           </p>
         </Panel>
@@ -452,7 +456,7 @@ const SLIDES: Slide[] = [
   {
     id: "demo",
     label: "The demo",
-    eyebrow: "Three steps live, the rest on standby",
+    eyebrow: "Seven steps — the first four live, the rest on standby",
     body: (
       <div>
         <Title>

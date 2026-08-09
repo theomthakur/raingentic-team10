@@ -151,7 +151,7 @@ self-approval refusal (step 6) are the two that land.
 ## 5. Where everything lives
 
 ```
-lib/checks/          the 7 checks + verify(). Pure. No I/O, no model, no clock.
+lib/checks/          the 11 checks + verify(). Pure. No I/O, no model, no clock.
 lib/rules/           versioned rule data, sha256, diff between versions
 lib/replay/          re-judging stored decisions against another rule version
 lib/store/           append-only log. Postgres when DATABASE_URL is set, memory otherwise

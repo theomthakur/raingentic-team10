@@ -184,7 +184,7 @@ step. This isn't only about safety — it's what makes the next feature possible
 Because rules are versioned data, and because checking is perfectly repeatable, we can
 **re-run all of history against a rule you just changed**:
 
-> *"Across 54 past decisions, 8 that we approved would now be refused. 0 refusals would now
+> *"Across 60 past decisions, 9 that we approved would now be refused. 0 refusals would now
 > pass."*
 
 That's a real number from the running app, not a mock-up. It works because each decision

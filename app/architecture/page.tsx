@@ -287,7 +287,7 @@ export default function ArchitecturePage() {
           <Panel>
             <p className="px-5 py-4 text-[13.5px] leading-relaxed text-ink-700">
               The checks, rule versioning, replay, the append-only log, the negotiation
-              engine, and the run-it-twice refusal are all built and tested (29 passing
+              engine, and the run-it-twice refusal are all built and tested (84 passing
               tests). Card issuance currently returns a{" "}
               <Badge tone="warn">simulated</Badge> card, labelled as such in the console,
               because the Rain endpoint paths are still being confirmed on site — the client
