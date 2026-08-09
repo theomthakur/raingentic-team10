@@ -365,7 +365,13 @@ export function AgentJourney({
                 {decision.card && <p className="mt-1 text-[12.5px] text-mint-700">Rain card ••••{decision.card.last4} · capped at {money(decision.card.limitCents)}</p>}
                 {decision.card?.rainSettlement && <p className="mt-1 font-mono text-[11.5px] text-mint-700">Rain sandbox settled · {decision.card.rainSettlement.transactionId}</p>}
               </div>
-              <Button variant="default" onClick={() => generateReceipt(decision)}>Download purchase receipt</Button>
+              <Button variant="default" onClick={() => generateReceipt(decision)}>
+                {decision.outcome === "approved"
+                  ? "Download order receipt"
+                  : decision.outcome === "held"
+                    ? "Download approval brief"
+                    : "Download decision record"}
+              </Button>
             </div>
             <p className="mt-3 text-[12px] leading-relaxed text-muted">Your receipt is saved with the order. Open the evidence section only if you want to inspect the details.</p>
           </div>
