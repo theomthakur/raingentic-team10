@@ -4,6 +4,7 @@ import { SystemDiagram } from "@/components/explain/SystemDiagram";
 import { FlowDiagram } from "@/components/explain/FlowDiagram";
 import { TechStack } from "@/components/explain/TechStack";
 import { ControlCoverage } from "@/components/explain/ControlCoverage";
+import { PaymentRailPanel } from "@/components/explain/PaymentRailPanel";
 import { Footer } from "@/components/layout/Footer";
 import { PAGES, SubPageHeader } from "@/components/layout/SiteNav";
 
@@ -239,6 +240,13 @@ export default function ArchitecturePage() {
             Where Mandate ends and Rain begins
           </p>
           <ControlCoverage />
+        </section>
+
+        <section className="mb-10">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-400">
+            Beyond a card: programmable money rails
+          </p>
+          <PaymentRailPanel />
         </section>
 
         <section className="mb-10">
